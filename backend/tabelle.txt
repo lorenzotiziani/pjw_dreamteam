@@ -1,0 +1,30 @@
+TUtente
+    -id pk
+    -nome
+    -cognome
+    -email
+    -password
+
+TRubrica
+    -idUtente fk pk
+    -nominativo
+
+-TContoCorrente
+    -ContoId pk
+    -iban
+    -dataApertura
+    -idUtente fk
+
+-TCategorieMovimenti.  ->apertura conto - bonifico in entrata - bonifico in uscita - ricarica telefono - ricarica conto - 
+    -idCategoria pk
+    -NomeCategoria
+    -Tipo
+
+-TMovimentiContoCorrente
+    -idMovimento pk
+    -ContoId fk
+    -data
+    -importo
+    -saldo
+    -idCategoria fk
+    -descrizione

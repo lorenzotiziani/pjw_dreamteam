@@ -1,0 +1,31 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model TUtente {
+  id       Int     @id @default(autoincrement())
+  email    String
+  password String
+  nome     String
+  cognome  String
+  isActive Boolean @default(false)
+  role     String  @default("USER")
+
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String
+  userId    Int
+  expiresAt DateTime
+  isRevoked Boolean? @default(false)
+  createdAt DateTime
+
+  user TUtente @relation(fields: [userId], references: [id])
+}

@@ -1,0 +1,11 @@
+/.DS_Store
+.idea
+backend/.env
+frontend/node_modules
+frontend/dist
+backend/node_modules
+backend/dist
+backend/package-lock.json
+backend/package.json
+backend/prisma/migrations
+frontend/.angular

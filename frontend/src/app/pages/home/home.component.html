@@ -1,0 +1,37 @@
+<h1>BENVENUTO NELLA HOME</h1>
+
+<button class="btn btn-danger mb-4" (click)="logout()">Logout</button>
+
+
+<div *ngIf="isGraph; else tableView">
+    <div style="display: block; max-width: 700px; margin: auto;">
+        <canvas baseChart
+                [data]="barChartData"
+                [options]="barChartOptions"
+                [type]="barChartType">
+        </canvas>
+        <button class="btn btn-primary mt-3" (click)="toggleView()">Show Table</button>
+    </div>
+
+</div>
+
+<ng-template #tableView>
+    <div style="display: block;max-width: 700px; margin: auto;">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+            <tr>
+                <th>Mese</th>
+                <th>Vendite</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- We loop through the labels and use the index 'i' to get the data -->
+            <tr *ngFor="let label of barChartData.labels; let i = index">
+                <td>{{ label }}</td>
+                <td>{{ barChartData.datasets[0].data[i] }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-primary mt-3" (click)="toggleView()">Show Graph</button>
+    </div>
+</ng-template>
