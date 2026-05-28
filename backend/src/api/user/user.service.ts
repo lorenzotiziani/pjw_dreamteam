@@ -10,49 +10,49 @@ export interface UpdateUserData {
 }
 
 export interface UsersResponse {
-  users: Omit<User, 'password'>[];
+  users: Omit<User, 'pwd'>[];
   total: number;
   page: number;
   totalPages: number;
 }
 
 export class UserService {
-  static async getUserById(id: number): Promise<Omit<User, 'password'> | null> {
+  static async getUserById(id: number): Promise<Omit<User, 'pwd'> | null> {
     const user = await UserModel.findById(id);
 
     if (!user) {
       return null;
     }
 
-    const { password, ...userWithoutPassword } = user;
+    const { pwd, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
 
 
   static async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
-    // Verifica la password attuale
+    // Verifica la pwd attuale
     const user = await UserModel.findById(userId);
     if (!user) {
       throw new Error('Utente non trovato');
     }
 
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.pwd);
     if (!isCurrentPasswordValid) {
-      throw new Error('Password attuale non corretta');
+      throw new Error('pwd attuale non corretta');
     }
 
-    // Verifica che la nuova password sia diversa da quella attuale
-    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    // Verifica che la nuova pwd sia diversa da quella attuale
+    const isSamePassword = await bcrypt.compare(newPassword, user.pwd);
     if (isSamePassword) {
-      throw new Error('La nuova password deve essere diversa da quella attuale');
+      throw new Error('La nuova pwd deve essere diversa da quella attuale');
     }
 
-    // Hash della nuova password
+    // Hash della nuova pwd
     const hashedNewPassword = await bcrypt.hash(newPassword, 12);
 
-    // Aggiorna la password
-    await UserModel.update(userId, { password: hashedNewPassword });
+    // Aggiorna la pwd
+    await UserModel.update(userId, { pwd: hashedNewPassword });
 
     // Revoca tutti i refresh token per forzare un nuovo login
     await RefreshTokenModel.revokeByUserId(userId);

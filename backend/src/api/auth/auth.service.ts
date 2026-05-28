@@ -22,15 +22,14 @@ export class AuthService {
 
     const user = await UserModel.create({
       email: data.email,
-      password: hashedPassword,
+      pwd: hashedPassword,
       nome: data.nome,
       cognome: data.cognome,
       role: data.role,
-      isActive: false
     });
 
 
-    const { password, ...userWithoutPassword } = user;
+    const { pwd, ...userWithoutPassword } = user;
 
     return {
       message: 'Registrazione completata. Controlla la tua email per attivare l\'account.',
@@ -45,11 +44,7 @@ export class AuthService {
       throw new UnauthorizedError('Credenziali non valide');
     }
 
-    if (!user.isActive) {
-      throw new UnauthorizedError('Account non attivato. Controlla la tua email.');
-    }
-
-    const isValidPassword = await bcrypt.compare(data.password, user.password);
+    const isValidPassword = await bcrypt.compare(data.password, user.pwd);
     if (!isValidPassword) {
       throw new UnauthorizedError('Credenziali non valide');
     }
@@ -65,7 +60,7 @@ export class AuthService {
       isRevoked: false
     });
 
-    const { password, ...userWithoutPassword } = user;
+    const { pwd, ...userWithoutPassword } = user;
 
     return {
       user: userWithoutPassword,
@@ -96,11 +91,6 @@ export class AuthService {
     const user = await UserModel.findById(decoded.userId);
     if (!user) {
       throw new UnauthorizedError('Utente non trovato');
-    }
-
-    if (!user.isActive) {
-      await RefreshTokenModel.revokeByUserId(user.id);
-      throw new UnauthorizedError('Account disattivato');
     }
 
     await RefreshTokenModel.revokeByToken(token);
