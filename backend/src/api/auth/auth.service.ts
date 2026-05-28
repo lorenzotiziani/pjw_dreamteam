@@ -25,7 +25,7 @@ export class AuthService {
       pwd: hashedPassword,
       nome: data.nome,
       cognome: data.cognome,
-      role: data.role,
+      ruolo: 'USER', // la registrazione pubblica crea sempre USER
     });
 
 
@@ -118,7 +118,7 @@ export class AuthService {
     const payload: JwtPayload = {
       userId: user.id,
       email: user.email,
-      role: user.role!
+      role: user.ruolo ?? 'USER',
     };
 
     const accessTokenOptions: jwt.SignOptions = {

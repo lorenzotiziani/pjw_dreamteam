@@ -4,7 +4,7 @@ export interface User {
   cognome: string;
   email: string;
   pwd: string;
-  role?: string;
+  ruolo?: 'OPERATORE' | 'USER';
 }
 
 export interface UserSafe {
@@ -12,14 +12,15 @@ export interface UserSafe {
   email: string;
   nome: string;
   cognome: string;
-  role?: string;
+  ruolo?: 'OPERATORE' | 'USER';
 }
 
 export interface AuthResponse {
-  user: Omit<User, "pwd">;
+  user: Omit<User, 'pwd'>;
   accessToken: string;
   refreshToken: string;
 }
+
 export interface JwtPayload {
   userId: number;
   email: string;
@@ -27,6 +28,7 @@ export interface JwtPayload {
   iat?: number;
   exp?: number;
 }
+
 export interface RefreshToken {
   id: number;
   token: string;
