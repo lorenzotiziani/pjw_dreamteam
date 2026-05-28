@@ -11,8 +11,8 @@ datasource db {
 // UTENTI E OPERATORI
 // ─────────────────────────────────────────
 
-model Utente {
-  id       String   @id @default(uuid())
+model TUtente {
+  id       Int      @id @default(autoincrement())
   nome     String
   cognome  String
   email    String   @unique
@@ -20,10 +20,20 @@ model Utente {
   ruolo    Ruolo    @default(USER)
   creatoIl DateTime @default(now())
 
-  prenotazioni Prenotazione[]
-  operaziones  Operazione[]
+  prenotazioni  Prenotazione[]
+  operaziones   Operazione[]
+  refreshTokens RefreshToken[]
+}
 
-  @@map("utenti")
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String
+  userId    Int
+  expiresAt DateTime
+  isRevoked Boolean? @default(false)
+  createdAt DateTime
+
+  user TUtente @relation(fields: [userId], references: [id])
 }
 
 enum Ruolo {
@@ -36,7 +46,7 @@ enum Ruolo {
 // ─────────────────────────────────────────
 
 model PuntoVendita {
-  id        String  @id @default(uuid())
+  id        Int     @id @default(autoincrement())
   nome      String
   indirizzo String
   citta     String
@@ -49,7 +59,7 @@ model PuntoVendita {
 }
 
 model TipoBici {
-  id                  String        @id @default(uuid())
+  id                  Int           @id @default(autoincrement())
   categoria           CategoriaBici
   motorizzazione      Tipo          @default(NORMALE)
   taglia              Taglia
@@ -81,11 +91,11 @@ enum Taglia {
 }
 
 model StockBici {
-  id                   String @id @default(uuid())
-  puntoVenditaId       String
-  tipoBiciId           String
+  id                   Int @id @default(autoincrement())
+  puntoVenditaId       Int
+  tipoBiciId           Int
   quantitaTotale       Int
-  quantitaManutenzione Int    @default(0)
+  quantitaManutenzione Int @default(0)
 
   puntoVendita PuntoVendita @relation(fields: [puntoVenditaId], references: [id])
   tipoBici     TipoBici     @relation(fields: [tipoBiciId], references: [id])
@@ -95,7 +105,7 @@ model StockBici {
 }
 
 model Accessorio {
-  id     String  @id @default(uuid())
+  id     Int     @id @default(autoincrement())
   nome   String  @unique
   prezzo Decimal @db.Decimal(6, 2)
 
@@ -105,7 +115,7 @@ model Accessorio {
 }
 
 model CoperturaAssicurativa {
-  id          String  @id @default(uuid())
+  id          Int     @id @default(autoincrement())
   nome        String  @unique
   descrizione String
   prezzo      Decimal @db.Decimal(6, 2)
@@ -120,9 +130,9 @@ model CoperturaAssicurativa {
 // ─────────────────────────────────────────
 
 model Prenotazione {
-  id                String            @id @default(uuid())
-  utenteId          String
-  puntoVenditaId    String
+  id                Int               @id @default(autoincrement())
+  utenteId          Int
+  puntoVenditaId    Int
   dataRitiro        DateTime          @db.Date
   oraRitiro         DateTime          @db.Time()
   dataOraRiconsegna DateTime
@@ -130,7 +140,7 @@ model Prenotazione {
   totale            Decimal           @db.Decimal(10, 2)
   creataIl          DateTime          @default(now())
 
-  utente       Utente             @relation(fields: [utenteId], references: [id])
+  utente       TUtente            @relation(fields: [utenteId], references: [id])
   puntoVendita PuntoVendita       @relation(fields: [puntoVenditaId], references: [id])
   righe        RigaPrenotazione[]
   operazioni   Operazione[]
@@ -147,10 +157,10 @@ enum StatoPrenotazione {
 }
 
 model RigaPrenotazione {
-  id             String  @id @default(uuid())
-  prenotazioneId String
-  tipoBiciId     String
-  coperturaId    String?
+  id             Int     @id @default(autoincrement())
+  prenotazioneId Int
+  tipoBiciId     Int
+  coperturaId    Int?
   subtotale      Decimal @db.Decimal(8, 2)
 
   prenotazione Prenotazione           @relation(fields: [prenotazioneId], references: [id], onDelete: Cascade)
@@ -162,10 +172,10 @@ model RigaPrenotazione {
 }
 
 model RigaAccessorio {
-  id                 String @id @default(uuid())
-  rigaPrenotazioneId String
-  accessorioId       String
-  quantita           Int    @default(1)
+  id                 Int @id @default(autoincrement())
+  rigaPrenotazioneId Int
+  accessorioId       Int
+  quantita           Int @default(1)
 
   rigaPrenotazione RigaPrenotazione @relation(fields: [rigaPrenotazioneId], references: [id], onDelete: Cascade)
   accessorio       Accessorio       @relation(fields: [accessorioId], references: [id])
@@ -179,15 +189,15 @@ model RigaAccessorio {
 // ─────────────────────────────────────────
 
 model Operazione {
-  id             String         @id @default(uuid())
-  prenotazioneId String
-  utenteId       String
+  id             Int            @id @default(autoincrement())
+  prenotazioneId Int
+  utenteId       Int
   tipo           TipoOperazione
   eseguitaIl     DateTime       @default(now())
   note           String?
 
   prenotazione Prenotazione @relation(fields: [prenotazioneId], references: [id])
-  utente       Utente       @relation(fields: [utenteId], references: [id])
+  utente       TUtente      @relation(fields: [utenteId], references: [id])
 
   @@map("operazioni")
 }
