@@ -7,25 +7,195 @@ datasource db {
   provider = "postgresql"
 }
 
-model TUtente {
-  id       Int     @id @default(autoincrement())
-  email    String
-  password String
+// ─────────────────────────────────────────
+// UTENTI E OPERATORI
+// ─────────────────────────────────────────
+
+model Utente {
+  id       String   @id @default(uuid())
   nome     String
   cognome  String
-  isActive Boolean @default(false)
-  role     String  @default("USER")
+  email    String   @unique
+  pwd      String
+  ruolo    Ruolo    @default(USER)
+  creatoIl DateTime @default(now())
 
-  refreshTokens RefreshToken[]
+  prenotazioni Prenotazione[]
+  operaziones  Operazione[]
+
+  @@map("utenti")
 }
 
-model RefreshToken {
-  id        Int      @id @default(autoincrement())
-  token     String
-  userId    Int
-  expiresAt DateTime
-  isRevoked Boolean? @default(false)
-  createdAt DateTime
+enum Ruolo {
+  OPERATORE
+  USER
+}
 
-  user TUtente @relation(fields: [userId], references: [id])
+// ─────────────────────────────────────────
+// CATALOGO
+// ─────────────────────────────────────────
+
+model PuntoVendita {
+  id        String  @id @default(uuid())
+  nome      String
+  indirizzo String
+  citta     String
+  attivo    Boolean @default(true)
+
+  prenotazioni Prenotazione[]
+  stockBici    StockBici[]
+
+  @@map("punti_vendita")
+}
+
+model TipoBici {
+  id                  String        @id @default(uuid())
+  categoria           CategoriaBici
+  motorizzazione      Tipo          @default(NORMALE)
+  taglia              Taglia
+  prezzoMezzaGiornata Decimal       @db.Decimal(8, 2)
+
+  righePrenotazione RigaPrenotazione[]
+  stockBici         StockBici[]
+
+  @@map("tipi_bici")
+}
+
+enum CategoriaBici {
+  CITY_BIKE
+  MOUNTAIN_BIKE
+  GRAVEL
+  ROAD_BIKE
+}
+
+enum Tipo {
+  NORMALE
+  ELETTRICA
+}
+
+enum Taglia {
+  S
+  M
+  L
+  XL
+}
+
+model StockBici {
+  id                   String @id @default(uuid())
+  puntoVenditaId       String
+  tipoBiciId           String
+  quantitaTotale       Int
+  quantitaManutenzione Int    @default(0)
+
+  puntoVendita PuntoVendita @relation(fields: [puntoVenditaId], references: [id])
+  tipoBici     TipoBici     @relation(fields: [tipoBiciId], references: [id])
+
+  @@unique([puntoVenditaId, tipoBiciId])
+  @@map("stock_bici")
+}
+
+model Accessorio {
+  id     String  @id @default(uuid())
+  nome   String  @unique
+  prezzo Decimal @db.Decimal(6, 2)
+
+  righeAccessorio RigaAccessorio[]
+
+  @@map("accessori")
+}
+
+model CoperturaAssicurativa {
+  id          String  @id @default(uuid())
+  nome        String  @unique
+  descrizione String
+  prezzo      Decimal @db.Decimal(6, 2)
+
+  righePrenotazione RigaPrenotazione[]
+
+  @@map("coperture_assicurative")
+}
+
+// ─────────────────────────────────────────
+// PRENOTAZIONI
+// ─────────────────────────────────────────
+
+model Prenotazione {
+  id                String            @id @default(uuid())
+  utenteId          String
+  puntoVenditaId    String
+  dataRitiro        DateTime          @db.Date
+  oraRitiro         DateTime          @db.Time()
+  dataOraRiconsegna DateTime
+  stato             StatoPrenotazione @default(IN_ATTESA)
+  totale            Decimal           @db.Decimal(10, 2)
+  creataIl          DateTime          @default(now())
+
+  utente       Utente             @relation(fields: [utenteId], references: [id])
+  puntoVendita PuntoVendita       @relation(fields: [puntoVenditaId], references: [id])
+  righe        RigaPrenotazione[]
+  operazioni   Operazione[]
+
+  @@map("prenotazioni")
+}
+
+enum StatoPrenotazione {
+  IN_ATTESA
+  CONFERMATA
+  RITIRATA
+  RESTITUITA
+  CANCELLATA
+}
+
+model RigaPrenotazione {
+  id             String  @id @default(uuid())
+  prenotazioneId String
+  tipoBiciId     String
+  coperturaId    String?
+  subtotale      Decimal @db.Decimal(8, 2)
+
+  prenotazione Prenotazione           @relation(fields: [prenotazioneId], references: [id], onDelete: Cascade)
+  tipoBici     TipoBici               @relation(fields: [tipoBiciId], references: [id])
+  copertura    CoperturaAssicurativa? @relation(fields: [coperturaId], references: [id])
+  accessori    RigaAccessorio[]
+
+  @@map("righe_prenotazione")
+}
+
+model RigaAccessorio {
+  id                 String @id @default(uuid())
+  rigaPrenotazioneId String
+  accessorioId       String
+  quantita           Int    @default(1)
+
+  rigaPrenotazione RigaPrenotazione @relation(fields: [rigaPrenotazioneId], references: [id], onDelete: Cascade)
+  accessorio       Accessorio       @relation(fields: [accessorioId], references: [id])
+
+  @@unique([rigaPrenotazioneId, accessorioId])
+  @@map("righe_accessorio")
+}
+
+// ─────────────────────────────────────────
+// OPERAZIONI DI BACKOFFICE
+// ─────────────────────────────────────────
+
+model Operazione {
+  id             String         @id @default(uuid())
+  prenotazioneId String
+  utenteId       String
+  tipo           TipoOperazione
+  eseguitaIl     DateTime       @default(now())
+  note           String?
+
+  prenotazione Prenotazione @relation(fields: [prenotazioneId], references: [id])
+  utente       Utente       @relation(fields: [utenteId], references: [id])
+
+  @@map("operazioni")
+}
+
+enum TipoOperazione {
+  RITIRO
+  RICONSEGNA
+  DANNO
+  RITARDO
+  MANUTENZIONE
 }
