@@ -2,7 +2,7 @@
     <div class="container-fluid">
 
         <!-- Brand -->
-        <a class="navbar-brand" [routerLink]="['/consegne']">
+        <a class="navbar-brand" [routerLink]="['/dashboard']">
             <span class="navbar-brand-icon">🚲</span>
             <span class="navbar-brand-text">Bike<span class="navbar-brand-accent">Rent</span></span>
             <span class="navbar-brand-divider"></span>
@@ -18,14 +18,27 @@
 
         <div class="collapse navbar-collapse" id="navContent">
 
-            <!-- Link per utenti autenticati -->
-            <ul class="navbar-nav me-auto" *ngIf="currentUser$ | async">
+            <!-- Nav links per operatori autenticati -->
+            <ul class="navbar-nav me-auto gap-1" *ngIf="currentUser$ | async">
                 <li class="nav-item">
                     <a class="nav-link" [routerLink]="['/dashboard']" routerLinkActive="active">Dashboard</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" [routerLink]="['/prenotazioni']" routerLinkActive="active">Prenotazioni</a>
+                </li>
+                <!-- Catalogo dropdown -->
+                <li class="nav-item" ngbDropdown>
+                    <a class="nav-link" ngbDropdownToggle>Catalogo</a>
+                    <div ngbDropdownMenu>
+                        <a ngbDropdownItem [routerLink]="['/punti-vendita']">🏪 Punti Vendita</a>
+                        <a ngbDropdownItem [routerLink]="['/tipi-bici']">🚲 Tipi di Bicicletta</a>
+                        <a ngbDropdownItem [routerLink]="['/accessori']">🎒 Accessori</a>
+                        <a ngbDropdownItem [routerLink]="['/coperture']">🛡️ Coperture Assicurative</a>
+                    </div>
+                </li>
             </ul>
 
-            <!-- Utente / Login (sempre a destra) -->
+            <!-- Utente / Login -->
             <ul class="navbar-nav ms-auto">
                 <app-nav-user
                     *ngIf="(currentUser$ | async) as currentUser; else loginButton"

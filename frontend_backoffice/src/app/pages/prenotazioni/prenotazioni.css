@@ -1,0 +1,12 @@
+.detail-section { background: #f8fafc; border-radius: 10px; padding: 1rem; }
+.detail-section-title { font-size: .75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .4px; margin-bottom: .65rem; }
+.detail-row { display: flex; gap: .5rem; margin-bottom: .4rem; font-size: .88rem; }
+.detail-row:last-child { margin-bottom: 0; }
+.dl { min-width: 80px; color: #94a3b8; font-weight: 500; }
+.dv { color: #0f172a; font-weight: 600; }
+
+.riga-detail { display: flex; align-items: center; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid #f1f5f9; }
+.riga-detail:last-child { border-bottom: none; }
+.riga-bici { flex: 1; font-size: .88rem; }
+.riga-price { font-weight: 700; color: #1d4ed8; font-size: .9rem; }
+.riga-acc { font-size: .78rem; color: #64748b; }

@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { JwtService } from "./jwt.service";
 import { Router } from "@angular/router";
-import { catchError, distinctUntilChanged, finalize, map, Observable, of, ReplaySubject, shareReplay, tap, throwError } from "rxjs";
+import { catchError, distinctUntilChanged, map, Observable, of, ReplaySubject, tap } from "rxjs";
 import { User } from "../entities/user.entity";
 
 @Injectable({
@@ -16,61 +16,43 @@ export class AuthService {
     protected _currentUser$ = new ReplaySubject<User | null>(1);
     currentUser$ = this._currentUser$.asObservable();
 
-    // Unico observable condiviso per il refresh: evita race condition
-    // quando più chiamate falliscono con 401 contemporaneamente.
-    private refreshInProgress$: Observable<{ token: string; refreshToken: string }> | null = null;
-
-    isAuthenticated$ = this.currentUser$
-        .pipe(
-            map(user => !!user),
-            distinctUntilChanged()
-        );
+    isAuthenticated$ = this.currentUser$.pipe(
+        map(user => !!user),
+        distinctUntilChanged()
+    );
 
     constructor() {
         const tokenValid = this.jwtSrv.areTokensValid();
         if (!tokenValid) {
             this.logout();
         } else {
-            const user = this.jwtSrv.getPayload<User>();
-            this._currentUser$.next(user);
+            this.fetchUser().subscribe();
         }
     }
 
-    // richiamo api per effettuare il login
-    login(username: string, password: string) {
-        return this.http.post<any>(`/api/login`, { username, password })
+    login(email: string, password: string) {
+        return this.http.post<any>('/api/auth/login', { email, password })
             .pipe(
-                tap(res => this.jwtSrv.setToken(res.token, res.refreshToken)),
-                tap(res => this._currentUser$.next(res.user)),
-                map(res => res.user)
+                tap(res => this.jwtSrv.setToken(res.data.accessToken, res.data.refreshToken)),
+                tap(res => this._currentUser$.next(res.data.user)),
+                map(res => res.data.user)
             );
     }
 
-    // Richiama /api/refresh per ottenere nuovi token.
-    // Se più chiamate richiedono il refresh nello stesso momento,
-    // condividono lo stesso observable (shareReplay) evitando race condition.
     refresh() {
         const authTokens = this.jwtSrv.getToken();
-        if (!authTokens) {
-            throw new Error('Missing refresh token');
-        }
-        return this.http.post<{ token: string, refreshToken: string }>('/api/refresh', { refreshToken: authTokens.refreshToken })
+        if (!authTokens) throw new Error('Missing refresh token');
+        return this.http.post<any>('/api/auth/refresh', { refreshToken: authTokens.refreshToken })
             .pipe(
-                tap(res => this.jwtSrv.setToken(res.token, res.refreshToken)),
-                tap(_ => {
-                    const user = this.jwtSrv.getPayload<User>();
-                    this._currentUser$.next(user);
-                })
+                tap(res => this.jwtSrv.setToken(res.data.accessToken, res.data.refreshToken))
             );
     }
 
     fetchUser() {
-        return this.http.get<User>('/api/users/me')
+        return this.http.get<any>('/api/users/profile')
             .pipe(
-                catchError(_ => {
-                    return of(null);
-                }),
-                tap(user => this._currentUser$.next(user))
+                catchError(_ => of(null)),
+                tap(res => this._currentUser$.next(res?.data ?? null))
             );
     }
 
@@ -79,7 +61,7 @@ export class AuthService {
         this._currentUser$.next(null);
     }
 
-    register(firstName: string, lastName: string, username: string, password: string, confirmPassword: string) {
-        return this.http.post('/api/register', { firstName, lastName, username, password, confirmPassword });
+    register(nome: string, cognome: string, email: string, password: string, confirm: string) {
+        return this.http.post('/api/auth/register', { nome, cognome, email, password, confirm });
     }
 }

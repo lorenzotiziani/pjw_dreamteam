@@ -1,0 +1,145 @@
+<div class="bo-page">
+
+  <div class="bo-page-header">
+    <div class="bo-page-header-left">
+      <span class="bo-page-icon">🏪</span>
+      <div>
+        <h1 class="bo-page-title">Punti Vendita</h1>
+        <p class="bo-page-subtitle">Gestione delle sedi di noleggio</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">+ Nuovo punto vendita</button>
+  </div>
+
+  <div *ngIf="errorMsg" class="alert alert-danger alert-dismissible mb-3">
+    {{ errorMsg }} <button class="btn-close" (click)="errorMsg=''"></button>
+  </div>
+
+  <div *ngIf="loading" class="bo-loading">
+    <div class="spinner-border text-primary"></div><span>Caricamento...</span>
+  </div>
+
+  <div *ngIf="!loading">
+    <div *ngIf="puntiVendita.length === 0" class="bo-empty">
+      <div class="bo-empty-icon">🏪</div>
+      <div class="bo-empty-text">Nessun punto vendita configurato</div>
+      <button class="btn btn-primary mt-2" (click)="openCreate()">Crea il primo</button>
+    </div>
+    <div class="row g-3" *ngIf="puntiVendita.length > 0">
+      <div class="col-12 col-md-6 col-xl-4" *ngFor="let pv of puntiVendita">
+        <app-punto-vendita-card
+          [puntoVendita]="pv"
+          (edit)="openEdit($event)"
+          (delete)="onDelete($event)"
+          (toggleAttivo)="onToggleAttivo($event)"
+          (manageStock)="openStock($event)">
+        </app-punto-vendita-card>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Create/Edit Modal -->
+<ng-template #formModal let-modal>
+  <div class="modal-header bo-modal-header">
+    <h5 class="modal-title">{{ editingId ? 'Modifica' : 'Nuovo' }} punto vendita</h5>
+    <button class="btn-close btn-close-white" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="bo-form-group">
+        <label class="bo-label">Nome sede <span class="text-danger">*</span></label>
+        <input class="bo-input" formControlName="nome" placeholder="Es. BikeRent Centro" />
+        <div class="bo-error" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">Campo obbligatorio</div>
+      </div>
+      <div class="bo-form-group">
+        <label class="bo-label">Indirizzo <span class="text-danger">*</span></label>
+        <input class="bo-input" formControlName="indirizzo" placeholder="Via Roma 1" />
+      </div>
+      <div class="bo-form-group">
+        <label class="bo-label">Città <span class="text-danger">*</span></label>
+        <input class="bo-input" formControlName="citta" placeholder="Milano" />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer bo-modal-footer">
+    <button class="btn btn-secondary" (click)="modal.dismiss()">Annulla</button>
+    <button class="btn btn-primary" (click)="save(modal)" [disabled]="form.invalid || saving">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+      {{ editingId ? 'Salva modifiche' : 'Crea sede' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- Stock Modal -->
+<ng-template #stockModal let-modal>
+  <div class="modal-header bo-modal-header">
+    <h5 class="modal-title">Stock — {{ selectedPv?.nome }}</h5>
+    <button class="btn-close btn-close-white" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="stockLoading" class="text-center py-3">
+      <div class="spinner-border text-primary"></div>
+    </div>
+    <ng-container *ngIf="!stockLoading">
+      <!-- Stock list -->
+      <div class="stock-table-wrap" *ngIf="stockList.length > 0">
+        <table class="bo-table mb-3">
+          <thead>
+            <tr><th>Tipo bici</th><th>Totale</th><th>Manutenzione</th><th>Disponibili</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of stockList">
+              <td>{{ tipoBiciLabel(s.tipoBiciId) }}</td>
+              <td class="text-center fw-600">{{ s.quantitaTotale }}</td>
+              <td class="text-center text-warning fw-600">{{ s.quantitaManutenzione }}</td>
+              <td class="text-center text-success fw-600">{{ s.quantitaTotale - s.quantitaManutenzione }}</td>
+              <td>
+                <button class="btn-icon btn-edit" (click)="editStock(s)" title="Modifica">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add/Edit stock form -->
+      <div class="stock-form-wrap">
+        <h6 class="stock-form-title">{{ editingStockId ? 'Modifica quantità' : 'Aggiungi tipo bici' }}</h6>
+        <form [formGroup]="stockForm" (ngSubmit)="saveStock()">
+          <div class="row g-2 align-items-end">
+            <div class="col-12 col-sm-5" *ngIf="!editingStockId">
+              <label class="bo-label">Tipo bici</label>
+              <select class="bo-input" formControlName="tipoBiciId">
+                <option [ngValue]="null">Seleziona...</option>
+                <option *ngFor="let t of availableTipi()" [value]="t.id">{{ tipoBiciLabel(t.id) }}</option>
+              </select>
+            </div>
+            <div class="col-6 col-sm-3">
+              <label class="bo-label">Totale</label>
+              <input type="number" class="bo-input" formControlName="quantitaTotale" min="0" />
+            </div>
+            <div class="col-6 col-sm-3">
+              <label class="bo-label">Manutenzione</label>
+              <input type="number" class="bo-input" formControlName="quantitaManutenzione" min="0" />
+            </div>
+            <div class="col-12 col-sm-1 d-flex gap-1">
+              <button type="submit" class="btn btn-primary btn-sm" [disabled]="stockForm.invalid || saving">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button *ngIf="editingStockId" type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelEditStock()">✕</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </ng-container>
+  </div>
+  <div class="modal-footer bo-modal-footer">
+    <button class="btn btn-secondary" (click)="modal.close()">Chiudi</button>
+  </div>
+</ng-template>

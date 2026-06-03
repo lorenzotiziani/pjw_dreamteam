@@ -10,7 +10,6 @@ import { catchError, map, Subject, takeUntil, throwError } from 'rxjs';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-
 export class LoginComponent implements OnInit, OnDestroy {
   protected fb = inject(FormBuilder);
   protected authSrv = inject(AuthService);
@@ -20,29 +19,21 @@ export class LoginComponent implements OnInit, OnDestroy {
   protected destroyed$ = new Subject<void>();
 
   loginForm = this.fb.group({
-    username: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required]
   });
 
   loginError = '';
-
   requestedUrl: string | null = null;
 
   ngOnInit() {
     this.loginForm.valueChanges
       .pipe(takeUntil(this.destroyed$))
-      .subscribe(_ => {
-        this.loginError = '';
-      });
+      .subscribe(_ => { this.loginError = ''; });
 
     this.activatedRoute.queryParams
-      .pipe(
-        takeUntil(this.destroyed$),
-        map(params => params['requestedUrl'])
-      )
-      .subscribe(url => {
-        this.requestedUrl = url;
-      });
+      .pipe(takeUntil(this.destroyed$), map(params => params['requestedUrl']))
+      .subscribe(url => { this.requestedUrl = url; });
   }
 
   ngOnDestroy(): void {
@@ -51,16 +42,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   login() {
-    const { username, password } = this.loginForm.value;
-    this.authSrv.login(username!, password!)
+    const { email, password } = this.loginForm.value;
+    this.authSrv.login(email!, password!)
       .pipe(
         catchError(response => {
-          this.loginError = 'Credenziali errate';
+          this.loginError = response?.error?.message ?? 'Credenziali errate';
           return throwError(() => response);
         })
       )
       .subscribe(() => {
-        this.router.navigate([this.requestedUrl ? this.requestedUrl : '/']);
-      })
+        this.router.navigate([this.requestedUrl ?? '/']);
+      });
   }
 }
