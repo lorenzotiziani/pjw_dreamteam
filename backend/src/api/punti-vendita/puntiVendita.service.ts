@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/prisma';
-import { CreatePuntoVenditaDTO, UpdatePuntoVenditaDTO } from './puntiVendita.dto';
-import { NotFoundError } from '../../errors';
+import { CreatePuntoVenditaDTO, UpdatePuntoVenditaDTO, CreateStockDTO, UpdateStockDTO } from './puntiVendita.dto';
+import { NotFoundError, BadRequestError } from '../../errors';
 
 export class PuntiVenditaService {
   static async getAll() {
@@ -44,6 +44,55 @@ export class PuntiVenditaService {
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')
         throw new NotFoundError('Punto vendita non trovato');
+      throw e;
+    }
+  }
+
+  // ─── Stock ────────────────────────────────────────────────
+
+  static async getStock(puntoVenditaId: number) {
+    return prisma.stockBici.findMany({
+      where: { puntoVenditaId },
+      include: {
+        tipoBici: true,
+      },
+      orderBy: { id: 'asc' },
+    });
+  }
+
+  static async createStock(puntoVenditaId: number, data: CreateStockDTO) {
+    try {
+      return await prisma.stockBici.create({
+        data: {
+          puntoVenditaId,
+          tipoBiciId: data.tipoBiciId,
+          quantitaTotale: data.quantitaTotale,
+          quantitaManutenzione: data.quantitaManutenzione ?? 0,
+        },
+        include: { tipoBici: true },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002')
+        throw new BadRequestError('Questo tipo di bici esiste già per questo punto vendita');
+      throw e;
+    }
+  }
+
+  static async updateStock(stockId: number, data: UpdateStockDTO) {
+    try {
+      const stock = await prisma.stockBici.update({
+        where: { id: stockId },
+        data,
+        include: { tipoBici: true },
+      });
+
+      if (stock.quantitaManutenzione > stock.quantitaTotale)
+        throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
+
+      return stock;
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')
+        throw new NotFoundError('Stock non trovato');
       throw e;
     }
   }

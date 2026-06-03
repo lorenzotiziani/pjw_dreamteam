@@ -1,0 +1,556 @@
+{
+  "info": {
+    "name": "Noleggio Bici API",
+    "description": "API backend per il sistema di noleggio biciclette",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000/api", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"Test123!\",\n  \"confirm\": \"Test123!\",\n  \"nome\": \"Mario\",\n  \"cognome\": \"Rossi\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data) {",
+                  "    pm.collectionVariables.set('access_token', res.data.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', res.data.refreshToken);",
+                  "    console.log('✅ Token salvati automaticamente');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"operatore@bikeshop.it\",\n  \"password\": \"Operatore123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data) {",
+                  "    pm.collectionVariables.set('access_token', res.data.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', res.data.refreshToken);",
+                  "    console.log('✅ Token aggiornati automaticamente');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Utenti",
+      "item": [
+        {
+          "name": "Profilo utente",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Lista utenti",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Cambia password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["users", "change-password"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Test123!\",\n  \"newPassword\": \"NuovaPassword123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Elimina account",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/users/deleteAccount",
+              "host": ["{{base_url}}"],
+              "path": ["users", "deleteAccount"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Punti Vendita",
+      "item": [
+        {
+          "name": "Lista punti vendita",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/punti-vendita",
+              "host": ["{{base_url}}"],
+              "path": ["punti-vendita"]
+            }
+          }
+        },
+        {
+          "name": "Dettaglio punto vendita",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/punti-vendita/1",
+              "host": ["{{base_url}}"],
+              "path": ["punti-vendita", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crea punto vendita",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/punti-vendita",
+              "host": ["{{base_url}}"],
+              "path": ["punti-vendita"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Bike Shop Centro\",\n  \"indirizzo\": \"Via Roma 12\",\n  \"citta\": \"Milano\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Modifica punto vendita",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/punti-vendita/1",
+              "host": ["{{base_url}}"],
+              "path": ["punti-vendita", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Bike Shop Centro Aggiornato\",\n  \"attivo\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Elimina punto vendita",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/punti-vendita/1",
+              "host": ["{{base_url}}"],
+              "path": ["punti-vendita", "1"]
+            }
+          }
+        },
+        {
+          "name": "Lista stock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/punti-vendita/1/stock",
+              "host": ["{{base_url}}"],
+              "path": ["punti-vendita", "1", "stock"]
+            }
+          }
+        },
+        {
+          "name": "Crea stock",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/punti-vendita/1/stock",
+              "host": ["{{base_url}}"],
+              "path": ["punti-vendita", "1", "stock"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoBiciId\": 1,\n  \"quantitaTotale\": 10,\n  \"quantitaManutenzione\": 0\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Modifica stock",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/punti-vendita/1/stock/1",
+              "host": ["{{base_url}}"],
+              "path": ["punti-vendita", "1", "stock", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantitaManutenzione\": 2\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tipi Bici",
+      "item": [
+        {
+          "name": "Lista tipi bici",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tipi-bici",
+              "host": ["{{base_url}}"],
+              "path": ["tipi-bici"]
+            }
+          }
+        },
+        {
+          "name": "Dettaglio tipo bici",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tipi-bici/1",
+              "host": ["{{base_url}}"],
+              "path": ["tipi-bici", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crea tipo bici",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tipi-bici",
+              "host": ["{{base_url}}"],
+              "path": ["tipi-bici"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoria\": \"CITY_BIKE\",\n  \"taglia\": \"M\",\n  \"prezzoMezzaGiornata\": 15.50,\n  \"motorizzazione\": \"NORMALE\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Modifica tipo bici",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tipi-bici/1",
+              "host": ["{{base_url}}"],
+              "path": ["tipi-bici", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prezzoMezzaGiornata\": 18.00\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Elimina tipo bici",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/tipi-bici/1",
+              "host": ["{{base_url}}"],
+              "path": ["tipi-bici", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Accessori",
+      "item": [
+        {
+          "name": "Lista accessori",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/accessori",
+              "host": ["{{base_url}}"],
+              "path": ["accessori"]
+            }
+          }
+        },
+        {
+          "name": "Dettaglio accessorio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/accessori/1",
+              "host": ["{{base_url}}"],
+              "path": ["accessori", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crea accessorio",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/accessori",
+              "host": ["{{base_url}}"],
+              "path": ["accessori"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Caschetto\",\n  \"prezzo\": 3.00\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Modifica accessorio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/accessori/1",
+              "host": ["{{base_url}}"],
+              "path": ["accessori", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prezzo\": 3.50\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Elimina accessorio",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/accessori/1",
+              "host": ["{{base_url}}"],
+              "path": ["accessori", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Coperture Assicurative",
+      "item": [
+        {
+          "name": "Lista coperture",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/coperture",
+              "host": ["{{base_url}}"],
+              "path": ["coperture"]
+            }
+          }
+        },
+        {
+          "name": "Dettaglio copertura",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/coperture/1",
+              "host": ["{{base_url}}"],
+              "path": ["coperture", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crea copertura",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/coperture",
+              "host": ["{{base_url}}"],
+              "path": ["coperture"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Assicurazione Base\",\n  \"descrizione\": \"Copre danni fino a 200€\",\n  \"prezzo\": 5.00\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Modifica copertura",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/coperture/1",
+              "host": ["{{base_url}}"],
+              "path": ["coperture", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prezzo\": 6.00\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Elimina copertura",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/coperture/1",
+              "host": ["{{base_url}}"],
+              "path": ["coperture", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
