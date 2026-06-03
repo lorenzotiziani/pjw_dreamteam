@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { PuntiVenditaService } from './puntiVendita.service';
 import { NotFoundError, BadRequestError } from '../../errors';
-import { CreatePuntoVenditaDTO, UpdatePuntoVenditaDTO } from './puntiVendita.dto';
+import { CreatePuntoVenditaDTO, UpdatePuntoVenditaDTO, CreateStockDTO, UpdateStockDTO } from './puntiVendita.dto';
 
 const parseId = (raw: string): number => {
   const id = parseInt(raw);
@@ -58,6 +58,40 @@ export class PuntiVenditaController {
       const id = parseId(req.params.id);
       await PuntiVenditaService.delete(id);
       res.json({ success: true, message: 'Punto vendita eliminato' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ─── Stock ────────────────────────────────────────────────
+
+  static async getStock(req: Request, res: Response, next: NextFunction) {
+    try {
+      const puntoVenditaId = parseId(req.params.id);
+      const stock = await PuntiVenditaService.getStock(puntoVenditaId);
+      res.json({ success: true, data: stock });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createStock(req: Request, res: Response, next: NextFunction) {
+    try {
+      const puntoVenditaId = parseId(req.params.id);
+      const data: CreateStockDTO = req.body;
+      const stock = await PuntiVenditaService.createStock(puntoVenditaId, data);
+      res.status(201).json({ success: true, data: stock });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateStock(req: Request, res: Response, next: NextFunction) {
+    try {
+      const stockId = parseId(req.params.stockId);
+      const data: UpdateStockDTO = req.body;
+      const stock = await PuntiVenditaService.updateStock(stockId, data);
+      res.json({ success: true, data: stock });
     } catch (error) {
       next(error);
     }
