@@ -25,6 +25,19 @@ export class PrenotazioniController {
     }
   }
 
+  static async getMie(req: Request, res: Response, next: NextFunction) {
+    try {
+      const utenteId = (req as any).user.id;
+      const prenotazioni = await PrenotazioniService.getMie(utenteId);
+      res.json({
+        success: true,
+        data: prenotazioni,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { params } = prenotazioneParamsSchema.parse({ params: req.params });

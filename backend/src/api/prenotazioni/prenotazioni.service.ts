@@ -79,9 +79,59 @@ export class PrenotazioniService {
     if (!prenotazione) throw new Error(`Prenotazione ${id} non trovata`);
     return prenotazione;
   }
-  
+
+  static async getMie(utenteId: number) {
+    return prisma.prenotazione.findMany({
+      where: { utenteId },
+      include: {
+        puntoVendita: true,
+        righe: {
+          include: {
+            tipoBici:  true,
+            copertura: true,
+            accessori: {
+              include: { accessorio: true },
+            },
+          },
+        },
+      },
+      orderBy: { creataIl: 'desc' },
+    });
+  }
+
   static async create(data: PrenotazioneCreateDTO): Promise<void> {
     const { body } = data;
+
+    for (const riga of body.righe) {
+      const stock = await prisma.stockBici.findFirst({
+        where: {
+          puntoVenditaId: body.puntoVenditaId,
+          tipoBiciId:     riga.tipoBiciId,
+        },
+      });
+
+      if (!stock) {
+        throw new Error(`Tipo bici ${riga.tipoBiciId} non disponibile in questo punto vendita`);
+      }
+
+      const disponibili = stock.quantitaTotale - stock.quantitaManutenzione;
+
+      const prenotate = await prisma.rigaPrenotazione.count({
+        where: {
+          tipoBiciId: riga.tipoBiciId,
+          prenotazione: {
+            puntoVenditaId: body.puntoVenditaId,
+            stato: { not: StatoPrenotazione.CANCELLATA },
+            dataRitiro:        { lte: body.dataOraRiconsegna },
+            dataOraRiconsegna: { gte: body.dataRitiro },
+          },
+        },
+      });
+
+      if (prenotate >= disponibili) {
+        throw new Error(`Nessuna bici di tipo ${riga.tipoBiciId} disponibile nel periodo selezionato`);
+      }
+    }
 
     await prisma.prenotazione.create({
       data: {
