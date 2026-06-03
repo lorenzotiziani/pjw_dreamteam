@@ -68,7 +68,14 @@ export const refreshTokenRequirements = z.object({
   })
 });
 
+export const verifyRequirements = z.object({
+  query: z.object({
+    token: z.string().min(1, "Token richiesto")
+  })
+});
+
 
 export type loginDTO = z.infer<typeof loginRequirements>['body'];
 export type registerDTO = z.infer<typeof registerRequirements>['body'];
+export type verifyDTO = z.infer<typeof verifyRequirements>['query'];
 

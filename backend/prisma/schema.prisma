@@ -19,6 +19,10 @@ model TUtente {
   pwd      String
   ruolo    Ruolo    @default(USER)
   creatoIl DateTime @default(now())
+  
+  emailVerified Boolean @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
 
   prenotazioni  Prenotazione[]
   operaziones   Operazione[]

@@ -18,11 +18,6 @@ export class AuthController {
   }
 
   static async login(req: Request, res: Response, next: NextFunction) {
-    const ipAddress =
-        req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
-        req.socket.remoteAddress ||
-        'Unknown';
-
     try {
       const data: loginDTO = req.body;
       const result = await AuthService.login(data);
@@ -61,6 +56,21 @@ export class AuthController {
       res.json({
         success: true,
         message: 'Logout effettuato con successo'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const token = req.query.token as string;
+  
+      await AuthService.verifyEmail(token);
+  
+      res.json({
+        success: true,
+        message: 'Email verificata con successo',
       });
     } catch (error) {
       next(error);

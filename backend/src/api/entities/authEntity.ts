@@ -1,19 +1,4 @@
-export interface User {
-  id: number;
-  nome: string;
-  cognome: string;
-  email: string;
-  pwd: string;
-  ruolo?: 'OPERATORE' | 'USER';
-}
-
-export interface UserSafe {
-  id: number;
-  email: string;
-  nome: string;
-  cognome: string;
-  ruolo?: 'OPERATORE' | 'USER';
-}
+import { User } from "./userEntity";
 
 export interface AuthResponse {
   user: Omit<User, 'pwd'>;

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { UserModel } from './user.model';
 import { RefreshTokenModel } from '../../models/RefreshToken';
-import { User, UserSafe } from '../entities/authEntity';
+import { User, UserSafe } from '../entities/userEntity';
 
 export interface UpdateUserData {
   firstName?: string;
