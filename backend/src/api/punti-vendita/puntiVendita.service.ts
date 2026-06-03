@@ -6,7 +6,6 @@ import { NotFoundError, BadRequestError } from '../../errors';
 export class PuntiVenditaService {
   static async getAll() {
     return prisma.puntoVendita.findMany({
-      where: { attivo: true },
       orderBy: { nome: 'asc' },
     });
   }
@@ -48,7 +47,6 @@ export class PuntiVenditaService {
     }
   }
 
-  // ─── Stock ────────────────────────────────────────────────
 
   static async getStock(puntoVenditaId: number) {
     return prisma.stockBici.findMany({
