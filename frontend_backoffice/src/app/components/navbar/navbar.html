@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-md mb-3" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" [routerLink]="['/consegne']">&#128666; Bike BackOffice</a>
+
+        <!-- Hamburger (visibile solo su mobile) -->
+        <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navContent"
+            aria-controls="navContent" aria-expanded="false">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navContent">
+
+            <!-- Link per utenti autenticati -->
+            <ul class="navbar-nav me-auto" *ngIf="currentUser$ | async">
+                <li class="nav-item">
+                    <a class="nav-link" [routerLink]="['/dashboard']" routerLinkActive="active">Dashboard</a>
+                </li>
+            </ul>
+
+            <!-- Utente / Login -->
+            <ul class="navbar-nav">
+                <app-nav-user
+                    *ngIf="(currentUser$ | async) as currentUser; else loginButton"
+                    (logout)="logout()"
+                    [user]="currentUser">
+                </app-nav-user>
+                <ng-template #loginButton>
+                    <li class="nav-item">
+                        <a class="nav-link" [routerLink]="['/login']">Login operatore</a>
+                    </li>
+                </ng-template>
+            </ul>
+        </div>
+    </div>
+</nav>

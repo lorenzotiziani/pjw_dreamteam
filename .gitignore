@@ -9,3 +9,7 @@ backend/package-lock.json
 backend/package.json
 backend/prisma/migrations
 frontend/.angular
+
+frontend_backoffice/node_modules
+frontend_backoffice/dist
+frontend_backoffice/.angular

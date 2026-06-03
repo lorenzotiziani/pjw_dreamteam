@@ -1,0 +1,104 @@
+.db-page {
+    padding: 2rem 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.db-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.db-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.db-header-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+    background: #f0f4ff;
+    padding: 0.5rem 0.65rem;
+    border-radius: 12px;
+}
+
+.db-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.db-subtitle {
+    font-size: 0.8rem;
+    color: #8a8fa8;
+    margin: 0;
+}
+
+.db-new-btn {
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+/* ── Stat cards ──────────────────────────────────────────── */
+.db-stat-card {
+    border-radius: 12px;
+    border: 1px solid #e8ecf4;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.db-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.db-stat-count {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    line-height: 1.1;
+    margin-bottom: 0.4rem;
+}
+
+.db-stat-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.3em 0.75em;
+    border-radius: 6px;
+}
+
+/* ── Section header ──────────────────────────────────────── */
+.db-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #e8ecf4;
+    padding-bottom: 0.6rem;
+}
+
+.db-section-title {
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.db-empty-icon {
+    font-size: 3rem;
+    opacity: 0.4;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 767px) {
+    .db-page { padding: 1rem 0.75rem; }
+    .db-header { flex-wrap: wrap; gap: 0.75rem; }
+    .db-new-btn { width: 100%; text-align: center; }
+    .db-stat-count { font-size: 1.8rem; }
+}
