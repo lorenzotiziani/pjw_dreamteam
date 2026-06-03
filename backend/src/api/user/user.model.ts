@@ -1,4 +1,4 @@
-import { User, UserSafe } from "../entities/authEntity";
+import { User, UserSafe } from "../entities/userEntity";
 import { prisma } from "../../config/prisma";
 
 export class UserModel {
@@ -11,6 +11,12 @@ export class UserModel {
   static async findByEmail(email: string): Promise<User | null> {
     return await prisma.tUtente.findFirst({
       where: { email },
+    });
+  }
+
+  static async findByVerificationToken(token: string): Promise<User | null> {
+    return await prisma.tUtente.findFirst({
+      where: { emailVerificationToken: token },
     });
   }
 

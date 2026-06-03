@@ -1,0 +1,96 @@
+import { Request, Response, NextFunction } from 'express';
+import { PrenotazioniService } from './prenotazioni.service';
+import {
+  prenotazioneCreateSchema,
+  prenotazioneUpdateSchema,
+  prenotazioneParamsSchema,
+  prenotazioneByFiltersSchema,
+} from './prenotazioni.dto';
+import { StatoPrenotazione } from '@prisma/client';
+
+export class PrenotazioniController {
+
+  static async getAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const filters = prenotazioneByFiltersSchema.parse({ query: req.query });
+  
+      const prenotazioni = await PrenotazioniService.getAll(filters);
+  
+      res.json({
+        success: true,
+        data: prenotazioni,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { params } = prenotazioneParamsSchema.parse({ params: req.params });
+      const prenotazione = await PrenotazioniService.getById(params.id);
+      res.json({
+        success: true,
+        data: prenotazione
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = prenotazioneCreateSchema.parse(req.body);
+      await PrenotazioniService.create(data);
+      res.json({
+        success: true,
+        message: 'prenotazione creata con successo'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = prenotazioneUpdateSchema.parse({
+        params: req.params,
+        body:   req.body,
+      });
+      await PrenotazioniService.update(data);
+      res.json({
+        success: true,
+        message: 'prenotazione aggiornata con successo'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { params } = prenotazioneParamsSchema.parse({ params: req.params });
+      await PrenotazioniService.delete(params.id);
+      res.json({
+        success: true,
+        message: 'prenotazione eliminata con successo'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async aggiornaStato(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { params } = prenotazioneParamsSchema.parse({ params: req.params });
+      const { stato }  = req.body as { stato: StatoPrenotazione };
+      await PrenotazioniService.aggiornaStato(params.id, stato);
+      res.json({
+        success: true,
+        message: `stato aggiornato a ${stato}`
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+}
