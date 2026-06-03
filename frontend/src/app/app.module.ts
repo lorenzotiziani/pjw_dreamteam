@@ -14,6 +14,12 @@ import {IfAuthenticatedDirective} from './utils/if-authenthicated.directive'
 import {logoutInterceptor} from "./utils/logout.interceptor";
 import {BaseChartDirective, provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {RouterModule} from "@angular/router";
+import { NavBarComponent } from './components/nav-bar/nav-bar.component';
+import { BookingComponent } from './pages/booking/booking.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { BookingFormComponent } from './pages/booking-form/booking-form.component';
+import { CardBikeComponent } from './components/card-bike/card-bike.component';
+import { NavUserComponent } from './components/nav-user/nav-user.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +27,12 @@ import {RouterModule} from "@angular/router";
     LoginComponent,
     RegisterComponent,
     HomeComponent,
-    IfAuthenticatedDirective
+    IfAuthenticatedDirective,
+    NavBarComponent,
+    BookingComponent,
+    BookingFormComponent,
+    CardBikeComponent,
+    NavUserComponent
   ],
   imports: [
     BrowserModule,
@@ -29,7 +40,8 @@ import {RouterModule} from "@angular/router";
     FormsModule,
     ReactiveFormsModule,
     BaseChartDirective,
-    RouterModule
+    RouterModule,
+    FontAwesomeModule
   ],
   providers: [
     CurrencyPipe,

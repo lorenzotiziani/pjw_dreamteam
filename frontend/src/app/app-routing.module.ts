@@ -3,7 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { HomeComponent } from './pages/home/home.component';
-import { authGuard } from './utils/auth.guard';
+import { BookingComponent } from './pages/booking/booking.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { BookingFormComponent } from './pages/booking-form/booking-form.component';
 
 const routes: Routes = [
   {
@@ -15,14 +17,31 @@ const routes: Routes = [
     component:RegisterComponent,
   },
   {
-    path:'',
-    component:HomeComponent,
-    canActivate:[authGuard]
+    path:'homepage',
+    component:HomeComponent
   },
+  {
+    path:'booking',
+    component: BookingComponent,
+    children:[
+      {
+        path:'form',
+        component:BookingFormComponent
+      }
+    ]
+  },
+  {
+    path:'',
+    redirectTo:'/homepage',
+    pathMatch: 'full'
+  }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    RouterModule.forRoot(routes),
+    FontAwesomeModule
+  ],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
