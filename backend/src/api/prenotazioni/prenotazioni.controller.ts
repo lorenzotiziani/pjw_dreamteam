@@ -40,9 +40,9 @@ export class PrenotazioniController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = prenotazioneCreateSchema.parse(req.body);
+      const data = prenotazioneCreateSchema.parse({ body: req.body });
       await PrenotazioniService.create(data);
-      res.json({
+      res.status(201).json({
         success: true,
         message: 'prenotazione creata con successo'
       });

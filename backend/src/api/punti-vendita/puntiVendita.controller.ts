@@ -13,7 +13,9 @@ export class PuntiVenditaController {
   static async getAll(req: Request, res: Response, next: NextFunction) {
     try {
       const puntiVendita = await PuntiVenditaService.getAll();
-      res.json({ success: true, data: puntiVendita });
+      res.json({
+        success: true, data: puntiVendita
+      });
     } catch (error) {
       next(error);
     }
@@ -26,7 +28,9 @@ export class PuntiVenditaController {
 
       if (!puntoVendita) throw new NotFoundError('Punto vendita non trovato');
 
-      res.json({ success: true, data: puntoVendita });
+      res.json({
+        success: true, data: puntoVendita
+      });
     } catch (error) {
       next(error);
     }
@@ -36,7 +40,9 @@ export class PuntiVenditaController {
     try {
       const data: CreatePuntoVenditaDTO = req.body;
       const puntoVendita = await PuntiVenditaService.create(data);
-      res.status(201).json({ success: true, data: puntoVendita });
+      res.status(201).json({
+        success: true, data: puntoVendita
+      });
     } catch (error) {
       next(error);
     }
@@ -47,7 +53,9 @@ export class PuntiVenditaController {
       const id = parseId(req.params.id);
       const data: UpdatePuntoVenditaDTO = req.body;
       const puntoVendita = await PuntiVenditaService.update(id, data);
-      res.json({ success: true, data: puntoVendita });
+      res.json({
+        success: true, data: puntoVendita
+      });
     } catch (error) {
       next(error);
     }
@@ -57,7 +65,9 @@ export class PuntiVenditaController {
     try {
       const id = parseId(req.params.id);
       await PuntiVenditaService.delete(id);
-      res.json({ success: true, message: 'Punto vendita eliminato' });
+      res.json({
+        success: true, message: 'Punto vendita eliminato'
+      });
     } catch (error) {
       next(error);
     }
@@ -69,7 +79,9 @@ export class PuntiVenditaController {
     try {
       const puntoVenditaId = parseId(req.params.id);
       const stock = await PuntiVenditaService.getStock(puntoVenditaId);
-      res.json({ success: true, data: stock });
+      res.json({
+        success: true, data: stock
+      });
     } catch (error) {
       next(error);
     }
@@ -80,7 +92,9 @@ export class PuntiVenditaController {
       const puntoVenditaId = parseId(req.params.id);
       const data: CreateStockDTO = req.body;
       const stock = await PuntiVenditaService.createStock(puntoVenditaId, data);
-      res.status(201).json({ success: true, data: stock });
+      res.status(201).json({
+        success: true, data: stock
+      });
     } catch (error) {
       next(error);
     }
@@ -91,7 +105,9 @@ export class PuntiVenditaController {
       const stockId = parseId(req.params.stockId);
       const data: UpdateStockDTO = req.body;
       const stock = await PuntiVenditaService.updateStock(stockId, data);
-      res.json({ success: true, data: stock });
+      res.json({
+        success: true, data: stock
+      });
     } catch (error) {
       next(error);
     }
