@@ -1,29 +1,91 @@
 .navbar {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 12px 24px;
-  background-color: #0d6efd; /* bg-primary */
+  padding: 10px 24px;
+  background-color: #1d4ed8;
+  font-family: 'Inter', sans-serif;
 }
 
+/* ── Brand ─────────────────────────────────────────────── */
 .navbar .navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: #fff;
-  font-size: 24px;
-  font-weight: 600;
   text-decoration: none;
+  padding: 0;
 }
 
 .navbar .navbar-brand:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  opacity: 0.9;
 }
 
-.navbar-nav .nav-link {
+.navbar-brand-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.navbar-brand-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
   color: #fff;
+}
+
+.navbar-brand-accent {
+  color: #93c5fd;
+}
+
+.navbar-brand-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0 4px;
+}
+
+.navbar-brand-sub {
+  font-size: 0.72rem;
   font-weight: 500;
-  padding: 8px 16px;
-  transition: background-color 0.3s ease;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+/* ── Nav links ─────────────────────────────────────────── */
+.navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .navbar-nav .nav-link:hover,
 .navbar-nav .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+/* ── Bottone login ─────────────────────────────────────── */
+.nav-btn-login {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  background: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.nav-btn-login:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
 }
