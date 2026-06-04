@@ -82,16 +82,20 @@ export class PuntiVenditaService {
 
   static async updateStock(stockId: number, data: UpdateStockDTO) {
     try {
-      const stock = await prisma.stockBici.update({
+      const existing = await prisma.stockBici.findUnique({ where: { id: stockId } });
+      if (!existing) throw new NotFoundError('Stock non trovato');
+
+      const nuovaTotale       = data.quantitaTotale       ?? existing.quantitaTotale;
+      const nuovaManutenzione = data.quantitaManutenzione ?? existing.quantitaManutenzione;
+
+      if (nuovaManutenzione > nuovaTotale)
+        throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
+
+      return await prisma.stockBici.update({
         where: { id: stockId },
         data,
         include: { tipoBici: true },
       });
-
-      if (stock.quantitaManutenzione > stock.quantitaTotale)
-        throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
-
-      return stock;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')
         throw new NotFoundError('Stock non trovato');

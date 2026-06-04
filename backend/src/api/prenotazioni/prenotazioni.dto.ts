@@ -23,8 +23,6 @@ export const prenotazioneCreateSchema = z.object({
     dataRitiro:        z.coerce.date(),
     oraRitiro:         timeHHMMSSSchema,
     dataOraRiconsegna: z.coerce.date(),
-    stato:             z.nativeEnum(StatoPrenotazione).default(StatoPrenotazione.IN_ATTESA),
-    utenteId:          z.number(),
     puntoVenditaId:    z.number(),
     righe:             z.array(rigaPrenotazioneSchema).min(1),
   }),
@@ -51,6 +49,13 @@ export const prenotazioneByFiltersSchema = z.object({
 
 export const prenotazioneParamsSchema = z.object({
   params: z.object({ id: z.coerce.number() }),
+});
+
+export const prenotazioneAggiornaStatoSchema = z.object({
+  params: z.object({ id: z.coerce.number() }),
+  body: z.object({
+    stato: z.nativeEnum(StatoPrenotazione),
+  }),
 });
 
 export type PrenotazioneCreateDTO = z.infer<typeof prenotazioneCreateSchema>;

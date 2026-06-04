@@ -152,7 +152,7 @@ export class PrenotazioniService {
     });
   }
 
-  static async create(data: PrenotazioneCreateDTO): Promise<void> {
+  static async create(data: PrenotazioneCreateDTO, utenteId: number): Promise<void> {
 
     const { body } = data;
     
@@ -179,7 +179,7 @@ export class PrenotazioniService {
     
     await prisma.prenotazione.create({
       data: {
-        utenteId: body.utenteId,
+        utenteId: utenteId,
         puntoVenditaId: body.puntoVenditaId,
         dataRitiro: body.dataRitiro,
         oraRitiro: dataOraRitiro,

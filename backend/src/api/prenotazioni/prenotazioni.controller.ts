@@ -5,8 +5,9 @@ import {
   prenotazioneUpdateSchema,
   prenotazioneParamsSchema,
   prenotazioneByFiltersSchema,
+  prenotazioneAggiornaStatoSchema,
 } from './prenotazioni.dto';
-import { StatoPrenotazione, TipoOperazione } from '@prisma/client';
+import { AuthRequest } from '../../middleware/auth.middleware';
 
 export class PrenotazioniController {
 
@@ -54,7 +55,8 @@ export class PrenotazioniController {
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
       const data = prenotazioneCreateSchema.parse({ body: req.body });
-      await PrenotazioniService.create(data);
+      const utenteId = (req as AuthRequest).user!.userId;
+      await PrenotazioniService.create(data, utenteId);
       res.status(201).json({
         success: true,
         message: 'prenotazione creata con successo'
@@ -95,13 +97,12 @@ export class PrenotazioniController {
 
   static async aggiornaStato(req: Request, res: Response, next: NextFunction) {
     try {
-      const { params } = prenotazioneParamsSchema.parse({ params: req.params });
-      const { stato } = req.body as { stato: StatoPrenotazione };
+      const { params, body } = prenotazioneAggiornaStatoSchema.parse({ params: req.params, body: req.body });
 
-      await PrenotazioniService.aggiornaStato(params.id, stato);
+      await PrenotazioniService.aggiornaStato(params.id, body.stato);
       res.json({
         success: true,
-        message: `stato aggiornato a ${stato}`
+        message: `stato aggiornato a ${body.stato}`
       });
     } catch (err) {
       next(err);
