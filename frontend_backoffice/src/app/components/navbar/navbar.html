@@ -29,11 +29,44 @@
                 <!-- Catalogo dropdown -->
                 <li class="nav-item" ngbDropdown>
                     <a class="nav-link" ngbDropdownToggle>Catalogo</a>
-                    <div ngbDropdownMenu>
-                        <a ngbDropdownItem [routerLink]="['/punti-vendita']">🏪 Punti Vendita</a>
-                        <a ngbDropdownItem [routerLink]="['/tipi-bici']">🚲 Tipi di Bicicletta</a>
-                        <a ngbDropdownItem [routerLink]="['/accessori']">🎒 Accessori</a>
-                        <a ngbDropdownItem [routerLink]="['/coperture']">🛡️ Coperture Assicurative</a>
+                    <div ngbDropdownMenu class="nav-dropdown-menu">
+                        <a ngbDropdownItem [routerLink]="['/punti-vendita']" routerLinkActive="nav-dropdown-active">
+                            <span class="nav-dropdown-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                    <polyline points="9 22 9 12 15 12 15 22"/>
+                                </svg>
+                            </span>
+                            Punti Vendita
+                        </a>
+                        <a ngbDropdownItem [routerLink]="['/tipi-bici']" routerLinkActive="nav-dropdown-active">
+                            <span class="nav-dropdown-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/>
+                                    <path d="M15 6a1 1 0 0 0-1-1h-1l-5 8h8l-1-7z"/>
+                                    <path d="M12 6v5h6"/>
+                                </svg>
+                            </span>
+                            Tipi di Bicicletta
+                        </a>
+                        <a ngbDropdownItem [routerLink]="['/accessori']" routerLinkActive="nav-dropdown-active">
+                            <span class="nav-dropdown-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                                    <line x1="3" y1="6" x2="21" y2="6"/>
+                                    <path d="M16 10a4 4 0 0 1-8 0"/>
+                                </svg>
+                            </span>
+                            Accessori
+                        </a>
+                        <a ngbDropdownItem [routerLink]="['/coperture']" routerLinkActive="nav-dropdown-active">
+                            <span class="nav-dropdown-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                </svg>
+                            </span>
+                            Coperture Assicurative
+                        </a>
                     </div>
                 </li>
             </ul>
