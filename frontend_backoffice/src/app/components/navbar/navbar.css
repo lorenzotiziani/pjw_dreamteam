@@ -66,6 +66,63 @@
   color: #fff;
 }
 
+/* ── Dropdown Catalogo ─────────────────────────────────── */
+.nav-dropdown-menu {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10) !important;
+  padding: 6px !important;
+  min-width: 210px;
+  margin-top: 6px !important;
+}
+
+.nav-dropdown-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #0f172a !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-dropdown-menu .dropdown-item:hover,
+.nav-dropdown-menu .dropdown-item:focus {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+
+.nav-dropdown-menu .dropdown-item:hover .nav-dropdown-icon,
+.nav-dropdown-menu .dropdown-item:focus .nav-dropdown-icon {
+  color: #1d4ed8;
+}
+
+.nav-dropdown-menu .nav-dropdown-active {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  font-weight: 600;
+}
+
+.nav-dropdown-menu .nav-dropdown-active .nav-dropdown-icon {
+  color: #1d4ed8;
+}
+
+.nav-dropdown-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
 /* ── Bottone login ─────────────────────────────────────── */
 .nav-btn-login {
   display: flex;
