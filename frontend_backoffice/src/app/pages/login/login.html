@@ -52,8 +52,9 @@
                     <span>{{ loginError }}</span>
                 </div>
 
-                <button type="submit" class="login-btn" [disabled]="loginForm.invalid">
-                    Accedi
+                <button type="submit" class="login-btn" [disabled]="loginForm.invalid || loading">
+                    <span *ngIf="loading" class="login-spinner"></span>
+                    {{ loading ? 'Accesso in corso…' : 'Accedi' }}
                 </button>
             </form>
         </div>

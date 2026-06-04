@@ -173,9 +173,27 @@
 }
 
 .login-btn:disabled {
-    opacity: 0.45;
+    opacity: 0.65;
     cursor: not-allowed;
     box-shadow: none;
+    transform: none;
+}
+
+/* ── Spinner dentro il bottone ─────────────────────────── */
+.login-spinner {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: login-spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+}
+
+@keyframes login-spin {
+    to { transform: rotate(360deg); }
 }
 
 /* ── Mobile ────────────────────────────────────────────── */

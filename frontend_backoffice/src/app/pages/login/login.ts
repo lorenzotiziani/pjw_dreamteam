@@ -26,6 +26,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginError = '';
   requestedUrl: string | null = null;
   showPassword = false;
+  loading = false;
 
   ngOnInit() {
     this.loginForm.valueChanges
@@ -48,11 +49,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   login() {
+    if (this.loading) return;
     const { email, password } = this.loginForm.value;
+    this.loading = true;
     this.authSrv.login(email!, password!)
       .pipe(
         catchError(response => {
           this.loginError = response?.error?.message ?? 'Credenziali errate';
+          this.loading = false;
           return throwError(() => response);
         })
       )
