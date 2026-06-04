@@ -15,8 +15,9 @@ const routes: Routes = [
     { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
     { path: 'login',         component: LoginComponent },
     { path: 'dashboard',     component: DashboardComponent,    canActivate: [authGuard, roleGuard] },
-    { path: 'prenotazioni',  component: PrenotazioniComponent, canActivate: [authGuard, roleGuard] },
-    { path: 'tipi-bici',     component: TipiBiciComponent,     canActivate: [authGuard, roleGuard] },
+    { path: 'prenotazioni',   component: PrenotazioniComponent, canActivate: [authGuard, roleGuard] },
+    { path: 'punti-vendita',  component: PuntiVenditaComponent, canActivate: [authGuard, roleGuard] },
+    { path: 'tipi-bici',      component: TipiBiciComponent,     canActivate: [authGuard, roleGuard] },
     { path: 'accessori',     component: AccessoriComponent,    canActivate: [authGuard, roleGuard] },
     { path: 'coperture',     component: CoperatureComponent,   canActivate: [authGuard, roleGuard] },
 ];

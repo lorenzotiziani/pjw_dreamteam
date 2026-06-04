@@ -11,7 +11,7 @@
     </div>
     <div class="d-flex align-items-center gap-2">
       <span class="badge bg-light text-dark border">{{ prenotazioniFiltrate.length }} risultati</span>
-      <button class="btn btn-outline-secondary btn-sm" (click)="loadPrenotazioni()">
+      <button class="btn btn-outline-secondary btn-sm" (click)="loadPrenotazioni()" [disabled]="loading">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
         </svg>
@@ -20,9 +20,12 @@
     </div>
   </div>
 
-  <!-- Error -->
-  <div *ngIf="errorMsg" class="alert alert-danger alert-dismissible mb-3" role="alert">
-    {{ errorMsg }}
+  <!-- Error banner -->
+  <div *ngIf="errorMsg" class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 mb-3" role="alert">
+    <svg width="18" height="18" class="flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span class="flex-grow-1">{{ errorMsg }}</span>
     <button type="button" class="btn-close" (click)="errorMsg = ''"></button>
   </div>
 
@@ -32,8 +35,7 @@
       <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
-      <input type="text" class="filter-input" placeholder="Cerca per cliente, email, ID..."
-        [(ngModel)]="filtroTesto" />
+      <input type="text" class="filter-input" placeholder="Cerca per cliente, email, ID…" [(ngModel)]="filtroTesto" />
     </div>
     <select class="filter-select" [(ngModel)]="filtroStato">
       <option *ngFor="let s of statiList" [value]="s.value">{{ s.label }}</option>
@@ -49,7 +51,7 @@
   <!-- Loading -->
   <div *ngIf="loading" class="bo-loading">
     <div class="spinner-border text-primary" role="status"></div>
-    <span>Caricamento prenotazioni...</span>
+    <span>Caricamento prenotazioni…</span>
   </div>
 
   <!-- Table -->
@@ -57,20 +59,22 @@
     <div *ngIf="prenotazioniFiltrate.length === 0" class="bo-empty">
       <div class="bo-empty-icon">📋</div>
       <div class="bo-empty-text">Nessuna prenotazione trovata</div>
-      <button *ngIf="filtroTesto || filtroStato || filtroSede || filtroData" class="btn btn-sm btn-outline-primary mt-2" (click)="resetFiltri()">Rimuovi filtri</button>
+      <button *ngIf="filtroTesto || filtroStato || filtroSede || filtroData"
+        class="btn btn-sm btn-outline-primary mt-2" (click)="resetFiltri()">Rimuovi filtri</button>
     </div>
+
     <div *ngIf="prenotazioniFiltrate.length > 0" class="table-responsive">
       <table class="bo-table">
         <thead>
           <tr>
-            <th style="width:60px">#</th>
+            <th style="width:55px">#</th>
             <th>Cliente</th>
             <th>Sede</th>
             <th>Ritiro</th>
             <th>Riconsegna</th>
             <th>Stato</th>
             <th>Totale</th>
-            <th style="width:200px">Azioni</th>
+            <th style="width:220px">Azioni</th>
           </tr>
         </thead>
         <tbody>
@@ -91,37 +95,72 @@
               <div class="pren-email">ore {{ p.oraRitiro?.slice(0,5) }}</div>
             </td>
             <td>{{ dataFmt(p.dataOraRiconsegna) }}</td>
-            <td><span class="stato-badge" [ngClass]="statoBadgeClass(p.stato)">{{ statoLabel(p.stato) }}</span></td>
+            <td>
+              <span class="stato-badge" [ngClass]="statoBadgeClass(p.stato)">{{ statoLabel(p.stato) }}</span>
+            </td>
             <td class="prezzo-cell">€ {{ (+p.totale).toFixed(2) }}</td>
             <td>
               <div class="pren-actions">
-                <button class="btn-icon btn-view" title="Dettaglio" (click)="openDetail(p)">
+
+                <!-- Dettaglio (sempre visibile) -->
+                <button class="btn-icon btn-view" title="Visualizza dettaglio" (click)="openDetail(p)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                   </svg>
                 </button>
-                <button class="btn-icon btn-icon-ok" title="Conferma" *ngIf="p.stato === 'IN_ATTESA'"
+
+                <!-- Modifica date (solo se > 2 giorni al ritiro e stato attivo) -->
+                <button class="btn-icon btn-edit" title="Modifica date" *ngIf="canModify(p)"
+                  (click)="openEdit(p)" [disabled]="actionLoading">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+
+                <!-- Conferma (IN_ATTESA) -->
+                <button class="btn-icon btn-icon-ok" title="Conferma prenotazione"
+                  *ngIf="p.stato === 'IN_ATTESA'" [disabled]="actionLoading"
                   (click)="onAggiornaStato({id: p.id, stato: 'CONFERMATA'})">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </button>
-                <button class="btn-icon btn-icon-primary" title="Segna ritirata" *ngIf="p.stato === 'CONFERMATA'"
+
+                <!-- Segna ritirata (CONFERMATA) -->
+                <button class="btn-icon btn-icon-primary" title="Segna come ritirata"
+                  *ngIf="p.stato === 'CONFERMATA'" [disabled]="actionLoading"
                   (click)="onAggiornaStato({id: p.id, stato: 'RITIRATA'})">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
-                <button class="btn-icon btn-icon-ok" title="Segna riconsegnata" *ngIf="p.stato === 'RITIRATA'"
+
+                <!-- Segna restituita (RITIRATA) -->
+                <button class="btn-icon btn-icon-ok" title="Segna come restituita"
+                  *ngIf="p.stato === 'RITIRATA'" [disabled]="actionLoading"
                   (click)="onAggiornaStato({id: p.id, stato: 'RESTITUITA'})">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 </button>
-                <button class="btn-icon btn-icon-warn" title="Cancella"
-                  *ngIf="p.stato === 'IN_ATTESA' || p.stato === 'CONFERMATA'"
+
+                <!-- Cancella (se > 2 giorni al ritiro) -->
+                <button class="btn-icon btn-icon-warn" title="Cancella prenotazione"
+                  *ngIf="canCancel(p)" [disabled]="actionLoading"
                   (click)="onAggiornaStato({id: p.id, stato: 'CANCELLATA'})">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
-                <button class="btn-icon btn-icon-danger" title="Elimina" (click)="onDelete(p.id)">
+
+                <!-- Blocco 2 giorni: indicatore visivo quando le azioni sono bloccate -->
+                <span *ngIf="isBlocked(p)" class="pren-lock"
+                  title="Modifica/cancellazione bloccata: mancano meno di 2 giorni al ritiro">
+                  🔒
+                </span>
+
+                <!-- Elimina (DELETE, regola 2 giorni o già cancellata) -->
+                <button class="btn-icon btn-icon-danger" title="Elimina definitivamente"
+                  *ngIf="canDelete(p)" [disabled]="actionLoading"
+                  (click)="onDelete(p)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/>
                   </svg>
                 </button>
+
               </div>
             </td>
           </tr>
@@ -132,7 +171,9 @@
 
 </div>
 
-<!-- Detail Modal -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Modal: Dettaglio                                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <ng-template #detailModal let-modal>
   <div class="modal-header bo-modal-header">
     <h5 class="modal-title">Prenotazione #{{ selectedPrenotazione?.id }}</h5>
@@ -143,22 +184,38 @@
       <div class="col-md-6">
         <div class="detail-section">
           <div class="detail-section-title">Cliente</div>
-          <div class="detail-row"><span class="dl">Nome</span><span class="dv">{{ selectedPrenotazione.utente?.cognome }} {{ selectedPrenotazione.utente?.nome }}</span></div>
-          <div class="detail-row"><span class="dl">Email</span><span class="dv">{{ selectedPrenotazione.utente?.email }}</span></div>
+          <div class="detail-row">
+            <span class="dl">Nome</span>
+            <span class="dv">{{ selectedPrenotazione.utente?.cognome }} {{ selectedPrenotazione.utente?.nome }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="dl">Email</span>
+            <span class="dv">{{ selectedPrenotazione.utente?.email }}</span>
+          </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="detail-section">
-          <div class="detail-section-title">Sede & Date</div>
-          <div class="detail-row"><span class="dl">Sede</span><span class="dv">{{ selectedPrenotazione.puntoVendita?.nome }}, {{ selectedPrenotazione.puntoVendita?.citta }}</span></div>
-          <div class="detail-row"><span class="dl">Ritiro</span><span class="dv">{{ dataFmt(selectedPrenotazione.dataRitiro) }} ore {{ selectedPrenotazione.oraRitiro?.slice(0,5) }}</span></div>
-          <div class="detail-row"><span class="dl">Riconsegna</span><span class="dv">{{ dataOraFmt(selectedPrenotazione.dataOraRiconsegna) }}</span></div>
+          <div class="detail-section-title">Sede &amp; Date</div>
+          <div class="detail-row">
+            <span class="dl">Sede</span>
+            <span class="dv">{{ selectedPrenotazione.puntoVendita?.nome }}, {{ selectedPrenotazione.puntoVendita?.citta }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="dl">Ritiro</span>
+            <span class="dv">{{ dataFmt(selectedPrenotazione.dataRitiro) }} ore {{ selectedPrenotazione.oraRitiro?.slice(0,5) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="dl">Riconsegna</span>
+            <span class="dv">{{ dataOraFmt(selectedPrenotazione.dataOraRiconsegna) }}</span>
+          </div>
         </div>
       </div>
       <div class="col-12">
         <div class="detail-section">
           <div class="detail-section-title">Biciclette prenotate</div>
-          <div *ngIf="!selectedPrenotazione.righe || selectedPrenotazione.righe.length === 0" class="text-muted small">Dettaglio non disponibile</div>
+          <div *ngIf="!selectedPrenotazione.righe || selectedPrenotazione.righe.length === 0"
+            class="text-muted small">Dettaglio non disponibile</div>
           <div *ngFor="let r of selectedPrenotazione.righe" class="riga-detail">
             <div class="riga-bici">
               <span class="fw-600">{{ r.tipoBici?.categoria }} {{ r.tipoBici?.motorizzazione === 'ELETTRICA' ? '⚡' : '' }} – {{ r.tipoBici?.taglia }}</span>
@@ -174,8 +231,94 @@
     </div>
   </div>
   <div class="modal-footer bo-modal-footer">
-    <span class="stato-badge me-auto" *ngIf="selectedPrenotazione" [ngClass]="statoBadgeClass(selectedPrenotazione.stato)">{{ statoLabel(selectedPrenotazione.stato) }}</span>
+    <span class="stato-badge me-auto" *ngIf="selectedPrenotazione"
+      [ngClass]="statoBadgeClass(selectedPrenotazione.stato)">{{ statoLabel(selectedPrenotazione.stato) }}</span>
     <span class="fw-700 text-dark">Totale: € {{ selectedPrenotazione ? (+selectedPrenotazione.totale).toFixed(2) : '' }}</span>
+    <button type="button" class="btn btn-outline-primary btn-sm"
+      *ngIf="selectedPrenotazione && canModify(selectedPrenotazione)"
+      (click)="modal.dismiss(); openEdit(selectedPrenotazione!)">
+      ✏️ Modifica date
+    </button>
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Chiudi</button>
+  </div>
+</ng-template>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Modal: Modifica                                                -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<ng-template #editModal let-modal>
+  <div class="modal-header bo-modal-header">
+    <h5 class="modal-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-2">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+      Modifica Prenotazione #{{ editingPrenotazione?.id }}
+    </h5>
+    <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body" *ngIf="editingPrenotazione">
+    <!-- Info cliente (sola lettura) -->
+    <div class="edit-info-banner mb-3">
+      <div class="edit-info-row">
+        <span class="edit-info-label">Cliente</span>
+        <span class="edit-info-value">{{ editingPrenotazione.utente?.cognome }} {{ editingPrenotazione.utente?.nome }} · {{ editingPrenotazione.utente?.email }}</span>
+      </div>
+      <div class="edit-info-row">
+        <span class="edit-info-label">Sede</span>
+        <span class="edit-info-value">{{ editingPrenotazione.puntoVendita?.nome }}, {{ editingPrenotazione.puntoVendita?.citta }}</span>
+      </div>
+    </div>
+
+    <!-- Avviso 2 giorni -->
+    <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-3" role="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <small>Le modifiche sono consentite <strong>fino a 2 giorni prima</strong> della data di ritiro.</small>
+    </div>
+
+    <form [formGroup]="editForm">
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <div class="bo-form-group mb-0">
+            <label class="bo-label">Data ritiro <span class="text-danger">*</span></label>
+            <input type="date" class="bo-input" formControlName="dataRitiro" />
+            <div class="bo-error" *ngIf="editForm.get('dataRitiro')?.invalid && editForm.get('dataRitiro')?.touched">
+              Campo obbligatorio
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="bo-form-group mb-0">
+            <label class="bo-label">Ora ritiro <span class="text-danger">*</span></label>
+            <input type="time" class="bo-input" formControlName="oraRitiro" />
+            <div class="bo-error" *ngIf="editForm.get('oraRitiro')?.invalid && editForm.get('oraRitiro')?.touched">
+              Campo obbligatorio
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="bo-form-group mb-0">
+            <label class="bo-label">Data e ora riconsegna <span class="text-danger">*</span></label>
+            <input type="datetime-local" class="bo-input" formControlName="dataOraRiconsegna" />
+            <div class="bo-error" *ngIf="editForm.get('dataOraRiconsegna')?.invalid && editForm.get('dataOraRiconsegna')?.touched">
+              Campo obbligatorio
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer bo-modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()" [disabled]="saving">Annulla</button>
+    <button type="button" class="btn btn-primary" (click)="saveEdit(modal)"
+      [disabled]="editForm.invalid || saving">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+      Salva modifiche
+    </button>
   </div>
 </ng-template>
