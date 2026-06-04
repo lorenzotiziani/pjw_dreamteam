@@ -6,7 +6,7 @@ import {
   prenotazioneParamsSchema,
   prenotazioneByFiltersSchema,
 } from './prenotazioni.dto';
-import { StatoPrenotazione } from '@prisma/client';
+import { StatoPrenotazione, TipoOperazione } from '@prisma/client';
 
 export class PrenotazioniController {
 
@@ -83,7 +83,8 @@ export class PrenotazioniController {
   static async aggiornaStato(req: Request, res: Response, next: NextFunction) {
     try {
       const { params } = prenotazioneParamsSchema.parse({ params: req.params });
-      const { stato }  = req.body as { stato: StatoPrenotazione };
+      const { stato } = req.body as { stato: StatoPrenotazione };
+
       await PrenotazioniService.aggiornaStato(params.id, stato);
       res.json({
         success: true,

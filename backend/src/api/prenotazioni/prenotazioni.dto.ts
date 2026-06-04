@@ -15,7 +15,6 @@ const rigaAccessorioSchema = z.object({
 const rigaPrenotazioneSchema = z.object({
   tipoBiciId:  z.number(),
   coperturaId: z.number().optional(),
-  subtotale:   z.number(),
   accessori:   z.array(rigaAccessorioSchema).default([]),
 });
 
@@ -25,7 +24,6 @@ export const prenotazioneCreateSchema = z.object({
     oraRitiro:         timeHHMMSSSchema,
     dataOraRiconsegna: z.coerce.date(),
     stato:             z.nativeEnum(StatoPrenotazione).default(StatoPrenotazione.IN_ATTESA),
-    totale:            z.number(),
     utenteId:          z.number(),
     puntoVenditaId:    z.number(),
     righe:             z.array(rigaPrenotazioneSchema).min(1),
@@ -39,7 +37,6 @@ export const prenotazioneUpdateSchema = z.object({
     oraRitiro:         timeHHMMSSSchema.optional(),
     dataOraRiconsegna: z.coerce.date().optional(),
     stato:             z.nativeEnum(StatoPrenotazione).optional(),
-    totale:            z.number().optional(),
     righe:             z.array(rigaPrenotazioneSchema).min(1).optional(),
   }),
 });
