@@ -4,7 +4,8 @@ export interface User {
   cognome: string;
   email: string;
   pwd: string;
-  ruolo?: 'OPERATORE' | 'USER';
+  ruolo?: 'OPERATORE' | 'USER' | 'ADMIN';
+  isActive?: boolean;
   emailVerified?: boolean;
   emailVerificationToken: string | null;
   emailVerificationExpires: Date | null;
@@ -15,5 +16,6 @@ export interface UserSafe {
   email: string;
   nome: string;
   cognome: string;
-  ruolo?: 'OPERATORE' | 'USER';
+  ruolo?: 'OPERATORE' | 'USER' | 'ADMIN';
+  isActive?: boolean;
 }

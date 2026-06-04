@@ -1,6 +1,7 @@
-import { Response,NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { UserService } from './user.service';
 import { AuthRequest } from '../../middleware/auth.middleware';
+import { changeStatusSchema } from './user.dto';
 
 
 export class UserController {
@@ -75,6 +76,19 @@ export class UserController {
       });
     } catch (error) {
       next(error)
+    }
+  }
+
+  static async changeStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { params, body } = changeStatusSchema.parse({ params: req.params, body: req.body });
+      await UserService.changeStatus(params.id, body.isActive);
+      res.json({
+        success: true,
+        message: `Utente ${body.isActive ? 'attivato' : 'disabilitato'} con successo`,
+      });
+    } catch (error) {
+      next(error);
     }
   }
 

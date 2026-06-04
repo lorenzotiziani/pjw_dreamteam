@@ -131,7 +131,7 @@
           }
         },
         {
-          "name": "Lista utenti",
+          "name": "Lista utenti [ADMIN]",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
@@ -139,6 +139,26 @@
               "raw": "{{base_url}}/users",
               "host": ["{{base_url}}"],
               "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Cambia stato utente [ADMIN]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1", "status"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}",
+              "options": { "raw": { "language": "json" } }
             }
           }
         },
