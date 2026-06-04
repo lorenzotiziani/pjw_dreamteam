@@ -59,6 +59,10 @@ export class PuntiVenditaService {
   }
 
   static async createStock(puntoVenditaId: number, data: CreateStockDTO) {
+    const manutenzione = data.quantitaManutenzione ?? 0;
+    if (manutenzione > data.quantitaTotale)
+      throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
+
     try {
       return await prisma.stockBici.create({
         data: {
