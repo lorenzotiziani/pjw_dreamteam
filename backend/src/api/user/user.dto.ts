@@ -23,3 +23,10 @@ export const changePasswordRequirements = z.object({
 
 
 export type changePasswordDTO = z.infer<typeof changePasswordRequirements>['body'];
+
+export const changeStatusSchema = z.object({
+  params: z.object({ id: z.coerce.number() }),
+  body: z.object({ isActive: z.boolean() }),
+});
+
+export type changeStatusDTO = z.infer<typeof changeStatusSchema>;

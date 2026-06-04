@@ -132,7 +132,26 @@ export class PrenotazioniService {
     if (!prenotazione) throw new Error(`Prenotazione ${id} non trovata`);
     return prenotazione;
   }
-  
+
+  static async getMie(utenteId: number) {
+    return prisma.prenotazione.findMany({
+      where: { utenteId },
+      include: {
+        puntoVendita: true,
+        righe: {
+          include: {
+            tipoBici:  true,
+            copertura: true,
+            accessori: {
+              include: { accessorio: true },
+            },
+          },
+        },
+      },
+      orderBy: { creataIl: 'desc' },
+    });
+  }
+
   static async create(data: PrenotazioneCreateDTO): Promise<void> {
 
     const { body } = data;

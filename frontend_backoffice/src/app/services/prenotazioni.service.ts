@@ -15,6 +15,10 @@ export class PrenotazioniService {
     return this.http.get<any>(`/api/prenotazioni/${id}`).pipe(map(res => res.data as Prenotazione));
   }
 
+  update(id: number, data: { dataRitiro?: string; oraRitiro?: string; dataOraRiconsegna?: string }) {
+    return this.http.put<any>(`/api/prenotazioni/${id}`, data);
+  }
+
   aggiornaStato(id: number, stato: StatoPrenotazione) {
     return this.http.patch<any>(`/api/prenotazioni/${id}/stato`, { stato });
   }

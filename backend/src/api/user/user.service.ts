@@ -74,4 +74,12 @@ export class UserService {
     const users = await UserModel.findAll();
     return users
   }
+
+  static async changeStatus(userId: number, isActive: boolean): Promise<void> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new Error('Utente non trovato');
+    }
+    await UserModel.update(userId, { isActive });
+  }
 }

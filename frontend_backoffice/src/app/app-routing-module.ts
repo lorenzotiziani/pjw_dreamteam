@@ -9,16 +9,17 @@ import { PuntiVenditaComponent } from './pages/punti-vendita/punti-vendita';
 import { TipiBiciComponent } from './pages/tipi-bici/tipi-bici';
 import { AccessoriComponent } from './pages/accessori/accessori';
 import { CoperatureComponent } from './pages/coperture/coperture';
+import { roleGuard } from './guards/role.guard';
 
 const routes: Routes = [
     { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
     { path: 'login',         component: LoginComponent },
-    { path: 'dashboard',     component: DashboardComponent,    canActivate: [authGuard] },
-    { path: 'prenotazioni',  component: PrenotazioniComponent, canActivate: [authGuard] },
-    { path: 'punti-vendita', component: PuntiVenditaComponent, canActivate: [authGuard] },
-    { path: 'tipi-bici',     component: TipiBiciComponent,     canActivate: [authGuard] },
-    { path: 'accessori',     component: AccessoriComponent,    canActivate: [authGuard] },
-    { path: 'coperture',     component: CoperatureComponent,   canActivate: [authGuard] },
+    { path: 'dashboard',     component: DashboardComponent,    canActivate: [authGuard, roleGuard] },
+    { path: 'prenotazioni',   component: PrenotazioniComponent, canActivate: [authGuard, roleGuard] },
+    { path: 'punti-vendita',  component: PuntiVenditaComponent, canActivate: [authGuard, roleGuard] },
+    { path: 'tipi-bici',      component: TipiBiciComponent,     canActivate: [authGuard, roleGuard] },
+    { path: 'accessori',     component: AccessoriComponent,    canActivate: [authGuard, roleGuard] },
+    { path: 'coperture',     component: CoperatureComponent,   canActivate: [authGuard, roleGuard] },
 ];
 
 @NgModule({

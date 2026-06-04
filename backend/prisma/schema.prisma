@@ -19,6 +19,7 @@ model TUtente {
   pwd      String
   ruolo    Ruolo    @default(USER)
   creatoIl DateTime @default(now())
+  isActive Boolean @default(true)
   
   emailVerified Boolean @default(false)
   emailVerificationToken String?
@@ -43,6 +44,7 @@ model RefreshToken {
 enum Ruolo {
   OPERATORE
   USER
+  ADMIN
 }
 
 // ─────────────────────────────────────────

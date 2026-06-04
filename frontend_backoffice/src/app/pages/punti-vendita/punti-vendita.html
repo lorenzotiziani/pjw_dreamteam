@@ -117,7 +117,7 @@
               <label class="bo-label">Tipo bici</label>
               <select class="bo-input" formControlName="tipoBiciId">
                 <option [ngValue]="null">Seleziona...</option>
-                <option *ngFor="let t of availableTipi()" [value]="t.id">{{ tipoBiciLabel(t.id) }}</option>
+                <option *ngFor="let t of availableTipi()" [ngValue]="t.id">{{ tipoBiciLabel(t.id) }}</option>
               </select>
             </div>
             <div class="col-6 col-sm-3">

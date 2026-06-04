@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { forkJoin, of } from 'rxjs';
 import { PuntiVenditaService } from '../../services/punti-vendita.service';
 import { TipiBiciService } from '../../services/tipi-bici.service';
 import { PuntoVendita, StockBici } from '../../entities/punto-vendita.entity';
@@ -54,7 +55,29 @@ export class PuntiVenditaComponent implements OnInit {
   load() {
     this.loading = true;
     this.srv.getAll().subscribe({
-      next: data => { this.puntiVendita = data ?? []; this.loading = false; },
+      next: puntiVendita => {
+        if (!puntiVendita?.length) {
+          this.puntiVendita = [];
+          this.loading = false;
+          return;
+        }
+        // Lo smart recupera lo stock per ogni sede e lo inietta in puntoVendita.stockBici
+        // così la card (dumb) riceve l'oggetto già completo senza fare chiamate proprie
+        forkJoin(puntiVendita.map(pv => this.srv.getStock(pv.id))).subscribe({
+          next: stockArrays => {
+            this.puntiVendita = puntiVendita.map((pv, i) => ({
+              ...pv,
+              stockBici: stockArrays[i] ?? []
+            }));
+            this.loading = false;
+          },
+          error: () => {
+            // Se le chiamate stock falliscono mostra comunque le card (senza contatori)
+            this.puntiVendita = puntiVendita;
+            this.loading = false;
+          }
+        });
+      },
       error: () => { this.loading = false; }
     });
   }
@@ -139,7 +162,14 @@ export class PuntiVenditaComponent implements OnInit {
         this.editingStockId = null;
         this.stockForm.reset({ tipoBiciId: null, quantitaTotale: 1, quantitaManutenzione: 0 });
         this.srv.getStock(this.selectedPv!.id).subscribe(data => {
-          this.stockList = data ?? [];
+          const stock = data ?? [];
+          // Aggiorna il modale
+          this.stockList = stock;
+          // Aggiorna anche la card corrispondente nell'array locale
+          // così i contatori (Bici totali / Manutenzione / Disponibili) si riflettono subito
+          this.puntiVendita = this.puntiVendita.map(pv =>
+            pv.id === this.selectedPv!.id ? { ...pv, stockBici: stock } : pv
+          );
           this.saving = false;
         });
       },
