@@ -1,4 +1,4 @@
-import { RigaAccessorio, StatoPrenotazione } from "@prisma/client";
+import { RigaAccessorio, StatoPrenotazione, TipoLogPrenotazione } from "@prisma/client";
 import {
   PrenotazioneCreateDTO,
   PrenotazioneUpdateDTO,
@@ -21,6 +21,7 @@ function twoDaysFromNow(): Date {
   return new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
 }
 
+//TODO: DA FIXARE, CONTROLLARE LE MEZZE GIORNATE
 function calcolaGiorni(dataOraRitiro: Date, dataOraRiconsegna: Date): number {
   const diffMs = dataOraRiconsegna.getTime() - dataOraRitiro.getTime();
   if (diffMs <= 0) {
@@ -292,26 +293,47 @@ export class PrenotazioniService {
 
   static async aggiornaStato(
     id: number,
-    stato: StatoPrenotazione,
+    stato: StatoPrenotazione | TipoLogPrenotazione,
+    operatoreId: number,
+    note?: string,
   ): Promise<void> {
     const existing = await PrenotazioniService.getById(id);
-
     if (!existing) {
       throw new Error(`La prenotazione non esiste`);
     }
-
+  
+    if (
+      stato === TipoLogPrenotazione.DANNO ||
+      stato === TipoLogPrenotazione.RITARDO
+    ) {
+      await prisma.logPrenotazione.create({
+        data: {
+          prenotazioneId: id,
+          operatoreId,
+          tipo: stato,
+          note,
+        },
+      });
+      return;
+    }
+  
     if (existing.stato === stato) {
       throw new Error(`La prenotazione è già ${stato}`);
     }
-
-    if (
-      existing.stato !== StatoPrenotazione.RESTITUITA &&
-      stato === StatoPrenotazione.RESTITUITA
-    ) {
+  
+    if (stato === StatoPrenotazione.RESTITUITA) {
       await prisma.$transaction(async (tx) => {
         await tx.prenotazione.update({
           where: { id },
           data: { stato },
+        });
+        await tx.logPrenotazione.create({
+          data: {
+            prenotazioneId: id,
+            operatoreId,
+            tipo: TipoLogPrenotazione.RESTITUITA,
+            note,
+          },
         });
         for (const riga of existing.righe) {
           await tx.stockBici.update({
@@ -326,9 +348,19 @@ export class PrenotazioniService {
         }
       });
     } else {
-      await prisma.prenotazione.update({
-        where: { id },
-        data: { stato },
+      await prisma.$transaction(async (tx) => {
+        await tx.prenotazione.update({
+          where: { id },
+          data: { stato },
+        });
+        await tx.logPrenotazione.create({
+          data: {
+            prenotazioneId: id,
+            operatoreId,
+            tipo: stato as TipoLogPrenotazione,
+            note,
+          },
+        });
       });
     }
   }

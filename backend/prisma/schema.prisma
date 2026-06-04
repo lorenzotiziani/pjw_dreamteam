@@ -26,7 +26,7 @@ model TUtente {
   emailVerificationExpires DateTime?
 
   prenotazioni  Prenotazione[]
-  operaziones   Operazione[]
+  operaziones   LogPrenotazione[]
   refreshTokens RefreshToken[]
 }
 
@@ -150,7 +150,7 @@ model Prenotazione {
   utente       TUtente            @relation(fields: [utenteId], references: [id])
   puntoVendita PuntoVendita       @relation(fields: [puntoVenditaId], references: [id])
   righe        RigaPrenotazione[]
-  operazioni   Operazione[]
+  operazioni   LogPrenotazione[]
 
   @@map("prenotazioni")
 }
@@ -195,24 +195,25 @@ model RigaAccessorio {
 // OPERAZIONI DI BACKOFFICE
 // ─────────────────────────────────────────
 
-model Operazione {
-  id             Int            @id @default(autoincrement())
-  prenotazioneId Int
-  utenteId       Int
-  tipo           TipoOperazione
-  eseguitaIl     DateTime       @default(now())
-  note           String?
+model LogPrenotazione {
+  id              Int            @id @default(autoincrement())
+  prenotazioneId  Int
+  operatoreId     Int
+  tipo            TipoLogPrenotazione
+  eseguitaIl      DateTime       @default(now())
+  note            String?
 
-  prenotazione Prenotazione @relation(fields: [prenotazioneId], references: [id])
-  utente       TUtente      @relation(fields: [utenteId], references: [id])
+  prenotazione    Prenotazione @relation(fields: [prenotazioneId], references: [id])
+  utente          TUtente      @relation(fields: [operatoreId], references: [id])
 
-  @@map("operazioni")
+  @@map("log_operazioni")
 }
 
-enum TipoOperazione {
-  RITIRO
-  RICONSEGNA
+enum TipoLogPrenotazione {
+  CONFERMATA
+  RITIRATA
+  RESTITUITA
+  CANCELLATA
   DANNO
   RITARDO
-  MANUTENZIONE
 }
