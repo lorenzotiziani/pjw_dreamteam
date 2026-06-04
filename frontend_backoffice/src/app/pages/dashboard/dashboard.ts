@@ -39,7 +39,7 @@ export class DashboardComponent implements OnInit {
 
   get ricaviTotali(): string {
     const tot = this.prenotazioni
-      .filter(p => p.stato === 'RITIRATA')
+      .filter(p => p.stato === 'RITIRATA' || p.stato === 'RESTITUITA')
       .reduce((s, p) => s + Number(p.totale), 0);
     return tot.toFixed(2);
   }
