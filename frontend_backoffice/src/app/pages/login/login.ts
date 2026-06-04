@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, map, Subject, takeUntil, throwError } from 'rxjs';
+import { catchError, Subject, takeUntil, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -32,8 +32,13 @@ export class LoginComponent implements OnInit, OnDestroy {
       .subscribe(_ => { this.loginError = ''; });
 
     this.activatedRoute.queryParams
-      .pipe(takeUntil(this.destroyed$), map(params => params['requestedUrl']))
-      .subscribe(url => { this.requestedUrl = url; });
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(params => {
+        this.requestedUrl = params['requestedUrl'] ?? null;
+        if (params['error'] === 'forbidden') {
+          this.loginError = 'Non hai i permessi per accedere a quest\'area.';
+        }
+      });
   }
 
   ngOnDestroy(): void {
