@@ -33,6 +33,7 @@ export const createStockSchema = z.object({
 
 export const updateStockSchema = z.object({
   body: z.object({
+    quantitaAttuale: z.number().int().min(0).optional(),
     quantitaTotale: z.number().int().min(0).optional(),
     quantitaManutenzione: z.number().int().min(0).optional(),
   }).refine(

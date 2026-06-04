@@ -60,6 +60,7 @@ export class PuntiVenditaService {
 
   static async createStock(puntoVenditaId: number, data: CreateStockDTO) {
     const manutenzione = data.quantitaManutenzione ?? 0;
+    
     if (manutenzione > data.quantitaTotale)
       throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
 
@@ -68,8 +69,9 @@ export class PuntiVenditaService {
         data: {
           puntoVenditaId,
           tipoBiciId: data.tipoBiciId,
+          quantitaAttuale: data.quantitaTotale - manutenzione,
           quantitaTotale: data.quantitaTotale,
-          quantitaManutenzione: data.quantitaManutenzione ?? 0,
+          quantitaManutenzione: manutenzione,
         },
         include: { tipoBici: true },
       });
