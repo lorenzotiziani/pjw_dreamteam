@@ -104,6 +104,36 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
+/* ── Password wrapper + occhietto ─────────────────────── */
+.login-input-wrap {
+    position: relative;
+}
+
+.login-input-wrap .login-input {
+    padding-right: 2.6rem;
+}
+
+.login-eye {
+    position: absolute;
+    right: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s;
+    line-height: 1;
+}
+
+.login-eye:hover {
+    color: #2563eb;
+}
+
 /* ── Errore ────────────────────────────────────────────── */
 .login-error {
     display: flex;

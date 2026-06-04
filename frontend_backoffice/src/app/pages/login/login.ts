@@ -25,6 +25,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   loginError = '';
   requestedUrl: string | null = null;
+  showPassword = false;
 
   ngOnInit() {
     this.loginForm.valueChanges
