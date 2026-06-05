@@ -1,4 +1,8 @@
-import { NgModule, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import {
+  NgModule,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -23,34 +27,30 @@ import { CoperatureComponent } from './pages/coperture/coperture';
 
 import { authInterceptor } from './interceptors/auth-interceptor';
 import { logoutInterceptor } from './interceptors/logout-interceptor';
+import { IfAuthenticatedDirective } from './directives/if-authenticated';
 
 @NgModule({
-    declarations: [
-        App,
-        LoginComponent,
-        NavbarComponent,
-        NavUserComponent,
-        StatCardComponent,
-        PuntoVenditaCardComponent,
-        DashboardComponent,
-        PrenotazioniComponent,
-        PuntiVenditaComponent,
-        TipiBiciComponent,
-        AccessoriComponent,
-        CoperatureComponent,
-    ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        NgbModule,
-        FormsModule,
-        ReactiveFormsModule
-    ],
-    providers: [
-        provideBrowserGlobalErrorListeners(),
-        provideZoneChangeDetection({ eventCoalescing: true }),
-        provideHttpClient(withInterceptors([authInterceptor, logoutInterceptor]))
-    ],
-    bootstrap: [App],
+  declarations: [
+    App,
+    LoginComponent,
+    NavbarComponent,
+    NavUserComponent,
+    StatCardComponent,
+    PuntoVenditaCardComponent,
+    DashboardComponent,
+    PrenotazioniComponent,
+    PuntiVenditaComponent,
+    TipiBiciComponent,
+    AccessoriComponent,
+    CoperatureComponent,
+    IfAuthenticatedDirective,
+  ],
+  imports: [BrowserModule, AppRoutingModule, NgbModule, FormsModule, ReactiveFormsModule],
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideHttpClient(withInterceptors([authInterceptor, logoutInterceptor])),
+  ],
+  bootstrap: [App],
 })
 export class AppModule {}

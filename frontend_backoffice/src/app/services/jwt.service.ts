@@ -1,86 +1,162 @@
 import { Injectable } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 
+interface DecodedToken {
+  userId: number;
+  email: string;
+  exp: number;
+  iat: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-export class JwtService {
-  protected tokenStorageKey = 'authToken';
-  protected refreshStorageKey = 'authRefreshToken';
 
-  // funzione che mi permette di ottenere il contenuto del mio token
-  getPayload<T>() {
+export class JwtService {
+  private readonly ACCESS_TOKEN_KEY = 'authToken';
+  private readonly REFRESH_TOKEN_KEY = 'authRefreshToken';
+
+  /**
+   * Decodifica il payload del token
+   */
+  getPayload<T = DecodedToken>(): T | null {
     const authTokens = this.getToken();
-    if (!authTokens) {
+    if (!authTokens || !this.isJwt(authTokens.token)) {
       return null;
     }
-    return jwtDecode<T>(authTokens.token);
+
+    try {
+      return jwtDecode<T>(authTokens.token);
+    } catch (e) {
+      console.error('Failed to decode access token', e);
+      return null;
+    }
   }
 
-  // funzione che fa il check se i token sono ancora validi
-  areTokensValid() {
-    // assegno alla variabile il risultato della funzione getToken()
+  /**
+   * ⚠️ CORRETTO: Verifica se il REFRESH token è valido
+   * (l'access token può essere scaduto, verrà refreshato)
+   */
+  areTokensValid(): boolean {
     const authTokens = this.getToken();
     if (!authTokens) {
       return false;
     }
-    // ottengo le informazioni del token decodificato
-    const decoded = jwtDecode(authTokens.refreshToken);
-    // se il token no ha exp, allora è considerato valido
-    // se ha exp, se scaduto -> flase, se non è scaduto -> true
-    // col *1000 setto il Date.nox() a secondi così da avere una validazione con lo stesso tipo di dato e effettuare la verifica
-    return !decoded.exp || decoded.exp * 1000 > Date.now();
-  }
 
-  getToken(): { token: string, refreshToken: string } | null {
-    // mi prendo i due token dal local storage se presenti
-    const token = localStorage.getItem(this.tokenStorageKey);
-    const refreshToken = localStorage.getItem(this.refreshStorageKey);
-
-    // faccio un check per verificare se i token sono presenti, se non ci sono return null
-    if (!(token && refreshToken)) {
-      this.removeToken();
-      return null;
-    }
-
-    // altrimenti return dei due token
-    return {
-      token,
-      refreshToken
-    };
-  }
-
-  // funzione che setta i due token nel localStorage del Browser
-  setToken(token: string, refreshToken: string) {
-    localStorage.setItem(this.tokenStorageKey, token);
-    localStorage.setItem(this.refreshStorageKey, refreshToken);
-  }
-
-  // funzione che rimuove i due token
-  removeToken() {
-    localStorage.removeItem(this.tokenStorageKey);
-    localStorage.removeItem(this.refreshStorageKey);
-  }
-
-  isTokenValid(): boolean {
-    const tokens = this.getToken();
-    if (!tokens) {
+    // Controlla il REFRESH token, non l'access token
+    if (!this.isJwt(authTokens.refreshToken)) {
       return false;
     }
 
     try {
-      const decoded: { exp?: number } = jwtDecode(tokens.refreshToken);
+      const decoded: any = jwtDecode(authTokens.refreshToken);
+      const isValid = !decoded.exp || decoded.exp * 1000 > Date.now();
 
-      // Se il token non ha campo exp consideralo valido
-      if (!decoded.exp) {
-        return true;
+      if (!isValid) {
+        console.warn('⚠️ Refresh token scaduto');
       }
 
-      // Se ha exp, verifica se non è scaduto
-      return decoded.exp * 1000 > Date.now();
+      return isValid;
     } catch (e) {
-      // Se il token è malformato o jwtDecode fallisce, ritorna false
+      console.error('Invalid refresh token', e);
       return false;
     }
+  }
+
+  /**
+   * Verifica se l'access token è ancora valido
+   */
+  isAccessTokenValid(): boolean {
+    const authTokens = this.getToken();
+    if (!authTokens || !this.isJwt(authTokens.token)) {
+      return false;
+    }
+
+    try {
+      const decoded: any = jwtDecode(authTokens.token);
+      return !decoded.exp || decoded.exp * 1000 > Date.now();
+    } catch (e) {
+      console.error('Invalid access token', e);
+      return false;
+    }
+  }
+
+  /**
+   * Verifica se il refresh token è ancora valido
+   */
+  isRefreshTokenValid(): boolean {
+    return this.areTokensValid();
+  }
+
+  /**
+   * Recupera i token da localStorage
+   */
+  getToken(): { token: string; refreshToken: string } | null {
+    const token = localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    const refreshToken = localStorage.getItem(this.REFRESH_TOKEN_KEY);
+
+    if (!token || !refreshToken) {
+      return null;
+    }
+
+    return { token, refreshToken };
+  }
+
+  /**
+   * Salva i token in localStorage
+   */
+  setToken(token: string, refreshToken: string): void {
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+  }
+
+  /**
+   * Rimuove i token da localStorage
+   */
+  removeToken(): void {
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+  }
+
+  /**
+   * Verifica se l'utente è autenticato
+   * (ha almeno un refresh token valido)
+   */
+  isAuthenticated(): boolean {
+    return this.areTokensValid();
+  }
+
+  /**
+   * Calcola quanto tempo manca alla scadenza dell'access token (in secondi)
+   */
+  getAccessTokenTimeToExpire(): number | null {
+    const authTokens = this.getToken();
+    if (!authTokens || !this.isJwt(authTokens.token)) {
+      return null;
+    }
+
+    try {
+      const decoded: any = jwtDecode(authTokens.token);
+      const now = Date.now() / 1000; // Converti in secondi
+      const timeToExpire = decoded.exp - now;
+
+      return timeToExpire > 0 ? timeToExpire : 0;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Ottieni i dati dell'utente dal token
+   */
+  getUserData(): DecodedToken | null {
+    return this.getPayload<DecodedToken>();
+  }
+
+  /**
+   * Verifica se una stringa è un JWT valido
+   */
+  private isJwt(token: string): boolean {
+    return !!token && token.split('.').length === 3;
   }
 }
