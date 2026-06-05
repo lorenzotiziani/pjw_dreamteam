@@ -34,7 +34,7 @@ export const prenotazioneUpdateSchema = z.object({
     dataRitiro:        z.coerce.date().optional(),
     oraRitiro:         timeHHMMSSSchema.optional(),
     dataOraRiconsegna: z.coerce.date().optional(),
-    puntoVenditaId:    z.number(),
+    puntoVenditaId:    z.number().optional(),
     stato:             z.nativeEnum(StatoPrenotazione).optional(),
     righe:             z.array(rigaPrenotazioneSchema).min(1).optional(),
   }),
