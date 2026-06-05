@@ -98,7 +98,6 @@ export class PrenotazioniController {
   static async aggiornaStato(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { params, body } = prenotazioneAggiornaStatoSchema.parse({ params: req.params, body: req.body });
-      const operatoreId = (req as AuthRequest).user!.userId;
 
       const operatoreId = req.user!.userId;
       
