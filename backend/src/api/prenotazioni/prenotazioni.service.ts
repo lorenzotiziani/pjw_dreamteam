@@ -21,19 +21,19 @@ function twoDaysFromNow(): Date {
   return new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
 }
 
-//TODO: DA FIXARE, CONTROLLARE LE MEZZE GIORNATE
-function calcolaGiorni(dataOraRitiro: Date, dataOraRiconsegna: Date): number {
+function calcolaMezzeGiornate(dataOraRitiro: Date, dataOraRiconsegna: Date): number {
   const diffMs = dataOraRiconsegna.getTime() - dataOraRitiro.getTime();
   if (diffMs <= 0) {
     throw new Error("La data di riconsegna deve essere successiva al ritiro.");
   }
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  const diffOre = diffMs / (1000 * 60 * 60);
+  return Math.ceil(diffOre / 6);
 }
 
 async function prenotaBici(
   tx: any,
   puntoVenditaId: number,
-  tipoBiciId: number
+  tipoBiciId: number,
 ): Promise<void> {
   const result = await tx.stockBici.updateMany({
     where: {
@@ -51,7 +51,7 @@ async function prenotaBici(
 async function rilasciaBici(
   tx: any,
   puntoVenditaId: number,
-  tipoBiciId: number
+  tipoBiciId: number,
 ): Promise<void> {
   await tx.stockBici.update({
     where: {
@@ -64,15 +64,11 @@ async function rilasciaBici(
   });
 }
 
-async function calcolaRiga(
-  riga: any,
-  giorniNoleggio: number
-) {
+async function calcolaRiga(riga: any, mezzeGiornate: number) {
   const tipoBici = await TipiBiciService.getById(riga.tipoBiciId);
   if (!tipoBici) throw new Error(`Tipo bici ${riga.tipoBiciId} non trovato`);
 
-  const prezzoGiornaliero = Number(tipoBici.prezzoMezzaGiornata) * 2;
-  let subtotale = prezzoGiornaliero * giorniNoleggio;
+  let subtotale = Number(tipoBici.prezzoMezzaGiornata) * mezzeGiornate;
 
   if (riga.coperturaId) {
     const copertura = await CopertureService.getById(riga.coperturaId);
@@ -85,7 +81,7 @@ async function calcolaRiga(
     const accessorio = await AccessoriService.getById(acc.accessorioId);
     if (!accessorio)
       throw new Error(`Accessorio ${acc.accessorioId} non trovato`);
-    subtotale += Number(accessorio.prezzo) * acc.quantita * giorniNoleggio;
+    subtotale += Number(accessorio.prezzo) * acc.quantita * mezzeGiornate;
   }
 
   return {
@@ -104,8 +100,7 @@ async function calcolaRiga(
 export class PrenotazioniService {
   static async getAll(filters: PrenotazioneByFiltersDTO) {
     const where: any = {};
-    if (filters.query.utenteId)
-      where.utenteId = Number(filters.query.utenteId);
+    if (filters.query.utenteId) where.utenteId = Number(filters.query.utenteId);
     if (filters.query.puntoVenditaId)
       where.puntoVenditaId = Number(filters.query.puntoVenditaId);
     if (filters.query.dataRitiro) {
@@ -120,7 +115,15 @@ export class PrenotazioniService {
     return prisma.prenotazione.findMany({
       where,
       include: {
-        utente: { select: { id: true, nome: true, cognome: true, email: true, ruolo: true } },
+        utente: {
+          select: {
+            id: true,
+            nome: true,
+            cognome: true,
+            email: true,
+            ruolo: true,
+          },
+        },
         puntoVendita: true,
         righe: {
           include: {
@@ -138,7 +141,15 @@ export class PrenotazioniService {
     const prenotazione = await prisma.prenotazione.findUnique({
       where: { id },
       include: {
-        utente: { select: { id: true, nome: true, cognome: true, email: true, ruolo: true } },
+        utente: {
+          select: {
+            id: true,
+            nome: true,
+            cognome: true,
+            email: true,
+            ruolo: true,
+          },
+        },
         puntoVendita: true,
         righe: {
           include: {
@@ -178,7 +189,7 @@ export class PrenotazioniService {
     const { body } = data;
 
     const dataOraRitiro = buildOraRitiro(body.dataRitiro, body.oraRitiro);
-    const giorniNoleggio = calcolaGiorni(dataOraRitiro, body.dataOraRiconsegna);
+    const giorniNoleggio = calcolaMezzeGiornate(dataOraRitiro, body.dataOraRiconsegna);
 
     await prisma.$transaction(async (tx) => {
       for (const riga of body.righe) {
@@ -186,10 +197,13 @@ export class PrenotazioniService {
       }
 
       const righeCalcolate = await Promise.all(
-        body.righe.map((riga) => calcolaRiga(riga, giorniNoleggio))
+        body.righe.map((riga) => calcolaRiga(riga, giorniNoleggio)),
       );
 
-      const totale = righeCalcolate.reduce((somma, r) => somma + r.subtotale, 0);
+      const totale = righeCalcolate.reduce(
+        (somma, r) => somma + r.subtotale,
+        0,
+      );
 
       await tx.prenotazione.create({
         data: {
@@ -214,7 +228,7 @@ export class PrenotazioniService {
 
     if (prenotazione.dataRitiro <= twoDaysFromNow()) {
       throw new Error(
-        "Impossibile modificare: mancano meno di 2 giorni al ritiro."
+        "Impossibile modificare: mancano meno di 2 giorni al ritiro.",
       );
     }
 
@@ -222,9 +236,14 @@ export class PrenotazioniService {
     const nuovaOraRitiro = body.oraRitiro
       ? buildOraRitiro(nuovaDataRitiro, body.oraRitiro)
       : prenotazione.oraRitiro;
-    const nuovaDataOraRiconsegna = body.dataOraRiconsegna ?? prenotazione.dataOraRiconsegna;
-    const giorniNoleggio = calcolaGiorni(nuovaOraRitiro, nuovaDataOraRiconsegna);
-    const nuovoPuntoVenditaId = body.puntoVenditaId ?? prenotazione.puntoVenditaId;
+    const nuovaDataOraRiconsegna =
+      body.dataOraRiconsegna ?? prenotazione.dataOraRiconsegna;
+    const giorniNoleggio = calcolaMezzeGiornate(
+      nuovaOraRitiro,
+      nuovaDataOraRiconsegna,
+    );
+    const nuovoPuntoVenditaId =
+      body.puntoVenditaId ?? prenotazione.puntoVenditaId;
 
     await prisma.$transaction(async (tx) => {
       for (const riga of prenotazione.righe) {
@@ -237,9 +256,12 @@ export class PrenotazioniService {
         }
 
         const righeCalcolate = await Promise.all(
-          body.righe.map((riga) => calcolaRiga(riga, giorniNoleggio))
+          body.righe.map((riga) => calcolaRiga(riga, giorniNoleggio)),
         );
-        const totale = righeCalcolate.reduce((somma, r) => somma + r.subtotale, 0);
+        const totale = righeCalcolate.reduce(
+          (somma, r) => somma + r.subtotale,
+          0,
+        );
 
         await tx.rigaPrenotazione.deleteMany({
           where: { prenotazioneId: params.id },
@@ -279,7 +301,7 @@ export class PrenotazioniService {
 
     if (prenotazione.dataRitiro <= twoDaysFromNow()) {
       throw new Error(
-        "Impossibile eliminare: mancano meno di 2 giorni al ritiro."
+        "Impossibile eliminare: mancano meno di 2 giorni al ritiro.",
       );
     }
 
@@ -302,40 +324,68 @@ export class PrenotazioniService {
       throw new Error(`La prenotazione non esiste`);
     }
   
-    if (
-      stato === StatoPrenotazione.DANNO ||
-      stato === StatoPrenotazione.RITARDO
-    ) {
-      await prisma.logPrenotazione.create({
-        data: {
-          prenotazioneId: id,
-          operatoreId,
-          tipo: stato,
-          note,
-        },
-      });
-      return;
-    }
-  
     if (existing.stato === stato) {
       throw new Error(`La prenotazione è già ${stato}`);
     }
   
+    if (stato === StatoPrenotazione.RITARDO) {
+      await prisma.logPrenotazione.create({
+        data: { prenotazioneId: id, operatoreId, tipo: stato, note },
+      });
+      return;
+    }
+  
+    if (stato === StatoPrenotazione.DANNO) {
+      await prisma.$transaction(async (tx) => {
+        for (const riga of existing.righe) {
+          const stock = await tx.stockBici.findUnique({
+            where: {
+              puntoVenditaId_tipoBiciId: {
+                puntoVenditaId: existing.puntoVenditaId,
+                tipoBiciId: riga.tipoBiciId,
+              },
+            },
+          });
+          
+          if (!stock) throw new Error(`Stock non trovato per bici ${riga.tipoBiciId}`);
+          if (stock.quantitaAttuale + stock.quantitaManutenzione + 1 > stock.quantitaTotale) {
+            throw new Error(`Impossibile segnalare danno: tutte le bici sono già state restituite`);
+          }
+          
+          await tx.stockBici.update({
+            where: {
+              puntoVenditaId_tipoBiciId: {
+                puntoVenditaId: existing.puntoVenditaId,
+                tipoBiciId: riga.tipoBiciId,
+              },
+            },
+            data: { quantitaManutenzione: { increment: 1 } },
+          });
+        }
+        await tx.logPrenotazione.create({
+          data: { prenotazioneId: id, operatoreId, tipo: stato, note },
+        });
+      });
+      return;
+    }
+  
     if (stato === StatoPrenotazione.RESTITUITA) {
       await prisma.$transaction(async (tx) => {
-        await tx.prenotazione.update({
-          where: { id },
-          data: { stato },
-        });
-        await tx.logPrenotazione.create({
-          data: {
-            prenotazioneId: id,
-            operatoreId,
-            tipo: StatoPrenotazione.RESTITUITA,
-            note,
-          },
-        });
         for (const riga of existing.righe) {
+          const stock = await tx.stockBici.findUnique({
+            where: {
+              puntoVenditaId_tipoBiciId: {
+                puntoVenditaId: existing.puntoVenditaId,
+                tipoBiciId: riga.tipoBiciId,
+              },
+            },
+          });
+          
+          if (!stock) throw new Error(`Stock non trovato per bici ${riga.tipoBiciId}`);
+          if (stock.quantitaAttuale + 1  + stock.quantitaManutenzione > stock.quantitaTotale) {
+            throw new Error(`Impossibile restituire: si supererebbe la quantità totale`);
+          }
+
           await tx.stockBici.update({
             where: {
               puntoVenditaId_tipoBiciId: {
@@ -346,22 +396,25 @@ export class PrenotazioniService {
             data: { quantitaAttuale: { increment: 1 } },
           });
         }
-      });
-    } else {
-      await prisma.$transaction(async (tx) => {
         await tx.prenotazione.update({
           where: { id },
           data: { stato },
         });
         await tx.logPrenotazione.create({
-          data: {
-            prenotazioneId: id,
-            operatoreId,
-            tipo: stato as StatoPrenotazione,
-            note,
-          },
+          data: { prenotazioneId: id, operatoreId, tipo: stato, note },
         });
       });
+      return;
     }
+  
+    await prisma.$transaction(async (tx) => {
+      await tx.prenotazione.update({
+        where: { id },
+        data: { stato },
+      });
+      await tx.logPrenotazione.create({
+        data: { prenotazioneId: id, operatoreId, tipo: stato as StatoPrenotazione, note },
+      });
+    });
   }
 }

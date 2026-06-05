@@ -10,9 +10,9 @@ const router = Router();
 // Punti vendita
 router.get('/', PuntiVenditaController.getAll);
 router.get('/:id', PuntiVenditaController.getById);
-router.post('/', authMiddleware, requireRole('OPERATORE'), validate(createPuntoVenditaSchema), PuntiVenditaController.create);
-router.put('/:id', authMiddleware, requireRole('OPERATORE'), validate(updatePuntoVenditaSchema), PuntiVenditaController.update);
-router.delete('/:id', authMiddleware, requireRole('OPERATORE'), PuntiVenditaController.delete);
+router.post('/', authMiddleware, requireRole('ADMIN'), validate(createPuntoVenditaSchema), PuntiVenditaController.create);
+router.put('/:id', authMiddleware, requireRole('ADMIN'), validate(updatePuntoVenditaSchema), PuntiVenditaController.update);
+router.delete('/:id', authMiddleware, requireRole('ADMIN'), PuntiVenditaController.delete);
 
 // Stock
 router.get('/:id/stock', PuntiVenditaController.getStock);
