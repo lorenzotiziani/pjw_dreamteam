@@ -33,7 +33,7 @@ export class AuthService {
       pwd: hashedPassword,
       nome: data.nome,
       cognome: data.cognome,
-      ruolo: "USER",
+      ruolo: data.ruolo === "ADMIN" ? "ADMIN" : "USER",
       emailVerificationToken: emailToken,
       emailVerificationExpires: expires,
     });
@@ -41,7 +41,7 @@ export class AuthService {
     const verifyLink = `${process.env.FRONTEND_URL}/verify-email?token=${emailToken}`;
 
     await transporter.sendMail({
-      from: 'no-reply@pjw-dreamteam.it',
+      from: '<no-reply@pjw-dreamteam.it>',
       to: user.email,
       subject: "Verifica la tua email",
       html: `
