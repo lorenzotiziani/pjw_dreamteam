@@ -40,11 +40,15 @@ interface JwtPayload {
     iat?: number;
 }
 
+// Sottoinsieme del profilo utente salvato in localStorage per il ripristino immediato
+type CachedUser = Pick<User, 'id' | 'nome' | 'cognome' | 'email' | 'ruolo'>;
+
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private readonly API_URL = 'http://localhost:3000/api';
+    private readonly USER_CACHE_KEY = 'currentUserCache';
 
     protected http = inject(HttpClient);
     protected jwtSrv = inject(JwtService);
@@ -87,18 +91,18 @@ export class AuthService {
                 error: () => this.performLogout()
             });
         } else {
-            // Token validi → emetti subito l'utente dal payload JWT (sincrono!)
-            // Questo evita la race condition tra la guard e la chiamata HTTP
-            const user = this.buildUserFromToken();
+            // Token validi → emetti subito l'utente (sincrono, nessuna HTTP)
+            // Priorità: cache localStorage (ha nome/cognome) > payload JWT (solo id/email/ruolo)
+            const user = this.buildUserFromCache() ?? this.buildUserFromToken();
             if (!user) {
                 this._currentUser$.next(null);
                 return;
             }
             this._currentUser$.next(user);
-            console.log('✅ Utente autenticato ripristinato dal token');
+            console.log('✅ Utente autenticato ripristinato', this.buildUserFromCache() ? '(dalla cache)' : '(dal token)');
 
-            // In background: aggiorna con i dati completi dal server (nome, cognome, ecc.)
-            // Se fallisce, l'utente dal JWT rimane valido (non viene messo a null)
+            // In background: aggiorna con i dati freschi dal server e riscrive la cache
+            // Se fallisce, l'utente dalla cache/JWT rimane valido (non viene messo a null)
             this.fetchUser().subscribe();
         }
     }
@@ -106,6 +110,7 @@ export class AuthService {
     /**
      * Decodifica il payload del JWT e lo mappa al tipo User del backoffice.
      * Il JWT usa il campo "role"; il roleGuard si aspetta "ruolo" → mapping.
+     * nome/cognome non sono nel JWT → usare buildUserFromCache() quando disponibile.
      */
     private buildUserFromToken(): User | null {
         const payload = this.jwtSrv.getPayload<JwtPayload>();
@@ -115,10 +120,40 @@ export class AuthService {
             id: String(payload.userId),
             email: payload.email,
             ruolo: payload.role,        // mapping role → ruolo
-            nome: '',                   // sarà aggiornato da fetchUser()
-            cognome: '',                // sarà aggiornato da fetchUser()
+            nome: '',                   // placeholder: fetchUser() aggiornerà
+            cognome: '',                // placeholder: fetchUser() aggiornerà
             creatoIl: new Date()
         } as User;
+    }
+
+    /** Legge il profilo completo salvato in localStorage (nome, cognome, ecc.). */
+    private buildUserFromCache(): User | null {
+        try {
+            const raw = localStorage.getItem(this.USER_CACHE_KEY);
+            if (!raw) return null;
+            const cached: CachedUser = JSON.parse(raw);
+            if (!cached?.id || !cached?.ruolo) return null;
+            return { ...cached, creatoIl: new Date() } as User;
+        } catch {
+            return null;
+        }
+    }
+
+    /** Salva i dati essenziali dell'utente in localStorage per il ripristino istantaneo. */
+    private saveUserToCache(user: User): void {
+        const cached: CachedUser = {
+            id: user.id,
+            nome: user.nome,
+            cognome: user.cognome,
+            email: user.email,
+            ruolo: user.ruolo
+        };
+        localStorage.setItem(this.USER_CACHE_KEY, JSON.stringify(cached));
+    }
+
+    /** Rimuove la cache utente (chiamato al logout). */
+    private clearUserCache(): void {
+        localStorage.removeItem(this.USER_CACHE_KEY);
     }
 
     // ─── Login ───────────────────────────────────────────────────────────────
@@ -131,6 +166,8 @@ export class AuthService {
                 }),
                 tap(res => {
                     this.jwtSrv.setToken(res.data.accessToken, res.data.refreshToken);
+                    // Salva in cache: al prossimo refresh la navbar mostra subito nome/cognome
+                    this.saveUserToCache(res.data.user);
                 }),
                 tap(res => {
                     // Dopo il login abbiamo il profilo completo (con nome, cognome)
@@ -213,6 +250,7 @@ export class AuthService {
             tap(res => {
                 if (res?.data) {
                     // Aggiorna con il profilo completo (sovrascrive quello parziale dal JWT)
+                    this.saveUserToCache(res.data);
                     this._currentUser$.next(res.data);
                     console.log('✅ Dati utente aggiornati');
                 }
@@ -255,6 +293,7 @@ export class AuthService {
      */
     private performLogout(): void {
         this.jwtSrv.removeToken();
+        this.clearUserCache();
         this._currentUser$.next(null);
         this.router.navigate(['/login']);
         console.log('🧹 Logout locale completato');
