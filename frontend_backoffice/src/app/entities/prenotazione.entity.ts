@@ -1,4 +1,4 @@
-export type StatoPrenotazione = 'IN_ATTESA' | 'CONFERMATA' | 'RITIRATA' | 'RESTITUITA' | 'CANCELLATA';
+export type StatoPrenotazione = 'IN_ATTESA' | 'CONFERMATA' | 'RITIRATA' | 'RESTITUITA' | 'CANCELLATA' | 'DANNO' | 'RITARDO';
 
 export type RigaAccessorio = {
   id: number;

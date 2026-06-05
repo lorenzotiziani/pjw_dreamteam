@@ -206,6 +206,8 @@
 .badge-ritirata  { background: #ede9fe; color: #5b21b6; }
 .badge-restituita { background: #dcfce7; color: #15803d; }
 .badge-cancellata { background: #fee2e2; color: #b91c1c; }
+.badge-danno     { background: #fee2e2; color: #7f1d1d; }
+.badge-ritardo   { background: #fef3c7; color: #92400e; }
 
 /* ── Categoria badges (tipi bici) ───────────────────────── */
 .cat-badge { display: inline-block; padding: .25em .75em; border-radius: 6px; font-size: .78rem; font-weight: 600; }

@@ -131,10 +131,10 @@
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
 
-                <!-- Segna restituita (RITIRATA) -->
-                <button class="btn-icon btn-icon-ok" title="Segna come restituita"
+                <!-- Restituzione (RITIRATA) → apre modale -->
+                <button class="btn-icon btn-icon-ok" title="Registra restituzione"
                   *ngIf="p.stato === 'RITIRATA'" [disabled]="actionLoading"
-                  (click)="onAggiornaStato({id: p.id, stato: 'RESTITUITA'})">
+                  (click)="openRestituzione(p)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 </button>
 
@@ -239,6 +239,78 @@
       ✏️ Modifica date
     </button>
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Chiudi</button>
+  </div>
+</ng-template>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Modal: Restituzione                                            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<ng-template #restituzioneModal let-modal>
+  <div class="modal-header bo-modal-header">
+    <h5 class="modal-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Registra restituzione — #{{ restituendoPrenotazione?.id }}
+    </h5>
+    <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body" *ngIf="restituendoPrenotazione">
+    <!-- Info cliente (sola lettura) -->
+    <div class="edit-info-banner mb-3">
+      <div class="edit-info-row">
+        <span class="edit-info-label">Cliente</span>
+        <span class="edit-info-value">
+          {{ restituendoPrenotazione.utente?.cognome }} {{ restituendoPrenotazione.utente?.nome }}
+          · {{ restituendoPrenotazione.utente?.email }}
+        </span>
+      </div>
+      <div class="edit-info-row">
+        <span class="edit-info-label">Sede</span>
+        <span class="edit-info-value">
+          {{ restituendoPrenotazione.puntoVendita?.nome }}, {{ restituendoPrenotazione.puntoVendita?.citta }}
+        </span>
+      </div>
+    </div>
+
+    <form [formGroup]="restituzioneForm">
+
+      <!-- Scelta stato -->
+      <div class="mb-3">
+        <label class="bo-label mb-2">Esito restituzione <span class="text-danger">*</span></label>
+        <div class="rest-options">
+          <label *ngFor="let opt of statiRestituzione"
+            class="rest-option"
+            [class.rest-option--selected]="restituzioneForm.get('stato')?.value === opt.value"
+            [class.rest-option--danno]="opt.value === 'DANNO'"
+            [class.rest-option--ritardo]="opt.value === 'RITARDO'">
+            <input type="radio" formControlName="stato" [value]="opt.value" class="rest-radio" />
+            <div class="rest-option-body">
+              <span class="rest-option-label">{{ opt.label }}</span>
+              <span class="rest-option-desc">{{ opt.desc }}</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="mb-1">
+        <label class="bo-label">Note <span class="text-muted fw-400">(facoltative)</span></label>
+        <textarea class="bo-input" formControlName="note" rows="3"
+          placeholder="Es. graffio sul telaio, riconsegna con 2 ore di ritardo…"></textarea>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="modal-footer bo-modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()" [disabled]="actionLoading">Annulla</button>
+    <button type="button" class="btn btn-primary" (click)="saveRestituzione(modal)"
+      [disabled]="restituzioneForm.invalid || actionLoading">
+      <span *ngIf="actionLoading" class="spinner-border spinner-border-sm me-1"></span>
+      Conferma
+    </button>
   </div>
 </ng-template>
 

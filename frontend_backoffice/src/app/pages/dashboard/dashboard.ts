@@ -55,9 +55,9 @@ export class DashboardComponent implements OnInit {
 
   get conteggioPerStato(): Record<StatoPrenotazione, number> {
     const result: Record<StatoPrenotazione, number> = {
-      IN_ATTESA: 0, CONFERMATA: 0, RITIRATA: 0, RESTITUITA: 0, CANCELLATA: 0
+      IN_ATTESA: 0, CONFERMATA: 0, RITIRATA: 0, RESTITUITA: 0, CANCELLATA: 0, DANNO: 0, RITARDO: 0
     };
-    this.prenotazioni.forEach(p => result[p.stato]++);
+    this.prenotazioni.forEach(p => { if (p.stato in result) result[p.stato]++; });
     return result;
   }
 
@@ -65,11 +65,13 @@ export class DashboardComponent implements OnInit {
     const tot = this.prenotazioni.length || 1;
     const c = this.conteggioPerStato;
     return {
-      IN_ATTESA: Math.round(c.IN_ATTESA / tot * 100),
+      IN_ATTESA:  Math.round(c.IN_ATTESA  / tot * 100),
       CONFERMATA: Math.round(c.CONFERMATA / tot * 100),
-      RITIRATA: Math.round(c.RITIRATA / tot * 100),
+      RITIRATA:   Math.round(c.RITIRATA   / tot * 100),
       RESTITUITA: Math.round(c.RESTITUITA / tot * 100),
-      CANCELLATA: Math.round(c.CANCELLATA / tot * 100)
+      CANCELLATA: Math.round(c.CANCELLATA / tot * 100),
+      DANNO:      Math.round(c.DANNO      / tot * 100),
+      RITARDO:    Math.round(c.RITARDO    / tot * 100)
     };
   }
 
@@ -85,17 +87,19 @@ export class DashboardComponent implements OnInit {
   statoLabel(s: StatoPrenotazione): string {
     const m: Record<StatoPrenotazione, string> = {
       IN_ATTESA: 'In attesa', CONFERMATA: 'Confermata',
-      RITIRATA: 'Ritirata', RESTITUITA: 'Restituita', CANCELLATA: 'Cancellata'
+      RITIRATA:  'Ritirata',  RESTITUITA: 'Restituita',
+      CANCELLATA: 'Cancellata', DANNO: 'Danno', RITARDO: 'Ritardo'
     };
-    return m[s];
+    return m[s] ?? s;
   }
 
   statoBadgeClass(s: StatoPrenotazione): string {
     const m: Record<StatoPrenotazione, string> = {
-      IN_ATTESA: 'badge-attesa', CONFERMATA: 'badge-confermata',
-      RITIRATA: 'badge-ritirata', RESTITUITA: 'badge-restituita', CANCELLATA: 'badge-cancellata'
+      IN_ATTESA:  'badge-attesa',    CONFERMATA: 'badge-confermata',
+      RITIRATA:   'badge-ritirata',  RESTITUITA: 'badge-restituita',
+      CANCELLATA: 'badge-cancellata', DANNO: 'badge-danno', RITARDO: 'badge-ritardo'
     };
-    return m[s];
+    return m[s] ?? '';
   }
 
   getConteggio(stato: string): number { return this.conteggioPerStato[stato as StatoPrenotazione] ?? 0; }

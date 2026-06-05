@@ -19,8 +19,8 @@ export class PrenotazioniService {
     return this.http.put<any>(`/api/prenotazioni/${id}`, data);
   }
 
-  aggiornaStato(id: number, stato: StatoPrenotazione) {
-    return this.http.patch<any>(`/api/prenotazioni/${id}/stato`, { stato });
+  aggiornaStato(id: number, stato: StatoPrenotazione, note?: string) {
+    return this.http.patch<any>(`/api/prenotazioni/${id}/stato`, { stato, ...(note ? { note } : {}) });
   }
 
   delete(id: number) {

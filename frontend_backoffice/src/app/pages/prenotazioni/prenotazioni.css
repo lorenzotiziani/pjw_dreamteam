@@ -22,6 +22,34 @@
 .edit-info-label { min-width: 60px; color: #94a3b8; font-weight: 500; }
 .edit-info-value { color: #0f172a; font-weight: 600; }
 
+/* ── Radio options restituzione ──────────────────────────────────── */
+.rest-options { display: flex; flex-direction: column; gap: .55rem; }
+
+.rest-option {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .75rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  user-select: none;
+}
+.rest-option:hover { border-color: #94a3b8; background: #f8fafc; }
+
+.rest-option--selected             { border-color: #2563eb; background: #eff6ff; }
+.rest-option--danno.rest-option--selected   { border-color: #dc2626; background: #fff1f1; }
+.rest-option--ritardo.rest-option--selected { border-color: #d97706; background: #fffbeb; }
+
+.rest-radio { margin-top: .2rem; accent-color: #2563eb; }
+.rest-option--danno   .rest-radio { accent-color: #dc2626; }
+.rest-option--ritardo .rest-radio { accent-color: #d97706; }
+
+.rest-option-body  { display: flex; flex-direction: column; gap: .1rem; }
+.rest-option-label { font-weight: 600; font-size: .9rem; color: #0f172a; }
+.rest-option-desc  { font-size: .78rem; color: #64748b; }
+
 /* ── Detail sections ─────────────────────────────────────────────── */
 .detail-section { background: #f8fafc; border-radius: 10px; padding: 1rem; }
 .detail-section-title { font-size: .75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .4px; margin-bottom: .65rem; }

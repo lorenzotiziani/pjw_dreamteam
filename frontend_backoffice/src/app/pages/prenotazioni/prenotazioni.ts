@@ -18,8 +18,9 @@ export class PrenotazioniComponent implements OnInit {
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
-  @ViewChild('detailModal') detailModal!: TemplateRef<any>;
-  @ViewChild('editModal')   editModal!: TemplateRef<any>;
+  @ViewChild('detailModal')        detailModal!: TemplateRef<any>;
+  @ViewChild('editModal')          editModal!: TemplateRef<any>;
+  @ViewChild('restituzioneModal')  restituzioneModal!: TemplateRef<any>;
 
   prenotazioni: Prenotazione[] = [];
   puntiVendita: PuntoVendita[] = [];
@@ -30,6 +31,7 @@ export class PrenotazioniComponent implements OnInit {
 
   selectedPrenotazione: Prenotazione | null = null;
   editingPrenotazione: Prenotazione | null = null;
+  restituendoPrenotazione: Prenotazione | null = null;
 
   // Filters
   filtroTesto = '';
@@ -43,13 +45,26 @@ export class PrenotazioniComponent implements OnInit {
     { value: 'CONFERMATA',  label: 'Confermata' },
     { value: 'RITIRATA',    label: 'Ritirata' },
     { value: 'RESTITUITA',  label: 'Restituita' },
-    { value: 'CANCELLATA',  label: 'Cancellata' }
+    { value: 'CANCELLATA',  label: 'Cancellata' },
+    { value: 'DANNO',       label: 'Danno' },
+    { value: 'RITARDO',     label: 'Ritardo' }
+  ];
+
+  readonly statiRestituzione: { value: 'RESTITUITA' | 'DANNO' | 'RITARDO'; label: string; desc: string }[] = [
+    { value: 'RESTITUITA', label: 'Restituita', desc: 'Riconsegna regolare, nessun problema' },
+    { value: 'DANNO',      label: 'Danno',      desc: 'La bici presenta danni — registra l\'evento senza chiudere' },
+    { value: 'RITARDO',    label: 'Ritardo',    desc: 'Riconsegna in ritardo — registra l\'evento senza chiudere' }
   ];
 
   editForm = this.fb.group({
     dataRitiro:        ['', Validators.required],
     oraRitiro:         ['', Validators.required],
     dataOraRiconsegna: ['', Validators.required]
+  });
+
+  restituzioneForm = this.fb.group({
+    stato: ['RESTITUITA' as 'RESTITUITA' | 'DANNO' | 'RITARDO', Validators.required],
+    note:  ['']
   });
 
   // ── Lifecycle ──────────────────────────────────────────────────────────
@@ -182,6 +197,36 @@ export class PrenotazioniComponent implements OnInit {
     });
   }
 
+  // ── Modale restituzione ─────────────────────────────────────────────────
+  openRestituzione(p: Prenotazione): void {
+    this.restituendoPrenotazione = p;
+    this.restituzioneForm.reset({ stato: 'RESTITUITA', note: '' });
+    this.errorMsg = '';
+    this.modalSrv.open(this.restituzioneModal, { size: 'md', centered: true });
+  }
+
+  saveRestituzione(modal: any): void {
+    if (!this.restituendoPrenotazione || this.restituzioneForm.invalid) return;
+    const v = this.restituzioneForm.value;
+    this.actionLoading = true;
+    this.prenotazioniSrv.aggiornaStato(
+      this.restituendoPrenotazione.id,
+      v.stato as StatoPrenotazione,
+      v.note?.trim() || undefined
+    ).subscribe({
+      next: () => {
+        this.actionLoading = false;
+        modal.close();
+        this.restituendoPrenotazione = null;
+        this.loadPrenotazioni();
+      },
+      error: (e) => {
+        this.errorMsg = this.parseError(e, 'aggiornamento stato');
+        this.actionLoading = false;
+      }
+    });
+  }
+
   // ── Elimina ────────────────────────────────────────────────────────────
   onDelete(p: Prenotazione) {
     if (!this.canDelete(p)) {
@@ -255,16 +300,18 @@ export class PrenotazioniComponent implements OnInit {
   statoLabel(s: StatoPrenotazione): string {
     const m: Record<StatoPrenotazione, string> = {
       IN_ATTESA: 'In attesa', CONFERMATA: 'Confermata',
-      RITIRATA: 'Ritirata', RESTITUITA: 'Restituita', CANCELLATA: 'Cancellata'
+      RITIRATA: 'Ritirata',   RESTITUITA: 'Restituita',
+      CANCELLATA: 'Cancellata', DANNO: 'Danno', RITARDO: 'Ritardo'
     };
-    return m[s];
+    return m[s] ?? s;
   }
 
   statoBadgeClass(s: StatoPrenotazione): string {
     const m: Record<StatoPrenotazione, string> = {
-      IN_ATTESA: 'badge-attesa', CONFERMATA: 'badge-confermata',
-      RITIRATA:  'badge-ritirata', RESTITUITA: 'badge-restituita', CANCELLATA: 'badge-cancellata'
+      IN_ATTESA:  'badge-attesa',    CONFERMATA: 'badge-confermata',
+      RITIRATA:   'badge-ritirata',  RESTITUITA: 'badge-restituita',
+      CANCELLATA: 'badge-cancellata', DANNO: 'badge-danno', RITARDO: 'badge-ritardo'
     };
-    return m[s];
+    return m[s] ?? '';
   }
 }
