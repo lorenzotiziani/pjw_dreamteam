@@ -3,7 +3,11 @@
   <!-- Header -->
   <div class="bo-page-header">
     <div class="bo-page-header-left">
-      <span class="bo-page-icon">📊</span>
+      <div class="bo-page-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </div>
       <div>
         <h1 class="bo-page-title">Dashboard</h1>
         <p class="bo-page-subtitle">{{ oggi }}</p>
@@ -83,14 +87,18 @@
             <div class="row g-3 mb-3">
               <div class="col-6">
                 <div class="ops-box ops-box-warn">
-                  <div class="ops-icon">⏳</div>
+                  <div class="ops-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  </div>
                   <div class="ops-value">{{ prenotazioniInAttesa }}</div>
                   <div class="ops-label">Da confermare</div>
                 </div>
               </div>
               <div class="col-6">
                 <div class="ops-box ops-box-primary">
-                  <div class="ops-icon">🚴</div>
+                  <div class="ops-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M5.5 17.5L8.5 8h7l3.5 9.5"/><path d="M8.5 8l3 9.5"/><line x1="7.5" y1="8" x2="12" y2="8"/></svg>
+                  </div>
                   <div class="ops-value">{{ prenotazioniRitirate }}</div>
                   <div class="ops-label">Bici in giro</div>
                 </div>

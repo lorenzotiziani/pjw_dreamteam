@@ -1,50 +1,62 @@
 .sc-card {
   background: #fff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e4e8ef;
   border-radius: 14px;
-  padding: 1.4rem 1.6rem;
+  padding: 1.3rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1.2rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,.06);
-  transition: box-shadow .2s, transform .2s;
+  gap: 1.1rem;
   height: 100%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: default;
 }
+
 .sc-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.04);
   transform: translateY(-2px);
 }
+
 .sc-icon-wrap {
-  width: 54px;
-  height: 54px;
+  width: 50px;
+  height: 50px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.55rem;
   flex-shrink: 0;
+  line-height: 1;
 }
+
 .sc-body { flex: 1; min-width: 0; }
+
 .sc-label {
-  font-size: .78rem;
+  font-size: .72rem;
   font-weight: 600;
-  color: #64748b;
+  color: #6b7280;
   text-transform: uppercase;
-  letter-spacing: .5px;
-  margin-bottom: .2rem;
-}
-.sc-value {
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: .15rem;
+  letter-spacing: .55px;
+  margin-bottom: .25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* Modalità compatta: font scalato per valori lunghi (es. ricavi con 7+ cifre) */
-.sc-value--compact {
-  font-size: 1.35rem;
-  letter-spacing: -.3px;
+
+.sc-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: .1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.5px;
 }
-.sc-sub { font-size: .78rem; color: #94a3b8; }
+
+.sc-value--compact {
+  font-size: 1.3rem;
+  letter-spacing: -0.4px;
+}
+
+.sc-sub { font-size: .75rem; color: #9ca3af; margin-top: .1rem; }

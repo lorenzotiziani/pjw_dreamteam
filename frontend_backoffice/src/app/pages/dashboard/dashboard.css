@@ -1,25 +1,150 @@
+/* ── Stato breakdown ─────────────────────────────────────── */
 .stato-row { margin-bottom: 1rem; }
 .stato-row:last-child { margin-bottom: 0; }
-.stato-row-info { display: flex; align-items: center; gap: .5rem; margin-bottom: .3rem; }
-.stato-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.stato-row-label { flex: 1; font-size: .83rem; color: #374151; font-weight: 500; }
-.stato-row-count { font-size: .83rem; font-weight: 700; color: #0f172a; }
-.stato-progress { height: 6px; border-radius: 4px; background: #f1f5f9; }
-.stato-progress .progress-bar { border-radius: 4px; transition: width .4s; }
 
-.ops-box { border-radius: 12px; padding: 1.1rem; text-align: center; }
-.ops-box-warn { background: #fffbeb; border: 1px solid #fde68a; }
-.ops-box-primary { background: #eff6ff; border: 1px solid #bfdbfe; }
-.ops-icon { font-size: 1.6rem; margin-bottom: .3rem; }
-.ops-value { font-size: 2rem; font-weight: 800; color: #0f172a; line-height: 1; }
-.ops-label { font-size: .75rem; color: #64748b; margin-top: .2rem; font-weight: 500; }
+.stato-row-info {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .35rem;
+}
 
-.punti-vendita-list { border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
-.pvl-header { background: #f8fafc; padding: .5rem .85rem; font-size: .75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .4px; }
-.pvl-item { display: flex; align-items: center; gap: .5rem; padding: .55rem .85rem; border-top: 1px solid #f1f5f9; }
-.pvl-nome { font-weight: 600; font-size: .85rem; color: #0f172a; flex: 1; }
-.pvl-citta { font-size: .78rem; color: #64748b; }
-.pvl-badge { font-size: .7rem; font-weight: 600; padding: .15em .55em; border-radius: 5px; }
-.pvl-badge.active { background: #dcfce7; color: #16a34a; }
-.pvl-badge.inactive { background: #f1f5f9; color: #64748b; }
-.pvl-empty { padding: .75rem .85rem; font-size: .83rem; color: #94a3b8; }
+.stato-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stato-row-label {
+  flex: 1;
+  font-size: .83rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.stato-row-count {
+  font-size: .83rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.stato-progress {
+  height: 5px;
+  border-radius: 99px;
+  background: #f0f2f7;
+  overflow: hidden;
+}
+
+.stato-progress .progress-bar {
+  border-radius: 99px;
+  transition: width .5s ease;
+}
+
+/* ── Ops boxes ───────────────────────────────────────────── */
+.ops-box {
+  border-radius: 14px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ops-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+}
+
+.ops-box-warn {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.ops-box-primary {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.ops-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto .5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.ops-box-warn    .ops-icon { background: #fef3c7; color: #d97706; }
+.ops-box-primary .ops-icon { background: #dbeafe; color: #1d4ed8; }
+
+.ops-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.ops-label {
+  font-size: .75rem;
+  color: #6b7280;
+  margin-top: .3rem;
+  font-weight: 500;
+}
+
+/* ── Punti vendita list ──────────────────────────────────── */
+.punti-vendita-list {
+  border: 1px solid #e4e8ef;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pvl-header {
+  background: #f8f9fc;
+  padding: .55rem .9rem;
+  font-size: .72rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  border-bottom: 1px solid #e4e8ef;
+}
+
+.pvl-item {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem .9rem;
+  border-top: 1px solid #f0f2f7;
+  transition: background 0.15s;
+}
+
+.pvl-item:hover { background: #f8f9fc; }
+
+.pvl-nome {
+  font-weight: 600;
+  font-size: .85rem;
+  color: #111827;
+  flex: 1;
+}
+
+.pvl-citta {
+  font-size: .77rem;
+  color: #6b7280;
+}
+
+.pvl-badge {
+  font-size: .68rem;
+  font-weight: 600;
+  padding: .18em .6em;
+  border-radius: 99px;
+}
+
+.pvl-badge.active   { background: #dcfce7; color: #16a34a; }
+.pvl-badge.inactive { background: #f3f4f6; color: #6b7280; }
+
+.pvl-empty {
+  padding: .85rem .9rem;
+  font-size: .83rem;
+  color: #9ca3af;
+}

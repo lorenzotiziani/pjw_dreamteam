@@ -1,92 +1,106 @@
+/* ── Navbar shell ────────────────────────────────────────── */
 .navbar {
-  padding: 10px 24px;
-  background-color: #1d4ed8;
-  font-family: 'Inter', sans-serif;
+  height: 58px;
+  padding: 0 24px;
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-family: 'Inter', -apple-system, sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.20);
 }
 
-/* ── Brand ─────────────────────────────────────────────── */
+/* ── Brand ───────────────────────────────────────────────── */
 .navbar .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: #fff;
   text-decoration: none;
   padding: 0;
+  margin-right: 1.5rem;
 }
+.navbar .navbar-brand:hover { opacity: .92; text-decoration: none; }
 
-.navbar .navbar-brand:hover {
-  text-decoration: none;
-  opacity: 0.9;
-}
-
-.navbar-brand-icon {
-  font-size: 1.35rem;
-  line-height: 1;
+.navbar-brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 9px;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.45);
 }
 
 .navbar-brand-text {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.3px;
   color: #fff;
+  line-height: 1;
 }
 
-.navbar-brand-accent {
-  color: #93c5fd;
-}
+.navbar-brand-accent { color: #60a5fa; }
 
 .navbar-brand-divider {
   width: 1px;
-  height: 16px;
-  background: rgba(255, 255, 255, 0.3);
-  margin: 0 4px;
+  height: 14px;
+  background: rgba(255,255,255,0.2);
+  margin: 0 2px;
 }
 
 .navbar-brand-sub {
-  font-size: 0.72rem;
+  font-size: .68rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.65);
-  letter-spacing: 0.6px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: .7px;
   text-transform: uppercase;
 }
 
-/* ── Nav links ─────────────────────────────────────────── */
+/* ── Nav links ───────────────────────────────────────────── */
 .navbar-nav .nav-link {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255,255,255,0.65);
   font-weight: 500;
-  font-size: 0.9rem;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background-color 0.2s, color 0.2s;
+  font-size: .875rem;
+  padding: 6px 11px;
+  border-radius: 7px;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
 }
 
-.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.92);
+}
+
 .navbar-nav .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255,0.12);
   color: #fff;
+  font-weight: 600;
 }
 
-/* ── Dropdown Catalogo ─────────────────────────────────── */
+/* ── Dropdown Catalogo ───────────────────────────────────── */
 .nav-dropdown-menu {
   background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid #e4e8ef !important;
   border-radius: 12px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.06) !important;
   padding: 6px !important;
-  min-width: 210px;
-  margin-top: 6px !important;
+  min-width: 215px;
+  margin-top: 8px !important;
 }
 
 .nav-dropdown-menu .dropdown-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #0f172a !important;
-  font-size: 0.875rem;
+  color: #111827 !important;
+  font-size: .875rem;
   font-weight: 500;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border-radius: 8px;
-  transition: background 0.15s, color 0.15s;
+  transition: background .15s, color .15s;
 }
 
 .nav-dropdown-menu .dropdown-item:hover,
@@ -97,6 +111,7 @@
 
 .nav-dropdown-menu .dropdown-item:hover .nav-dropdown-icon,
 .nav-dropdown-menu .dropdown-item:focus .nav-dropdown-icon {
+  background: #dbeafe;
   color: #1d4ed8;
 }
 
@@ -107,6 +122,7 @@
 }
 
 .nav-dropdown-menu .nav-dropdown-active .nav-dropdown-icon {
+  background: #dbeafe;
   color: #1d4ed8;
 }
 
@@ -118,31 +134,38 @@
   height: 28px;
   border-radius: 6px;
   background: #f1f5f9;
-  color: #475569;
+  color: #6b7280;
   flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
+  transition: background .15s, color .15s;
 }
 
-/* ── Bottone login ─────────────────────────────────────── */
+/* ── Hamburger ───────────────────────────────────────────── */
+.navbar-toggler {
+  border-color: rgba(255,255,255,0.2);
+  padding: 4px 8px;
+}
+.navbar-toggler-icon { filter: invert(1); }
+
+/* ── Login button ────────────────────────────────────────── */
 .nav-btn-login {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 16px;
   font-family: 'Inter', sans-serif;
-  font-size: 0.875rem;
+  font-size: .875rem;
   font-weight: 600;
   color: #1d4ed8;
-  background: #ffffff;
+  background: #fff;
   border-radius: 8px;
   text-decoration: none;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  transition: background .15s, box-shadow .15s;
   white-space: nowrap;
 }
 
 .nav-btn-login:hover {
   background: #eff6ff;
   color: #1d4ed8;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   text-decoration: none;
 }

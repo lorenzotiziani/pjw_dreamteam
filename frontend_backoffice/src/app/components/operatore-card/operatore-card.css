@@ -3,56 +3,55 @@
   align-items: center;
   gap: 14px;
   background: #fff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e4e8ef;
   border-radius: 14px;
   padding: 16px 18px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  transition: box-shadow 0.2s, border-color 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.03);
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
 }
 
 .op-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.09);
-  border-color: #cbd5e1;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.04);
+  border-color: #d1d9e6;
+  transform: translateY(-1px);
 }
 
 .op-card--inactive {
-  background: #f8fafc;
-  opacity: 0.75;
+  background: #f9fafb;
+  opacity: 0.72;
 }
 
-/* ── Avatar ─────────────────────────────────────────────── */
+/* ── Avatar ──────────────────────────────────────────────── */
 .op-card-avatar {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
   letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-/* ── Body ───────────────────────────────────────────────── */
-.op-card-body {
-  flex: 1;
-  min-width: 0;
-}
+/* ── Body ────────────────────────────────────────────────── */
+.op-card-body { flex: 1; min-width: 0; }
 
 .op-card-name {
   font-weight: 600;
-  font-size: 0.95rem;
-  color: #0f172a;
+  font-size: 0.93rem;
+  color: #111827;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .op-card-email {
-  font-size: 0.8rem;
-  color: #64748b;
+  font-size: 0.78rem;
+  color: #6b7280;
   margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -61,68 +60,52 @@
 
 .op-card-badges {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   margin-top: 8px;
   flex-wrap: wrap;
 }
 
 .op-badge {
-  display: inline-block;
-  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 99px;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
 }
 
-.op-badge--role {
-  background: #eff6ff;
-  color: #1d4ed8;
-}
+.op-badge--role     { background: #eff6ff; color: #1d4ed8; }
+.op-badge--active   { background: #dcfce7; color: #15803d; }
+.op-badge--inactive { background: #f3f4f6; color: #6b7280; }
 
-.op-badge--active {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.op-badge--inactive {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-/* ── Actions ────────────────────────────────────────────── */
-.op-card-actions {
-  flex-shrink: 0;
-}
+/* ── Actions ─────────────────────────────────────────────── */
+.op-card-actions { flex-shrink: 0; }
 
 .op-toggle-btn {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.78rem;
+  font-size: 0.77rem;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 6px 13px;
   border-radius: 8px;
-  border: none;
+  border: 1.5px solid transparent;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
   white-space: nowrap;
 }
 
 .op-toggle-btn--disable {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
 }
-
-.op-toggle-btn--disable:hover {
-  background: #fecaca;
-}
+.op-toggle-btn--disable:hover { background: #fee2e2; }
 
 .op-toggle-btn--enable {
-  background: #dcfce7;
-  color: #15803d;
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
 }
-
-.op-toggle-btn--enable:hover {
-  background: #bbf7d0;
-}
+.op-toggle-btn--enable:hover { background: #dcfce7; }
