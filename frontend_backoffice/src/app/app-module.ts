@@ -1,4 +1,8 @@
-import { NgModule, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import {
+  NgModule,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -7,40 +11,46 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 
-// Auth
 import { LoginComponent } from './pages/login/login';
-
-// Layout
 import { NavbarComponent } from './components/navbar/navbar';
 import { NavUserComponent } from './components/nav-user/nav-user';
 
-// Dashboard
-import { DashboardComponent } from './pages/dashboard/dashboard';
+import { StatCardComponent } from './components/stat-card/stat-card';
+import { PuntoVenditaCardComponent } from './components/punto-vendita-card/punto-vendita-card';
 
-// Interceptors
+import { DashboardComponent } from './pages/dashboard/dashboard';
+import { PrenotazioniComponent } from './pages/prenotazioni/prenotazioni';
+import { PuntiVenditaComponent } from './pages/punti-vendita/punti-vendita';
+import { TipiBiciComponent } from './pages/tipi-bici/tipi-bici';
+import { AccessoriComponent } from './pages/accessori/accessori';
+import { CoperatureComponent } from './pages/coperture/coperture';
+
 import { authInterceptor } from './interceptors/auth-interceptor';
 import { logoutInterceptor } from './interceptors/logout-interceptor';
+import { IfAuthenticatedDirective } from './directives/if-authenticated';
 
 @NgModule({
-    declarations: [
-        App,
-        LoginComponent,
-        NavbarComponent,
-        NavUserComponent,
-        DashboardComponent,
-    ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        NgbModule,
-        FormsModule,
-        ReactiveFormsModule
-    ],
-    providers: [
-        provideBrowserGlobalErrorListeners(),
-        provideZoneChangeDetection({ eventCoalescing: true }),
-        provideHttpClient(withInterceptors([authInterceptor, logoutInterceptor]))
-    ],
-    bootstrap: [App],
+  declarations: [
+    App,
+    LoginComponent,
+    NavbarComponent,
+    NavUserComponent,
+    StatCardComponent,
+    PuntoVenditaCardComponent,
+    DashboardComponent,
+    PrenotazioniComponent,
+    PuntiVenditaComponent,
+    TipiBiciComponent,
+    AccessoriComponent,
+    CoperatureComponent,
+    IfAuthenticatedDirective,
+  ],
+  imports: [BrowserModule, AppRoutingModule, NgbModule, FormsModule, ReactiveFormsModule],
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideHttpClient(withInterceptors([authInterceptor, logoutInterceptor])),
+  ],
+  bootstrap: [App],
 })
 export class AppModule {}

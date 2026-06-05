@@ -13,7 +13,9 @@ export class CopertureController {
   static async getAll(req: Request, res: Response, next: NextFunction) {
     try {
       const coperture = await CopertureService.getAll();
-      res.json({ success: true, data: coperture });
+      res.json({
+        success: true, data: coperture
+      });
     } catch (error) {
       next(error);
     }
@@ -26,7 +28,9 @@ export class CopertureController {
 
       if (!copertura) throw new NotFoundError('Copertura assicurativa non trovata');
 
-      res.json({ success: true, data: copertura });
+      res.json({
+        success: true, data: copertura
+      });
     } catch (error) {
       next(error);
     }
@@ -36,7 +40,9 @@ export class CopertureController {
     try {
       const data: CreateCoperturaDTO = req.body;
       const copertura = await CopertureService.create(data);
-      res.status(201).json({ success: true, data: copertura });
+      res.status(201).json({
+        success: true, data: copertura
+      });
     } catch (error) {
       next(error);
     }
@@ -47,7 +53,9 @@ export class CopertureController {
       const id = parseId(req.params.id);
       const data: UpdateCoperturaDTO = req.body;
       const copertura = await CopertureService.update(id, data);
-      res.json({ success: true, data: copertura });
+      res.json({
+        success: true, data: copertura
+      });
     } catch (error) {
       next(error);
     }
@@ -57,7 +65,9 @@ export class CopertureController {
     try {
       const id = parseId(req.params.id);
       await CopertureService.delete(id);
-      res.json({ success: true, message: 'Copertura assicurativa eliminata' });
+      res.json({
+        success: true, message: 'Copertura assicurativa eliminata'
+      });
     } catch (error) {
       next(error);
     }

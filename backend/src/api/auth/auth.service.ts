@@ -34,7 +34,6 @@ export class AuthService {
       nome: data.nome,
       cognome: data.cognome,
       ruolo: "USER",
-
       emailVerificationToken: emailToken,
       emailVerificationExpires: expires,
     });
@@ -75,6 +74,10 @@ export class AuthService {
 
     if (!user.emailVerified) {
       throw new UnauthorizedError('Email non verificata');
+    }
+
+    if (!user.isActive) {
+      throw new UnauthorizedError('Account disabilitato');
     }
 
     

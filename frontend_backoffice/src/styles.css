@@ -1,25 +1,304 @@
-/* ── Responsive globale ─────────────────────────────────── */
+/* ── Global Design System ───────────────────────────────── */
+
+/* ── Page layout ────────────────────────────────────────── */
+.bo-page {
+  padding: 1.75rem 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.bo-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+.bo-page-header-left { display: flex; align-items: center; gap: 1rem; }
+.bo-page-icon {
+  font-size: 2rem;
+  line-height: 1;
+  background: #eff6ff;
+  padding: .55rem .7rem;
+  border-radius: 12px;
+}
+.bo-page-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0; line-height: 1.2; }
+.bo-page-subtitle { font-size: .82rem; color: #64748b; margin: 0; }
+
+/* ── Cards ──────────────────────────────────────────────── */
+.bo-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  overflow: hidden;
+}
+.bo-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.bo-card-title { font-size: .95rem; font-weight: 700; color: #0f172a; margin: 0; }
+.bo-card-link { font-size: .82rem; color: #2563eb; text-decoration: none; font-weight: 600; }
+.bo-card-link:hover { text-decoration: underline; }
+.bo-card-body { padding: 1.25rem; }
+
+/* ── Table ──────────────────────────────────────────────── */
+.bo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .875rem;
+  font-family: 'Inter', sans-serif;
+}
+.bo-table th {
+  padding: .75rem 1rem;
+  background: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+.bo-table td {
+  padding: .75rem 1rem;
+  color: #0f172a;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.bo-table tbody tr:last-child td { border-bottom: none; }
+.bo-table tbody tr:hover td { background: #f8fafc; }
+
+/* ── Loading & Empty ────────────────────────────────────── */
+.bo-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding: 3rem;
+  color: #64748b;
+  font-size: .9rem;
+}
+.bo-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 1rem;
+  text-align: center;
+}
+.bo-empty-icon { font-size: 3rem; opacity: .35; margin-bottom: .75rem; }
+.bo-empty-text { font-size: .95rem; color: #94a3b8; font-weight: 500; }
+
+/* ── Filters bar ────────────────────────────────────────── */
+.bo-filters-bar {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: .75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+.filter-search {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+.filter-search-icon {
+  position: absolute;
+  left: .7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.filter-input {
+  width: 100%;
+  padding: .5rem .75rem .5rem 2.1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: .875rem;
+  font-family: 'Inter', sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.filter-input:focus { border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+.filter-select {
+  padding: .5rem .75rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: .875rem;
+  font-family: 'Inter', sans-serif;
+  color: #374151;
+  background: #f8fafc;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.filter-select:focus { border-color: #2563eb; background: #fff; }
+
+/* ── Form fields ────────────────────────────────────────── */
+.bo-form-group { margin-bottom: 1rem; }
+.bo-form-group:last-child { margin-bottom: 0; }
+.bo-label {
+  display: block;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: .4rem;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.bo-input {
+  display: block;
+  width: 100%;
+  padding: .6rem .85rem;
+  font-family: 'Inter', sans-serif;
+  font-size: .9rem;
+  color: #0f172a;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  box-sizing: border-box;
+}
+.bo-input:focus { border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+.bo-error { font-size: .78rem; color: #dc2626; margin-top: .3rem; }
+
+/* ── Modals ─────────────────────────────────────────────── */
+.bo-modal-header {
+  background: #1d4ed8;
+  color: #fff;
+  border-bottom: none;
+  border-radius: 0;
+  padding: 1rem 1.25rem;
+}
+.bo-modal-header .modal-title { font-weight: 700; font-size: 1rem; }
+.bo-modal-footer {
+  border-top: 1px solid #f1f5f9;
+  padding: .85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* ── Status badges ──────────────────────────────────────── */
+.stato-badge {
+  display: inline-block;
+  padding: .25em .7em;
+  border-radius: 6px;
+  font-size: .75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-attesa    { background: #fef9c3; color: #854d0e; }
+.badge-confermata { background: #dbeafe; color: #1d4ed8; }
+.badge-ritirata  { background: #ede9fe; color: #5b21b6; }
+.badge-restituita { background: #dcfce7; color: #15803d; }
+.badge-cancellata { background: #fee2e2; color: #b91c1c; }
+
+/* ── Categoria badges (tipi bici) ───────────────────────── */
+.cat-badge { display: inline-block; padding: .25em .75em; border-radius: 6px; font-size: .78rem; font-weight: 600; }
+.badge-city    { background: #dbeafe; color: #1e40af; }
+.badge-mtb     { background: #d1fae5; color: #065f46; }
+.badge-gravel  { background: #fef3c7; color: #92400e; }
+.badge-road    { background: #fce7f3; color: #9d174d; }
+
+.motore-badge {
+  display: inline-block;
+  padding: .25em .65em;
+  border-radius: 6px;
+  font-size: .78rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #374151;
+}
+.motore-badge.elettrica { background: #fef9c3; color: #854d0e; }
+.taglia-badge {
+  display: inline-block;
+  width: 32px;
+  text-align: center;
+  padding: .2em 0;
+  border-radius: 6px;
+  font-size: .8rem;
+  font-weight: 700;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.prezzo-cell { font-weight: 700; color: #1d4ed8; }
+.acc-nome, .cop-nome { font-weight: 600; color: #0f172a; }
+.cop-desc { font-size: .83rem; color: #64748b; max-width: 300px; }
+
+/* ── Prenotazione row cells ─────────────────────────────── */
+.pren-id { font-weight: 700; color: #94a3b8; font-size: .82rem; }
+.pren-cliente { display: flex; flex-direction: column; gap: .1rem; }
+.pren-nome { font-weight: 600; color: #0f172a; font-size: .875rem; display: block; }
+.pren-email { font-size: .75rem; color: #94a3b8; display: block; }
+.pren-sede { font-weight: 600; color: #0f172a; font-size: .875rem; display: block; }
+.pren-citta { font-size: .75rem; color: #94a3b8; display: block; }
+.pren-totale { font-weight: 700; color: #1d4ed8; }
+.pren-actions { display: flex; gap: .25rem; align-items: center; }
+
+/* ── Icon buttons ───────────────────────────────────────── */
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  background: transparent;
+  flex-shrink: 0;
+}
+.btn-icon:hover { transform: scale(1.08); }
+.btn-view    { color: #2563eb; background: #eff6ff; }
+.btn-view:hover { background: #dbeafe; }
+.btn-edit    { color: #d97706; background: #fffbeb; }
+.btn-edit:hover { background: #fef3c7; }
+.btn-icon.btn-success { color: #16a34a; background: #f0fdf4; }
+.btn-icon.btn-success:hover { background: #dcfce7; }
+.btn-icon.btn-danger  { color: #dc2626; background: #fef2f2; }
+.btn-icon.btn-danger:hover { background: #fee2e2; }
+.btn-icon.btn-primary { color: #2563eb; background: #eff6ff; }
+.btn-icon.btn-primary:hover { background: #dbeafe; }
+.btn-icon.btn-warning { color: #d97706; background: #fffbeb; }
+.btn-icon.btn-warning:hover { background: #fef3c7; }
+/* Inline button variants for prenotazioni page */
+.btn-icon-ok      { color: #16a34a; background: #f0fdf4; }
+.btn-icon-ok:hover { background: #dcfce7; }
+.btn-icon-primary { color: #2563eb; background: #eff6ff; }
+.btn-icon-primary:hover { background: #dbeafe; }
+.btn-icon-warn    { color: #dc2626; background: #fef2f2; }
+.btn-icon-warn:hover { background: #fee2e2; }
+.btn-icon-danger  { color: #dc2626; background: #fef2f2; }
+.btn-icon-danger:hover { background: #fee2e2; }
+.row-actions { display: flex; gap: .25rem; align-items: center; }
+
+/* ── Utility ────────────────────────────────────────────── */
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+
+/* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 767px) {
-    /* Riduci padding pagine su mobile */
-    .container, .container-fluid {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-    }
-
-    /* Card login/register: padding ridotto */
-    .login-card .card-body,
-    .register-card .card-body {
-        padding: 1.5rem 1.25rem !important;
-    }
-
-    /* Bottoni affiancati nel detail: stack verticale */
-    .detail-actions {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.4rem;
-    }
-    .detail-actions .btn {
-        width: 100%;
-        text-align: center;
-    }
+  .bo-page { padding: 1rem .75rem; }
+  .bo-page-header { gap: .75rem; }
+  .bo-page-header .btn { width: 100%; text-align: center; }
+  .bo-filters-bar { flex-direction: column; }
+  .filter-search { min-width: unset; width: 100%; }
+  .login-card .card-body,
+  .register-card .card-body { padding: 1.5rem 1.25rem !important; }
 }

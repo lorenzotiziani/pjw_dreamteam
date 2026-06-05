@@ -131,7 +131,7 @@
           }
         },
         {
-          "name": "Lista utenti",
+          "name": "Lista utenti [ADMIN]",
           "request": {
             "method": "GET",
             "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
@@ -139,6 +139,26 @@
               "raw": "{{base_url}}/users",
               "host": ["{{base_url}}"],
               "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Cambia stato utente [ADMIN]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1", "status"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}",
+              "options": { "raw": { "language": "json" } }
             }
           }
         },
@@ -547,6 +567,124 @@
               "raw": "{{base_url}}/coperture/1",
               "host": ["{{base_url}}"],
               "path": ["coperture", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prenotazioni",
+      "item": [
+        {
+          "name": "Lista prenotazioni",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/prenotazioni?utenteId=1&puntoVenditaId=1&dataRitiro=2025-06-10",
+              "host": ["{{base_url}}"],
+              "path": ["prenotazioni"],
+              "query": [
+                { "key": "utenteId",       "value": "1",          "description": "Filtra per utente (opzionale)" },
+                { "key": "puntoVenditaId", "value": "1",          "description": "Filtra per punto vendita (opzionale)" },
+                { "key": "dataRitiro",     "value": "2025-06-10", "description": "Filtra per data ritiro (opzionale)" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Le mie prenotazioni",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/prenotazioni/mie",
+              "host": ["{{base_url}}"],
+              "path": ["prenotazioni", "mie"]
+            }
+          }
+        },
+        {
+          "name": "Dettaglio prenotazione",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/prenotazioni/1",
+              "host": ["{{base_url}}"],
+              "path": ["prenotazioni", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crea prenotazione",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/prenotazioni",
+              "host": ["{{base_url}}"],
+              "path": ["prenotazioni"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"utenteId\": 1,\n  \"puntoVenditaId\": 1,\n  \"dataRitiro\": \"2025-06-10\",\n  \"oraRitiro\": \"09:00:00\",\n  \"dataOraRiconsegna\": \"2025-06-10T18:00:00\",\n  \"stato\": \"CONFERMATA\",\n  \"totale\": 31.00,\n  \"righe\": [\n    {\n      \"tipoBiciId\": 1,\n      \"coperturaId\": 1,\n      \"subtotale\": 20.50,\n      \"accessori\": [\n        { \"accessorioId\": 1, \"quantita\": 1 }\n      ]\n    }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Modifica prenotazione",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/prenotazioni/1",
+              "host": ["{{base_url}}"],
+              "path": ["prenotazioni", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dataRitiro\": \"2025-06-11\",\n  \"oraRitiro\": \"10:00:00\",\n  \"dataOraRiconsegna\": \"2025-06-11T19:00:00\",\n  \"totale\": 35.00,\n  \"righe\": [\n    {\n      \"tipoBiciId\": 1,\n      \"coperturaId\": null,\n      \"subtotale\": 31.50,\n      \"accessori\": [\n        { \"accessorioId\": 1, \"quantita\": 2 }\n      ]\n    }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Elimina prenotazione",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/prenotazioni/1",
+              "host": ["{{base_url}}"],
+              "path": ["prenotazioni", "1"]
+            }
+          }
+        },
+        {
+          "name": "Aggiorna stato prenotazione",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/prenotazioni/1/stato",
+              "host": ["{{base_url}}"],
+              "path": ["prenotazioni", "1", "stato"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stato\": \"CONFERMATA\"\n}",
+              "options": { "raw": { "language": "json" } }
             }
           }
         }

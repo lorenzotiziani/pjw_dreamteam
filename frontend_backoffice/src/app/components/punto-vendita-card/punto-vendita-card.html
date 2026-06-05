@@ -1,0 +1,60 @@
+<div class="pv-card" [class.pv-inactive]="!puntoVendita.attivo">
+  <div class="pv-card-header">
+    <div class="pv-card-title-wrap">
+      <h5 class="pv-card-title">{{ puntoVendita.nome }}</h5>
+      <span class="pv-stato-badge" [class.active]="puntoVendita.attivo" [class.inactive]="!puntoVendita.attivo">
+        {{ puntoVendita.attivo ? 'Attivo' : 'Inattivo' }}
+      </span>
+    </div>
+    <div class="pv-card-actions">
+      <button class="btn-icon btn-edit" title="Modifica" (click)="edit.emit(puntoVendita)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
+      <button class="btn-icon" [class.btn-warning]="puntoVendita.attivo" [class.btn-success]="!puntoVendita.attivo"
+        [title]="puntoVendita.attivo ? 'Disattiva' : 'Attiva'" (click)="toggleAttivo.emit(puntoVendita)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="5" width="22" height="14" rx="7" ry="7"/>
+          <circle [attr.cx]="puntoVendita.attivo ? 17 : 7" cy="12" r="4" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="btn-icon btn-primary" title="Gestisci stock" (click)="manageStock.emit(puntoVendita)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        </svg>
+      </button>
+      <button class="btn-icon btn-danger" title="Elimina" (click)="delete.emit(puntoVendita.id)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+          <path d="M9 6V4h6v2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="pv-card-body">
+    <div class="pv-info-row">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
+      <span>{{ puntoVendita.indirizzo }}, {{ puntoVendita.citta }}</span>
+    </div>
+    <div class="pv-stock-row">
+      <div class="pv-stock-item">
+        <span class="pv-stock-value">{{ totaleBici }}</span>
+        <span class="pv-stock-label">Bici totali</span>
+      </div>
+      <div class="pv-stock-divider"></div>
+      <div class="pv-stock-item">
+        <span class="pv-stock-value warn">{{ inManutenzione }}</span>
+        <span class="pv-stock-label">In manutenzione</span>
+      </div>
+      <div class="pv-stock-divider"></div>
+      <div class="pv-stock-item">
+        <span class="pv-stock-value ok">{{ totaleBici - inManutenzione }}</span>
+        <span class="pv-stock-label">Disponibili</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -28,7 +28,7 @@ export class UserModel {
 
   static async update(
     id: number,
-    userData: Partial<User>,
+    userData: Omit<Partial<User>, 'id'>,
   ): Promise<User | null> {
     try {
       return await prisma.tUtente.update({
@@ -50,6 +50,8 @@ export class UserModel {
         email: true,
         nome: true,
         cognome: true,
+        ruolo: true,
+        isActive: true,
       },
     });
   }

@@ -1,0 +1,10 @@
+<div class="sc-card">
+  <div class="sc-icon-wrap" [style.background]="accent + '18'" [style.color]="accent">
+    {{ icon }}
+  </div>
+  <div class="sc-body">
+    <div class="sc-label">{{ label }}</div>
+    <div class="sc-value" [style.color]="accent">{{ value }}</div>
+    <div class="sc-sub" *ngIf="subtitle">{{ subtitle }}</div>
+  </div>
+</div>

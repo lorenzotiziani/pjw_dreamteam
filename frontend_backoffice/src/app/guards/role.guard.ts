@@ -11,7 +11,8 @@ export const roleGuard: CanActivateFn = (route, state) => {
     .pipe(
       tap(user => {
         if (user && user.ruolo !== 'OPERATORE') {
-          router.navigate(['/home']);
+          authSrv.logout();
+          router.navigate(['/login'], { queryParams: { error: 'forbidden' } });
         }
       }),
       map(user => !!user && user.ruolo === 'OPERATORE')

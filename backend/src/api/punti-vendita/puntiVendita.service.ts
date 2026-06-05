@@ -6,7 +6,6 @@ import { NotFoundError, BadRequestError } from '../../errors';
 export class PuntiVenditaService {
   static async getAll() {
     return prisma.puntoVendita.findMany({
-      where: { attivo: true },
       orderBy: { nome: 'asc' },
     });
   }
@@ -48,7 +47,6 @@ export class PuntiVenditaService {
     }
   }
 
-  // ─── Stock ────────────────────────────────────────────────
 
   static async getStock(puntoVenditaId: number) {
     return prisma.stockBici.findMany({
@@ -61,13 +59,19 @@ export class PuntiVenditaService {
   }
 
   static async createStock(puntoVenditaId: number, data: CreateStockDTO) {
+    const manutenzione = data.quantitaManutenzione ?? 0;
+    
+    if (manutenzione > data.quantitaTotale)
+      throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
+
     try {
       return await prisma.stockBici.create({
         data: {
           puntoVenditaId,
           tipoBiciId: data.tipoBiciId,
+          quantitaAttuale: data.quantitaTotale - manutenzione,
           quantitaTotale: data.quantitaTotale,
-          quantitaManutenzione: data.quantitaManutenzione ?? 0,
+          quantitaManutenzione: manutenzione,
         },
         include: { tipoBici: true },
       });
@@ -80,16 +84,20 @@ export class PuntiVenditaService {
 
   static async updateStock(stockId: number, data: UpdateStockDTO) {
     try {
-      const stock = await prisma.stockBici.update({
+      const existing = await prisma.stockBici.findUnique({ where: { id: stockId } });
+      if (!existing) throw new NotFoundError('Stock non trovato');
+
+      const nuovaTotale       = data.quantitaTotale       ?? existing.quantitaTotale;
+      const nuovaManutenzione = data.quantitaManutenzione ?? existing.quantitaManutenzione;
+
+      if (nuovaManutenzione > nuovaTotale)
+        throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
+
+      return await prisma.stockBici.update({
         where: { id: stockId },
         data,
         include: { tipoBici: true },
       });
-
-      if (stock.quantitaManutenzione > stock.quantitaTotale)
-        throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
-
-      return stock;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')
         throw new NotFoundError('Stock non trovato');

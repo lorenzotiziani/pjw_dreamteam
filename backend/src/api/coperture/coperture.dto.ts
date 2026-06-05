@@ -6,7 +6,7 @@ export const createCoperturaSchema = z.object({
     descrizione: z.string().min(5, 'La descrizione è obbligatoria').trim(),
     prezzo: z
       .number({ message: 'Il prezzo è obbligatorio' })
-      .positive('Il prezzo deve essere positivo'),
+      .min(0, 'Il prezzo deve essere maggiore o uguale a zero'),
   }),
 });
 
@@ -14,7 +14,7 @@ export const updateCoperturaSchema = z.object({
   body: z.object({
     nome: z.string().min(2).trim().optional(),
     descrizione: z.string().min(5).trim().optional(),
-    prezzo: z.number().positive('Il prezzo deve essere positivo').optional(),
+    prezzo: z.number().min(0, 'Il prezzo deve essere maggiore o uguale a zero').optional(),
   }),
 });
 

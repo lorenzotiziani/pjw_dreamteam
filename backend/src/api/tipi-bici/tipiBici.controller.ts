@@ -13,7 +13,9 @@ export class TipiBiciController {
   static async getAll(req: Request, res: Response, next: NextFunction) {
     try {
       const tipiBici = await TipiBiciService.getAll();
-      res.json({ success: true, data: tipiBici });
+      res.json({
+        success: true, data: tipiBici
+      });
     } catch (error) {
       next(error);
     }
@@ -26,7 +28,9 @@ export class TipiBiciController {
 
       if (!tipoBici) throw new NotFoundError('Tipo bici non trovato');
 
-      res.json({ success: true, data: tipoBici });
+      res.json({
+        success: true, data: tipoBici
+      });
     } catch (error) {
       next(error);
     }
@@ -36,7 +40,9 @@ export class TipiBiciController {
     try {
       const data: CreateTipoBiciDTO = req.body;
       const tipoBici = await TipiBiciService.create(data);
-      res.status(201).json({ success: true, data: tipoBici });
+      res.status(201).json({
+        success: true, data: tipoBici
+      });
     } catch (error) {
       next(error);
     }
@@ -47,7 +53,9 @@ export class TipiBiciController {
       const id = parseId(req.params.id);
       const data: UpdateTipoBiciDTO = req.body;
       const tipoBici = await TipiBiciService.update(id, data);
-      res.json({ success: true, data: tipoBici });
+      res.json({
+        success: true, data: tipoBici
+      });
     } catch (error) {
       next(error);
     }
@@ -57,7 +65,9 @@ export class TipiBiciController {
     try {
       const id = parseId(req.params.id);
       await TipiBiciService.delete(id);
-      res.json({ success: true, message: 'Tipo bici eliminato' });
+      res.json({
+        success: true, message: 'Tipo bici eliminato'
+      });
     } catch (error) {
       next(error);
     }

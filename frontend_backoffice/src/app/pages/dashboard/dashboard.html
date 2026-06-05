@@ -1,1 +1,146 @@
-<p>Dashboard Works!</p>
+<div class="bo-page">
+
+  <!-- Header -->
+  <div class="bo-page-header">
+    <div class="bo-page-header-left">
+      <span class="bo-page-icon">📊</span>
+      <div>
+        <h1 class="bo-page-title">Dashboard</h1>
+        <p class="bo-page-subtitle">{{ oggi }}</p>
+      </div>
+    </div>
+    <a [routerLink]="['/prenotazioni']" class="btn btn-primary btn-sm fw-600">Vedi prenotazioni</a>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="bo-loading">
+    <div class="spinner-border text-primary" role="status"></div>
+    <span>Caricamento dati...</span>
+  </div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-xl-3">
+        <app-stat-card icon="📋" label="Prenotazioni totali" [value]="totalePrenotazioni" accent="#2563eb"></app-stat-card>
+      </div>
+      <div class="col-6 col-xl-3">
+        <app-stat-card icon="💶" label="Ricavi completati" [value]="'€ ' + ricaviTotali" accent="#10b981"></app-stat-card>
+      </div>
+      <div class="col-6 col-xl-3">
+        <app-stat-card icon="📅" label="Ritiri di oggi" [value]="prenotazioniOggi" accent="#f59e0b"></app-stat-card>
+      </div>
+      <div class="col-6 col-xl-3">
+        <app-stat-card icon="🏪" label="Punti vendita attivi" [value]="puntiVenditaAttivi" accent="#8b5cf6"></app-stat-card>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+
+      <!-- Status breakdown -->
+      <div class="col-12 col-lg-5">
+        <div class="bo-card h-100">
+          <div class="bo-card-header">
+            <h6 class="bo-card-title">Prenotazioni per stato</h6>
+          </div>
+          <div class="bo-card-body">
+            <div *ngIf="totalePrenotazioni === 0" class="text-center text-muted py-3">Nessuna prenotazione</div>
+            <ng-container *ngIf="totalePrenotazioni > 0">
+              <div class="stato-row" *ngFor="let item of [
+                {stato: 'IN_ATTESA',   label: 'In attesa',   color: '#f59e0b'},
+                {stato: 'CONFERMATA',  label: 'Confermata',  color: '#3b82f6'},
+                {stato: 'RITIRATA',    label: 'Ritirata',    color: '#1d4ed8'},
+                {stato: 'RESTITUITA',  label: 'Restituita',  color: '#10b981'},
+                {stato: 'CANCELLATA',  label: 'Cancellata',  color: '#ef4444'}
+              ]">
+                <div class="stato-row-info">
+                  <span class="stato-dot" [style.background]="item.color"></span>
+                  <span class="stato-row-label">{{ item.label }}</span>
+                  <span class="stato-row-count">{{ getConteggio(item.stato) }}</span>
+                </div>
+                <div class="progress stato-progress">
+                  <div class="progress-bar" role="progressbar"
+                    [style.width.%]="getPercentuale(item.stato)"
+                    [style.background]="item.color">
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick ops -->
+      <div class="col-12 col-lg-7">
+        <div class="bo-card h-100">
+          <div class="bo-card-header">
+            <h6 class="bo-card-title">Riepilogo operativo</h6>
+          </div>
+          <div class="bo-card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <div class="ops-box ops-box-warn">
+                  <div class="ops-icon">⏳</div>
+                  <div class="ops-value">{{ prenotazioniInAttesa }}</div>
+                  <div class="ops-label">Da confermare</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="ops-box ops-box-primary">
+                  <div class="ops-icon">🚴</div>
+                  <div class="ops-value">{{ prenotazioniRitirate }}</div>
+                  <div class="ops-label">Bici in giro</div>
+                </div>
+              </div>
+            </div>
+            <div class="punti-vendita-list">
+              <div class="pvl-header">Punti vendita</div>
+              <div class="pvl-item" *ngFor="let pv of puntiVendita">
+                <span class="pvl-nome">{{ pv.nome }}</span>
+                <span class="pvl-citta">{{ pv.citta }}</span>
+                <span class="pvl-badge" [class.active]="pv.attivo" [class.inactive]="!pv.attivo">
+                  {{ pv.attivo ? 'Attivo' : 'Inattivo' }}
+                </span>
+              </div>
+              <div *ngIf="puntiVendita.length === 0" class="pvl-empty">Nessun punto vendita configurato</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent bookings -->
+    <div class="bo-card">
+      <div class="bo-card-header">
+        <h6 class="bo-card-title">Prenotazioni recenti</h6>
+        <a [routerLink]="['/prenotazioni']" class="bo-card-link">Vedi tutte →</a>
+      </div>
+      <div class="bo-card-body p-0">
+        <div *ngIf="prenotazioniRecenti.length === 0" class="text-center text-muted py-4">
+          Nessuna prenotazione ancora
+        </div>
+        <div class="table-responsive" *ngIf="prenotazioniRecenti.length > 0">
+          <table class="bo-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Cliente</th><th>Sede</th><th>Data ritiro</th><th>Stato</th><th>Totale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of prenotazioniRecenti">
+                <td><span class="pren-id">#{{ p.id }}</span></td>
+                <td>{{ p.utente?.cognome }} {{ p.utente?.nome }}</td>
+                <td>{{ p.puntoVendita?.nome }}</td>
+                <td>{{ dataFmt(p.dataRitiro) }}</td>
+                <td><span class="stato-badge" [ngClass]="statoBadgeClass(p.stato)">{{ statoLabel(p.stato) }}</span></td>
+                <td class="fw-600">€ {{ (+p.totale).toFixed(2) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>

@@ -19,13 +19,14 @@ model TUtente {
   pwd      String
   ruolo    Ruolo    @default(USER)
   creatoIl DateTime @default(now())
+  isActive Boolean @default(true)
   
   emailVerified Boolean @default(false)
   emailVerificationToken String?
   emailVerificationExpires DateTime?
 
   prenotazioni  Prenotazione[]
-  operaziones   Operazione[]
+  operaziones   LogPrenotazione[]
   refreshTokens RefreshToken[]
 }
 
@@ -43,6 +44,7 @@ model RefreshToken {
 enum Ruolo {
   OPERATORE
   USER
+  ADMIN
 }
 
 // ─────────────────────────────────────────
@@ -98,6 +100,7 @@ model StockBici {
   id                   Int @id @default(autoincrement())
   puntoVenditaId       Int
   tipoBiciId           Int
+  quantitaAttuale      Int 
   quantitaTotale       Int
   quantitaManutenzione Int @default(0)
 
@@ -147,7 +150,7 @@ model Prenotazione {
   utente       TUtente            @relation(fields: [utenteId], references: [id])
   puntoVendita PuntoVendita       @relation(fields: [puntoVenditaId], references: [id])
   righe        RigaPrenotazione[]
-  operazioni   Operazione[]
+  operazioni   LogPrenotazione[]
 
   @@map("prenotazioni")
 }
@@ -192,24 +195,25 @@ model RigaAccessorio {
 // OPERAZIONI DI BACKOFFICE
 // ─────────────────────────────────────────
 
-model Operazione {
-  id             Int            @id @default(autoincrement())
-  prenotazioneId Int
-  utenteId       Int
-  tipo           TipoOperazione
-  eseguitaIl     DateTime       @default(now())
-  note           String?
+model LogPrenotazione {
+  id              Int            @id @default(autoincrement())
+  prenotazioneId  Int
+  operatoreId     Int
+  tipo            TipoLogPrenotazione
+  eseguitaIl      DateTime       @default(now())
+  note            String?
 
-  prenotazione Prenotazione @relation(fields: [prenotazioneId], references: [id])
-  utente       TUtente      @relation(fields: [utenteId], references: [id])
+  prenotazione    Prenotazione @relation(fields: [prenotazioneId], references: [id])
+  utente          TUtente      @relation(fields: [operatoreId], references: [id])
 
-  @@map("operazioni")
+  @@map("log_operazioni")
 }
 
-enum TipoOperazione {
-  RITIRO
-  RICONSEGNA
+enum TipoLogPrenotazione {
+  CONFERMATA
+  RITIRATA
+  RESTITUITA
+  CANCELLATA
   DANNO
   RITARDO
-  MANUTENZIONE
 }

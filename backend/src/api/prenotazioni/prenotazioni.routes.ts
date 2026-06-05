@@ -8,6 +8,7 @@ const router = Router();
 
 router.use(authMiddleware);
 
+router.get('/mie', PrenotazioniController.getMie);
 router.get('/', validate(prenotazioneByFiltersSchema), PrenotazioniController.getAll);
 router.get('/:id', validate(prenotazioneParamsSchema), PrenotazioniController.getById);
 router.post('/', validate(prenotazioneCreateSchema), PrenotazioniController.create);

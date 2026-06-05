@@ -13,7 +13,9 @@ export class AccessoriController {
   static async getAll(req: Request, res: Response, next: NextFunction) {
     try {
       const accessori = await AccessoriService.getAll();
-      res.json({ success: true, data: accessori });
+      res.json({
+        success: true, data: accessori
+      });
     } catch (error) {
       next(error);
     }
@@ -26,7 +28,9 @@ export class AccessoriController {
 
       if (!accessorio) throw new NotFoundError('Accessorio non trovato');
 
-      res.json({ success: true, data: accessorio });
+      res.json({
+        success: true, data: accessorio
+      });
     } catch (error) {
       next(error);
     }
@@ -36,7 +40,9 @@ export class AccessoriController {
     try {
       const data: CreateAccessorioDTO = req.body;
       const accessorio = await AccessoriService.create(data);
-      res.status(201).json({ success: true, data: accessorio });
+      res.status(201).json({
+        success: true, data: accessorio
+      });
     } catch (error) {
       next(error);
     }
@@ -47,7 +53,9 @@ export class AccessoriController {
       const id = parseId(req.params.id);
       const data: UpdateAccessorioDTO = req.body;
       const accessorio = await AccessoriService.update(id, data);
-      res.json({ success: true, data: accessorio });
+      res.json({
+        success: true, data: accessorio
+      });
     } catch (error) {
       next(error);
     }
@@ -57,7 +65,9 @@ export class AccessoriController {
     try {
       const id = parseId(req.params.id);
       await AccessoriService.delete(id);
-      res.json({ success: true, message: 'Accessorio eliminato' });
+      res.json({
+        success: true, message: 'Accessorio eliminato'
+      });
     } catch (error) {
       next(error);
     }

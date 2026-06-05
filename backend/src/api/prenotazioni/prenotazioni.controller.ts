@@ -5,8 +5,9 @@ import {
   prenotazioneUpdateSchema,
   prenotazioneParamsSchema,
   prenotazioneByFiltersSchema,
+  prenotazioneAggiornaStatoSchema,
 } from './prenotazioni.dto';
-import { StatoPrenotazione } from '@prisma/client';
+import { AuthRequest } from '../../middleware/auth.middleware';
 
 export class PrenotazioniController {
 
@@ -16,6 +17,19 @@ export class PrenotazioniController {
   
       const prenotazioni = await PrenotazioniService.getAll(filters);
   
+      res.json({
+        success: true,
+        data: prenotazioni,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getMie(req: Request, res: Response, next: NextFunction) {
+    try {
+      const utenteId = (req as any).user.id;
+      const prenotazioni = await PrenotazioniService.getMie(utenteId);
       res.json({
         success: true,
         data: prenotazioni,
@@ -40,9 +54,10 @@ export class PrenotazioniController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const data = prenotazioneCreateSchema.parse(req.body);
-      await PrenotazioniService.create(data);
-      res.json({
+      const data = prenotazioneCreateSchema.parse({ body: req.body });
+      const utenteId = (req as AuthRequest).user!.userId;
+      await PrenotazioniService.create(data, utenteId);
+      res.status(201).json({
         success: true,
         message: 'prenotazione creata con successo'
       });
@@ -82,12 +97,13 @@ export class PrenotazioniController {
 
   static async aggiornaStato(req: Request, res: Response, next: NextFunction) {
     try {
-      const { params } = prenotazioneParamsSchema.parse({ params: req.params });
-      const { stato }  = req.body as { stato: StatoPrenotazione };
-      await PrenotazioniService.aggiornaStato(params.id, stato);
+      const { params, body } = prenotazioneAggiornaStatoSchema.parse({ params: req.params, body: req.body });
+      const operatoreId = (req as AuthRequest).user!.userId;
+
+      await PrenotazioniService.aggiornaStato(params.id, body.stato, operatoreId);
       res.json({
         success: true,
-        message: `stato aggiornato a ${stato}`
+        message: `stato aggiornato a ${body.stato}`
       });
     } catch (err) {
       next(err);
