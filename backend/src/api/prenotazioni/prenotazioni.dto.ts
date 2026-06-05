@@ -1,8 +1,7 @@
 import * as z from 'zod';
 import { StatoPrenotazione } from '@prisma/client';
 
-const timeHHMMSSSchema = z
-  .string()
+const timeHHMMSSSchema = z.string()
   .regex(/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, {
     message: "Formato orario non valido. Usa HH:MM:SS (es. 09:00:00)",
   });

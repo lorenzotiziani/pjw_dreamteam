@@ -13,7 +13,7 @@ import { AccessoriService } from "../accessori/accessori.service";
 function buildOraRitiro(dataRitiro: Date, oraRitiro: string): Date {
   const [hours, minutes, seconds] = oraRitiro.split(":").map(Number);
   const date = new Date(dataRitiro);
-  date.setHours(hours, minutes, seconds, 0);
+  date.setUTCHours(hours, minutes, seconds, 0);
   return date;
 }
 
@@ -362,6 +362,10 @@ export class PrenotazioniService {
             data: { quantitaManutenzione: { increment: 1 } },
           });
         }
+        await tx.prenotazione.update({
+          where: { id: id },
+          data: { stato },
+        });
         await tx.logPrenotazione.create({
           data: { prenotazioneId: id, operatoreId, tipo: stato, note },
         });
