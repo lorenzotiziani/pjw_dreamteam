@@ -4,7 +4,8 @@ export class LogOperazioniService {
   static async getAll() {
     return prisma.logPrenotazione.findMany({
       include: {
-        prenotazione:true,
+        utente: true,
+        prenotazione: true,
       }
     })
   }

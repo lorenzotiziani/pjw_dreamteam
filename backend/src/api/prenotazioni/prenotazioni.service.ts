@@ -212,6 +212,7 @@ export class PrenotazioniService {
           dataRitiro: body.dataRitiro,
           oraRitiro: dataOraRitiro,
           dataOraRiconsegna: body.dataOraRiconsegna,
+          stato: StatoPrenotazione.CONFERMATA,
           totale,
           righe: {
             create: righeCalcolate,
@@ -328,9 +329,18 @@ export class PrenotazioniService {
       throw new Error(`La prenotazione è già ${stato}`);
     }
   
-    if (stato === StatoPrenotazione.RITARDO) {
-      await prisma.logPrenotazione.create({
-        data: { prenotazioneId: id, operatoreId, tipo: stato, note },
+    if (stato === StatoPrenotazione.RITIRATA) {
+      await prisma.$transaction(async (tx) => {
+        for (const riga of existing.righe) {
+          await prenotaBici(tx, existing.puntoVenditaId, riga.tipoBiciId);
+        }
+        await tx.prenotazione.update({
+          where: { id: id },
+          data: { stato },
+        });
+        await tx.logPrenotazione.create({
+          data: { prenotazioneId: id, operatoreId, tipo: stato, note },
+        });
       });
       return;
     }
@@ -373,7 +383,7 @@ export class PrenotazioniService {
       return;
     }
   
-    if (stato === StatoPrenotazione.RESTITUITA) {
+    if (stato === StatoPrenotazione.RESTITUITA || stato === StatoPrenotazione.RITARDO) {
       await prisma.$transaction(async (tx) => {
         for (const riga of existing.righe) {
           const stock = await tx.stockBici.findUnique({
@@ -405,7 +415,12 @@ export class PrenotazioniService {
           data: { stato },
         });
         await tx.logPrenotazione.create({
-          data: { prenotazioneId: id, operatoreId, tipo: stato, note },
+          data: {
+            prenotazioneId: id,
+            operatoreId,
+            tipo: stato,
+            note,
+          },
         });
       });
       return;
