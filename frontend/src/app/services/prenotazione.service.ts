@@ -23,11 +23,8 @@ add(
   coperturaId: number | null,
   accessori: { accessorioId: number; quantita: number }[]
 ) {
-  // Formatta dataRitiro come "YYYY-MM-DD" (senza ora)
   const dataRitiroStr = dataRitiro.toISOString().split('T')[0];
 
-  // Formatta dataOraRiconsegna come "YYYY-MM-DDTHH:MM:SS" (senza millisecondi e senza Z)
-  // Esempio: "2025-06-10T18:00:00"
   const dataOraRiconsegnaStr = dataOraRiconsegna.toISOString().replace('Z', '').slice(0, 19);
 
   const body = {
@@ -48,12 +45,7 @@ add(
     ]
   };
 
-  // Imposta esplicitamente l'header Content-Type
-  const httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
- console.log("body", body)
-  return this.http.post<Prenotazione>('/api/prenotazioni', body, httpOptions);
+  return this.http.post<Prenotazione>('/api/prenotazioni', body);
 }
 }
 
