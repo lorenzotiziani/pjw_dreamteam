@@ -6,6 +6,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { BookingComponent } from './pages/booking/booking.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BookingFormComponent } from './pages/booking-form/booking-form.component';
+import { BookingListComponent } from './pages/booking-list/booking-list.component';
 
 const routes: Routes = [
   {
@@ -27,6 +28,10 @@ const routes: Routes = [
       {
         path:'form',
         component:BookingFormComponent
+      },
+      {
+        path:'list',
+        component:BookingListComponent
       }
     ]
   },

@@ -9,7 +9,7 @@ export enum StatoPrenotazione {
 export type Prenotazione = {
   id: string,
   utenteId: string,
-  puntoVenditaId: string,
+  puntoVenditaId: number,
   dataRitiro: Date,
   oraRitiro: Date,
   dataOraRiconsegna: Date,

@@ -20,6 +20,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BookingFormComponent } from './pages/booking-form/booking-form.component';
 import { CardBikeComponent } from './components/card-bike/card-bike.component';
 import { NavUserComponent } from './components/nav-user/nav-user.component';
+import { BookingListComponent } from './pages/booking-list/booking-list.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { NavUserComponent } from './components/nav-user/nav-user.component';
     BookingComponent,
     BookingFormComponent,
     CardBikeComponent,
-    NavUserComponent
+    NavUserComponent,
+    BookingListComponent
   ],
   imports: [
     BrowserModule,

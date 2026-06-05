@@ -28,10 +28,10 @@ export type TipoBici = {
 }
 
 export type StockBici = {
-  id: string,
-  puntoVenditaId: string,
-  tipoBiciId: string,
-  quantitaTotale: string,
-  quantitaManutenzione: string
+  id: number,
+  puntoVenditaId: number,
+  tipoBiciId: number,
+  quantitaTotale: number,
+  quantitaManutenzione: number
 
 }

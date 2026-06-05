@@ -2,7 +2,7 @@ import { CategoriaBici, Motorizzazione, StockBici, Taglia } from "./Bike"
 import { Prenotazione } from "./prenotazione"
 
 export type PuntoVendita = {
-  id: string,
+  id: number,
   nome: string,
   indirizzo: string,
   citta: string,
