@@ -9,7 +9,7 @@ export class AuthController {
       const role = req.user!.role;
       let data: registerDTO = req.body;
       if (role === 'ADMIN') {
-        data = { ...data, role: 'OPERATORE' };
+        data = { ...data, ruolo: 'OPERATORE' };
       }
       
       const registerResult = await AuthService.register(data);
