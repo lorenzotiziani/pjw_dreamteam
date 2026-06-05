@@ -16,30 +16,38 @@
     <button class="btn btn-primary" (click)="openCreate()">+ Nuovo punto vendita</button>
   </div>
 
-  </div>
-
+  <!-- Loading -->
   <div *ngIf="loading" class="bo-loading">
     <div class="spinner-border text-primary"></div><span>Caricamento...</span>
   </div>
 
+  <!-- Contenuto -->
   <div *ngIf="!loading">
+
     <div *ngIf="puntiVendita.length === 0" class="bo-empty">
       <div class="bo-empty-icon">🏪</div>
       <div class="bo-empty-text">Nessun punto vendita configurato</div>
       <button class="btn btn-primary mt-2" (click)="openCreate()">Crea il primo</button>
     </div>
-    <div class="row g-3" *ngIf="puntiVendita.length > 0">
-      <div class="col-12 col-md-6 col-xl-4" *ngFor="let pv of puntiVendita">
-        <app-punto-vendita-card
-          [puntoVendita]="pv"
-          (edit)="openEdit($event)"
-          (delete)="onDelete($event)"
-          (toggleAttivo)="onToggleAttivo($event)"
-          (manageStock)="openStock($event)">
-        </app-punto-vendita-card>
+
+    <!-- Griglia card centrata, stile "tabella senza bordi" -->
+    <div class="pv-grid-wrap" *ngIf="puntiVendita.length > 0">
+      <div class="row g-3">
+        <div class="col-12 col-md-6" *ngFor="let pv of puntiVendita">
+          <app-punto-vendita-card
+            [puntoVendita]="pv"
+            (edit)="openEdit($event)"
+            (delete)="onDelete($event)"
+            (toggleAttivo)="onToggleAttivo($event)"
+            (manageStock)="openStock($event)">
+          </app-punto-vendita-card>
+        </div>
       </div>
     </div>
+
   </div>
+
+</div>
 
 
 <!-- Create/Edit Modal -->

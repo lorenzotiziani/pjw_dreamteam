@@ -1,3 +1,10 @@
+/* Contenitore griglia card — stile "tabella senza bordi" */
+.pv-grid-wrap {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.25rem 1rem;
+}
+
 .stock-table-wrap { overflow-x: auto; }
 .stock-form-wrap { background: #f8fafc; border-radius: 10px; padding: 1rem; border: 1px solid #e2e8f0; }
 .stock-form-title { font-size: .85rem; font-weight: 700; color: #374151; margin-bottom: .75rem; }

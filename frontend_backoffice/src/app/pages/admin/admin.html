@@ -57,49 +57,116 @@
   <section class="admin-section">
 
     <div class="section-head">
-      <h2 class="section-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Log Operazioni
-      </h2>
+      <div>
+        <h2 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Log Operazioni
+        </h2>
+        <p class="section-sub" *ngIf="!loading">
+          <ng-container *ngIf="logTotale !== logOperazioni.length">
+            {{ logTotale }} di {{ logOperazioni.length }} record
+          </ng-container>
+          <ng-container *ngIf="logTotale === logOperazioni.length">
+            {{ logOperazioni.length }} record totali
+          </ng-container>
+        </p>
+      </div>
     </div>
 
-    <div *ngIf="!loading" class="bo-table-wrap">
-      <table class="bo-table" *ngIf="logOperazioni.length > 0; else emptyLog">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Tipo</th>
-            <th>Prenotazione</th>
-            <th>Operatore</th>
-            <th>Data esecuzione</th>
-            <th>Note</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let log of logOperazioni">
-            <td class="log-id">#{{ log.id }}</td>
-            <td>
-              <span class="log-badge" [ngClass]="tipoBadgeClass(log.tipo)">
-                {{ tipoLabel(log.tipo) }}
-              </span>
-            </td>
-            <td>#{{ log.prenotazioneId }}</td>
-            <td>
-              <span *ngIf="log.utente">{{ log.utente.cognome }} {{ log.utente.nome }}</span>
-              <span *ngIf="!log.utente" class="log-id">#{{ log.operatoreId }}</span>
-            </td>
-            <td class="log-date">{{ dataFmt(log.eseguitaIl) }}</td>
-            <td class="log-note">{{ log.note || '—' }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- ── Barra filtri ── -->
+    <div *ngIf="!loading && logOperazioni.length > 0" class="log-filters">
+
+      <select class="log-filter-select" [(ngModel)]="logFiltroTipo" (ngModelChange)="applyLogFiltri()">
+        <option value="">Tutti i tipi</option>
+        <option value="CONFERMATA">Confermata</option>
+        <option value="RITIRATA">Ritirata</option>
+        <option value="RESTITUITA">Restituita</option>
+        <option value="CANCELLATA">Cancellata</option>
+        <option value="DANNO">Danno</option>
+        <option value="RITARDO">Ritardo</option>
+      </select>
+
+      <div class="log-date-range">
+        <span class="log-date-label">Dal</span>
+        <input type="date" class="log-filter-date" [(ngModel)]="logFiltroDal" (ngModelChange)="applyLogFiltri()" />
+        <span class="log-date-label">Al</span>
+        <input type="date" class="log-filter-date" [(ngModel)]="logFiltroAl" (ngModelChange)="applyLogFiltri()" />
+      </div>
+
+      <button *ngIf="logFiltroTipo || logFiltroDal || logFiltroAl"
+              class="log-filter-reset" (click)="resetLogFiltri()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Reset
+      </button>
+
+    </div>
+
+    <!-- ── Tabella ── -->
+    <div *ngIf="!loading">
+
+      <ng-container *ngIf="logTotale > 0; else emptyLog">
+        <div class="bo-table-wrap">
+          <table class="bo-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tipo</th>
+                <th>Prenotazione</th>
+                <th>Operatore</th>
+                <th>Data esecuzione</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let log of logPaginati">
+                <td class="log-id">#{{ log.id }}</td>
+                <td>
+                  <span class="log-badge" [ngClass]="tipoBadgeClass(log.tipo)">
+                    {{ tipoLabel(log.tipo) }}
+                  </span>
+                </td>
+                <td>#{{ log.prenotazioneId }}</td>
+                <td>
+                  <span *ngIf="log.utente">{{ log.utente.cognome }} {{ log.utente.nome }}</span>
+                  <span *ngIf="!log.utente" class="log-id">#{{ log.operatoreId }}</span>
+                </td>
+                <td class="log-date">{{ dataFmt(log.eseguitaIl) }}</td>
+                <td class="log-note">{{ log.note || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── Paginazione ── -->
+        <div class="log-pagination" *ngIf="logTotalePagine > 1">
+          <span class="log-page-info">
+            {{ (logPage - 1) * logPageSize + 1 }}–{{ logPageEnd }} di {{ logTotale }}
+          </span>
+          <div class="log-page-controls">
+            <button class="log-page-btn" [disabled]="logPage === 1" (click)="logPage = logPage - 1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <ng-container *ngFor="let p of logPageNums">
+              <span *ngIf="p === -1" class="log-page-ellipsis">…</span>
+              <button *ngIf="p !== -1"
+                      class="log-page-btn"
+                      [class.log-page-btn--active]="p === logPage"
+                      (click)="logPage = p">{{ p }}</button>
+            </ng-container>
+            <button class="log-page-btn" [disabled]="logPage === logTotalePagine" (click)="logPage = logPage + 1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </ng-container>
 
       <ng-template #emptyLog>
         <div class="admin-empty">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <p>Nessun log disponibile</p>
+          <p>{{ logOperazioni.length === 0 ? 'Nessun log disponibile' : 'Nessun risultato per i filtri selezionati' }}</p>
         </div>
       </ng-template>
+
     </div>
 
   </section>

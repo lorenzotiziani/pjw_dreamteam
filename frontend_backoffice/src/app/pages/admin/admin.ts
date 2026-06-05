@@ -45,6 +45,15 @@ export class AdminComponent implements OnInit {
   filtroAnno: number = new Date().getFullYear();
   anni: number[] = [];
 
+  // ── Filtri log ────────────────────────────────────────────
+  logFiltroTipo  = '';
+  logFiltroDal   = '';
+  logFiltroAl    = '';
+
+  // ── Paginazione log ───────────────────────────────────────
+  logPage     = 1;
+  logPageSize = 10;
+
   // ── Form crea operatore ───────────────────────────────────
   createForm = this.fb.group({
     nome:     ['', Validators.required],
@@ -122,6 +131,53 @@ export class AdminComponent implements OnInit {
 
   get operatoriAttiviCount(): number {
     return this.operatori.filter(o => o.isActive).length;
+  }
+
+  // ── Log: filtri + paginazione ─────────────────────────────
+  get logFiltrati(): LogOperazione[] {
+    return this.logOperazioni.filter(l => {
+      if (this.logFiltroTipo && l.tipo !== this.logFiltroTipo) return false;
+      if (this.logFiltroDal) {
+        const d = l.eseguitaIl ? l.eseguitaIl.slice(0, 10) : '';
+        if (!d || d < this.logFiltroDal) return false;
+      }
+      if (this.logFiltroAl) {
+        const d = l.eseguitaIl ? l.eseguitaIl.slice(0, 10) : '';
+        if (!d || d > this.logFiltroAl) return false;
+      }
+      return true;
+    });
+  }
+
+  get logTotale(): number { return this.logFiltrati.length; }
+  get logTotalePagine(): number { return Math.max(1, Math.ceil(this.logTotale / this.logPageSize)); }
+  get logPageEnd(): number { return Math.min(this.logPage * this.logPageSize, this.logTotale); }
+
+  get logPaginati(): LogOperazione[] {
+    const start = (this.logPage - 1) * this.logPageSize;
+    return this.logFiltrati.slice(start, start + this.logPageSize);
+  }
+
+  get logPageNums(): number[] {
+    const total = this.logTotalePagine;
+    const cur   = this.logPage;
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const pages: number[] = [];
+    pages.push(1);
+    if (cur > 3)          pages.push(-1);      // ellipsis
+    for (let p = Math.max(2, cur - 1); p <= Math.min(total - 1, cur + 1); p++) pages.push(p);
+    if (cur < total - 2)  pages.push(-1);      // ellipsis
+    pages.push(total);
+    return pages;
+  }
+
+  applyLogFiltri(): void { this.logPage = 1; }
+
+  resetLogFiltri(): void {
+    this.logFiltroTipo = '';
+    this.logFiltroDal  = '';
+    this.logFiltroAl   = '';
+    this.logPage = 1;
   }
 
   // ── Chart ricavi ─────────────────────────────────────────
