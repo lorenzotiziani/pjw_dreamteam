@@ -157,32 +157,34 @@ export class PuntiVenditaComponent implements OnInit {
   saveStock() {
     if (!this.selectedPv || this.stockForm.invalid) return;
     this.saving = true;
-    const v = this.stockForm.value;
-    const obs = this.editingStockId
-      ? this.srv.updateStock(this.selectedPv.id, this.editingStockId, {
-          quantitaTotale: v.quantitaTotale!,
+    const v      = this.stockForm.value;
+    const isEdit = !!this.editingStockId;
+    const obs = isEdit
+      ? this.srv.updateStock(this.selectedPv.id, this.editingStockId!, {
+          quantitaTotale:      v.quantitaTotale!,
           quantitaManutenzione: v.quantitaManutenzione!
         })
       : this.srv.createStock(this.selectedPv.id, {
-          tipoBiciId: v.tipoBiciId!,
-          quantitaTotale: v.quantitaTotale!,
+          tipoBiciId:          v.tipoBiciId!,
+          quantitaTotale:      v.quantitaTotale!,
           quantitaManutenzione: v.quantitaManutenzione!
         });
     obs.subscribe({
-      next: () => {
+      next: (res: any) => {
+        const record: StockBici = res?.data ?? res;
+        // Aggiorna la lista nel modale direttamente con il record restituito dall'API
+        if (isEdit) {
+          this.stockList = this.stockList.map(s => s.id === record.id ? record : s);
+        } else {
+          this.stockList = [...this.stockList, record];
+        }
+        // Propaga il nuovo stockList anche alla card (contatori Bici totali / Disponibili)
+        this.puntiVendita = this.puntiVendita.map(pv =>
+          pv.id === this.selectedPv!.id ? { ...pv, stockBici: [...this.stockList] } : pv
+        );
         this.editingStockId = null;
         this.stockForm.reset({ tipoBiciId: null, quantitaTotale: 1, quantitaManutenzione: 0 });
-        this.srv.getStock(this.selectedPv!.id).subscribe(data => {
-          const stock = data ?? [];
-          // Aggiorna il modale
-          this.stockList = stock;
-          // Aggiorna anche la card corrispondente nell'array locale
-          // così i contatori (Bici totali / Manutenzione / Disponibili) si riflettono subito
-          this.puntiVendita = this.puntiVendita.map(pv =>
-            pv.id === this.selectedPv!.id ? { ...pv, stockBici: stock } : pv
-          );
-          this.saving = false;
-        });
+        this.saving = false;
       },
       error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore stock'); this.saving = false; }
     });
