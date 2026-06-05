@@ -83,11 +83,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     this.setupOrariRiconsegnaListener();
   }
 
-  ngOnDestroy() {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
-
   // Genera orari di ritiro dalle 9 alle 18
   generaOrariDisponibili(): void {
     for (let ora = 9; ora <= 17; ora++) {
@@ -127,7 +122,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Quando si seleziona/deseleziona un accessorio
   onAccessorioChange(event: any, accessorio: Accessorio) {
     if (event.target.checked) {
       this.accessoriSelezionati.push(accessorio);
@@ -137,7 +131,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     this.calcolaTotale();
   }
 
-  // Quando si seleziona una copertura (radio button)
   onCoperturaSelezionata(copertura: Copertura) {
     this.coperturaSelezionata = copertura;
     this.bookingForm.patchValue({ coperturaId: copertura.id });
@@ -249,5 +242,9 @@ async addPrenotazione() {
 }
   login() {
     this.router.navigate(['/login']);
+  }
+    ngOnDestroy() {
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 }

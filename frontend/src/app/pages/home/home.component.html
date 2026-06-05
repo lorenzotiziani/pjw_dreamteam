@@ -1,14 +1,63 @@
-<div>
-    <h1>Benvenuto nell noleggio ITS!</h1> 
-    <ng-container *ngIf="user$ | async as user">
-        <h2>
-        {{user.email}}
-        </h2>
-    </ng-container>
-    <div>
-        <h2>Noleggio bici a Vicenza</h2>
-        <p>Prenota ora la tua bici</p>
+<!-- Hero section con sfondo sfumato e allineamento centrale -->
+<div class="bg-gradient-primary py-5 mb-5">
+  <div class="container py-4">
+    <div class="text-center">
+
+    <div class="bg-light rounded p-5 auto shadow">
+      <i class="fas fa-bicycle fs-1 mb-3 text-warning"></i>
+      <h1 class="display-4 fw-bold">Benvenuto nel noleggio ITS!</h1>
+      <p class="lead mb-2">Scopri la libertà su due ruote a Vicenza</p>
+    </div>  
+      <!-- Messaggio user autenticato -->
+      <ng-container *ngIf="user$ | async as user">
+        <div class="alert alert-light d-inline-flex align-items-center gap-2 shadow-sm" role="alert">
+          <i class="fas fa-user-circle fs-5"></i>
+          <span class="fw-semibold">{{ user.email }}</span>
+        </div>
+      </ng-container>
+
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <div class="mt-4">
+          <a routerLink="/booking/form" class="btn btn-warning btn-lg px-4 py-2 fw-bold shadow">
+            <i class="fas fa-calendar-check me-2"></i>Prenota ora
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- Sezione descrittiva sotto l'hero -->
+<div class="container mb-5">
+  <div class="row g-4 text-center">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <i class="fas fa-bike fs-1 text-primary mb-3"></i>
+          <h5 class="card-title">Bici moderne</h5>
+          <p class="card-text">City bike, mountain bike, elettriche: scegli la tua preferita.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <i class="fas fa-clock fs-1 text-primary mb-3"></i>
+          <h5 class="card-title">Orari flessibili</h5>
+          <p class="card-text">Ritiro e riconsegna in qualsiasi fascia oraria dalle 9 alle 18.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <i class="fas fa-shield-alt fs-1 text-primary mb-3"></i>
+          <h5 class="card-title">Coperture assicurative</h5>
+          <p class="card-text">Proteggi il tuo noleggio con le nostre coperture aggiuntive.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!--

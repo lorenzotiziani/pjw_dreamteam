@@ -13,14 +13,6 @@ export class NavBarComponent {
   protected router = inject(Router)
   currentUser$ = this.authSrv.currentUser$;
 
-  routeHome(){
-    this.router.navigate([`/`])
-  }
-
-  routeForm(){
-    this.router.navigate([`/booking/form`])
-  }
-
   logout() {
     this.authSrv.logout();
     this.router.navigate(['/login'])

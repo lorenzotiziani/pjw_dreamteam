@@ -23,6 +23,6 @@ export type Stock = {
     categoria: CategoriaBici;       
     motorizzazione: Motorizzazione;   
     taglia: Taglia;           
-    prezzoMezzaGiornata: string | number;
+    prezzoMezzaGiornata: string;
   };
 }

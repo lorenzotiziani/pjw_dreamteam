@@ -1,22 +1,27 @@
-<nav class="navbar navbar-expand-lg bg-primary shadow-sm py-2 mb-3" data-bs-theme="dark">
-  <div class="container-fluid px-4">
-    <a class="navbar-brand fw-semibold" style="cursor: pointer;" (click)="routeHome()">
-      Noleggio ITS
-    </a>
-    <a class="navbar-brand" style="cursor: pointer;" (click)="routeForm()">
-      NOLEGGIO BICI
-    </a>
-    <div class="collapse navbar-collapse" id="navbarContent">
-      <div class="ms-auto">
-        <ul class="navbar-nav align-items-center gap-2">
-          <app-nav-user
-            *ifAuthenticated="let currentUser"
-            [user]="currentUser"
-            (logout)="logout()"
-            (login)="login()"
-          ></app-nav-user>
-        </ul>
-      </div>
+<nav class="navbar bg-primary navbar-expand mb-3" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="nabar-brand" [routerLink]="['/']">ITS-NOLEGGIO</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/booking/form']" routerLinkActive="active">Prenota</a>
+        </li>
+        <li class="nav-item" *ifAuthenticated>
+          <a class="nav-link" [routerLink]="['/booking/list']" routerLinkActive="active">Prenotazioni</a>
+        </li>
+      </ul>
     </div>
+    <ul class="navbar-nav me-3">
+      <app-nav-user
+        *ngIf="(currentUser$ | async) as currentUser; else loginButton"
+        (logout)="logout()"
+        [user]="currentUser"
+        ></app-nav-user>
+      <ng-template #loginButton>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/login']">Login</a>
+        </li>
+      </ng-template>
+    </ul>
   </div>
 </nav>

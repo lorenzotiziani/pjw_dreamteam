@@ -1,16 +1,8 @@
-<ng-container *ngIf="user; else noAuth">
-  <li class="nav-item" ngbDropdown display="dynamic" placement="bottom-end">
-    <a class="nav-link" ngbDropdownToggle>
-      {{user.email}}
-    </a>
-    <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
-      <button ngbDropdownItem (click)="onLogoutClick()">Logout</button>
-    </div>
-  </li>
-</ng-container>
-
-<ng-template #noAuth>
-  <li class="nav-item">
-    <button class="btn btn-link nav-link" (click)="onLoginClick()">Login</button>
-  </li>
-</ng-template>
+<li class="nav-item" ngbDropdown display="dynamic" placement="bottom-end">
+  <a class="nav-link" ngbDropdownToggle>
+    {{user.email}}
+  </a>
+  <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
+    <button ngbDropdownItem (click)="onLogoutClick()">Logout</button>
+  </div>
+</li>

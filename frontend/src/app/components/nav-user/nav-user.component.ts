@@ -13,16 +13,9 @@ export class NavUserComponent {
 
   @Output()
   logout = new EventEmitter<void>();
-
-  @Output()
-  login = new EventEmitter<void>();
-
+  
   onLogoutClick(){
     this.logout.emit();
-  }
-
-  onLoginClick(){
-    this.login.emit();
   }
 
 }
