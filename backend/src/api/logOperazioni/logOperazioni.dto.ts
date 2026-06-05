@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { StatoPrenotazione } from "@prisma/client";
+
 const TipoLogOperazioneEnum = z.enum([
   StatoPrenotazione.CONFERMATA,
   StatoPrenotazione.RITIRATA,
