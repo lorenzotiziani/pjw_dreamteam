@@ -4,7 +4,21 @@ import { loginDTO, registerDTO } from './auth.dto';
 import { AuthRequest } from '../../middleware/auth.middleware';
 
 export class AuthController {
-  static async register(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  static async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const data: registerDTO = req.body;
+      const registerResult = await AuthService.register(data);
+
+      res.status(201).json({
+        success: true,
+        data: registerResult
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async registerOperatore(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const role = req.user!.role;
       let data: registerDTO = req.body;
