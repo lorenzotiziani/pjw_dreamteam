@@ -9,10 +9,16 @@ export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) 
     const router = inject(Router);
     const http = inject(HttpClient);
 
-    // 1. Non intercettare le route di autenticazione
-    if (req.url.includes('/api/auth/login') ||
-        req.url.includes('/api/auth/register') ||
-        req.url.includes('/api/auth/activate')) {
+    // 1. Non intercettare le route di autenticazione pubbliche
+    //    Nota: il check '/api/auth/register' è volutamente ESATTO con $ per non
+    //    colpire endpoint protetti che iniziano con la stessa stringa
+    //    (es. /api/auth/registerOperatore che richiede il token ADMIN).
+    const publicPaths = ['/api/auth/login', '/api/auth/register', '/api/auth/activate'];
+    const isPublic = publicPaths.some(p => {
+        const url = req.url.split('?')[0]; // ignora query string
+        return url === p || url.endsWith(p);
+    });
+    if (isPublic) {
         return next(req);
     }
 

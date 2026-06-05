@@ -20,13 +20,9 @@ export class OperatoriService {
     return this.http.patch<any>(`/api/users/${id}/status`, { isActive });
   }
 
-  /**
-   * Crea un nuovo utente tramite il flow di registrazione.
-   * Nota: l'utente verrà creato con ruolo USER e dovrà verificare l'email.
-   * Il ruolo OPERATORE va assegnato manualmente nel DB o via endpoint dedicato.
-   */
+  /** Crea un nuovo operatore tramite l'endpoint dedicato (ruolo OPERATORE assegnato automaticamente). */
   create(data: { nome: string; cognome: string; email: string; password: string }) {
-    return this.http.post<any>('/api/auth/register', {
+    return this.http.post<any>('/api/auth/registerOperatore', {
       nome: data.nome,
       cognome: data.cognome,
       email: data.email,

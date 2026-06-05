@@ -38,8 +38,9 @@ export class AdminComponent implements OnInit {
   logOperazioni: LogOperazione[] = [];
   prenotazioni: Prenotazione[]   = [];
 
-  loading = true;
-  saving  = false;
+  loading     = true;
+  saving      = false;
+  createError = '';
 
   // ── Filtri chart ─────────────────────────────────────────
   filtroAnno: number = new Date().getFullYear();
@@ -105,12 +106,14 @@ export class AdminComponent implements OnInit {
 
   openCreate(): void {
     this.createForm.reset();
+    this.createError = '';
     this.modalSrv.open(this.createModal, { centered: true, size: 'md' });
   }
 
   saveCreate(modal: any): void {
     if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
-    this.saving = true;
+    this.saving      = true;
+    this.createError = '';
     const v = this.createForm.value;
     this.operatoriSrv.create({
       nome:     v.nome!,
@@ -126,8 +129,7 @@ export class AdminComponent implements OnInit {
       },
       error: (e) => {
         this.saving = false;
-        const msg = e?.error?.message ?? e?.error?.error ?? 'Errore durante la creazione. Riprova.';
-        this.toastSrv.error(msg);
+        this.createError = e?.error?.message ?? e?.error?.error ?? 'Errore durante la creazione. Riprova.';
       }
     });
   }

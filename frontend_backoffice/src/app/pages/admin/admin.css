@@ -493,3 +493,19 @@
   border-radius: 50%;
   animation: admin-spin 0.8s linear infinite;
 }
+
+/* ── Errore inline modal crea operatore ────────────────── */
+.create-error-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 10px 14px;
+  margin: 0 1rem 0.5rem;
+  line-height: 1.4;
+}
