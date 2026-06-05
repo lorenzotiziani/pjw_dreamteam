@@ -98,8 +98,9 @@ export class PrenotazioniController {
   static async aggiornaStato(req: Request, res: Response, next: NextFunction) {
     try {
       const { params, body } = prenotazioneAggiornaStatoSchema.parse({ params: req.params, body: req.body });
+      const operatoreId = (req as AuthRequest).user!.userId;
 
-      await PrenotazioniService.aggiornaStato(params.id, body.stato);
+      await PrenotazioniService.aggiornaStato(params.id, body.stato, operatoreId);
       res.json({
         success: true,
         message: `stato aggiornato a ${body.stato}`
