@@ -1,0 +1,22 @@
+<nav class="navbar navbar-expand-lg bg-primary shadow-sm py-2 mb-3" data-bs-theme="dark">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-semibold" style="cursor: pointer;" (click)="routeHome()">
+      Noleggio ITS
+    </a>
+    <a class="navbar-brand" style="cursor: pointer;" (click)="routeForm()">
+      NOLEGGIO BICI
+    </a>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <div class="ms-auto">
+        <ul class="navbar-nav align-items-center gap-2">
+          <app-nav-user
+            *ifAuthenticated="let currentUser"
+            [user]="currentUser"
+            (logout)="logout()"
+            (login)="login()"
+          ></app-nav-user>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>

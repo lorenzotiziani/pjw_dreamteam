@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {ChartConfiguration, ChartType} from "chart.js";
 
@@ -9,15 +9,11 @@ import {ChartConfiguration, ChartType} from "chart.js";
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
+  protected authSrv = inject(AuthService);
+
+  user$ = this.authSrv.currentUser$;
+
   isGraph:boolean = true;
-
-  constructor(private authService: AuthService) {}
-
-  logout() {
-    this.authService.logout().subscribe({
-      complete: () => console.log('Logout completato')
-    });
-  }
 
   toggleView() { this.isGraph = !this.isGraph; }
   // DATI DI TEST

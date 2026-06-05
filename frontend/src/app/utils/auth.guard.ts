@@ -1,30 +1,18 @@
 // src/app/core/guards/auth.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { JwtService } from '../services/jwt.service';
+import { AuthService } from '../services/auth.service';
+import { tap } from 'rxjs';
 
 export const authGuard: CanActivateFn = (route, state) => {
-    const jwtService = inject(JwtService);
-    const router = inject(Router);
+  const authSrv = inject(AuthService);
+  const router = inject(Router);
 
-    // Controlla se il refresh token è valido
-    // (l'access token può essere scaduto, verrà refreshato dall'interceptor)
-    const isAuthenticated = jwtService.isAuthenticated();
-
-    if (isAuthenticated) {
-        return true;
-    }
-
-    // Non autenticato → pulisci eventuali token invalidi e redirect
-    console.warn('🚫 Auth Guard: accesso negato');
-    jwtService.removeToken();
-
-    router.navigate(['/login'], {
-        queryParams: {
-            returnUrl: state.url,
-            reason: 'unauthorized'
-        }
-    });
-
-    return false;
+  return authSrv.isAuthenticated$.pipe(
+    tap(isAuth => {
+      if(!isAuth){
+        router.navigate(['/login'], {queryParams: {requestedUrl: state.url}})
+      }
+    })
+  )
 };
