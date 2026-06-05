@@ -4,6 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PrenotazioniService } from '../../services/prenotazioni.service';
 import { PuntiVenditaService } from '../../services/punti-vendita.service';
 import { ToastService } from '../../services/toast.service';
+import { ConfirmModalService } from '../../services/confirm-modal.service';
 import { Prenotazione, StatoPrenotazione } from '../../entities/prenotazione.entity';
 import { PuntoVendita } from '../../entities/punto-vendita.entity';
 
@@ -16,7 +17,8 @@ import { PuntoVendita } from '../../entities/punto-vendita.entity';
 export class PrenotazioniComponent implements OnInit {
   private prenotazioniSrv = inject(PrenotazioniService);
   private puntiVenditaSrv = inject(PuntiVenditaService);
-  private toastSrv = inject(ToastService);
+  private toastSrv   = inject(ToastService);
+  private confirmSrv = inject(ConfirmModalService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
@@ -193,12 +195,19 @@ export class PrenotazioniComponent implements OnInit {
 
   // ── Aggiorna stato ──────────────────────────────────────────────────────
   onAggiornaStato(event: { id: number; stato: StatoPrenotazione }) {
-    const label = this.statoLabel(event.stato).toLowerCase();
-    if (!confirm(`Confermi di impostare la prenotazione come "${label}"?`)) return;
-    this.actionLoading = true;
-    this.prenotazioniSrv.aggiornaStato(event.id, event.stato).subscribe({
-      next: () => { this.loadPrenotazioni(); this.actionLoading = false; },
-      error: (e) => { this.toastSrv.error(this.parseError(e, 'aggiornamento stato')); this.actionLoading = false; }
+    const label = this.statoLabel(event.stato);
+    this.confirmSrv.confirm({
+      title: 'Aggiorna stato prenotazione',
+      message: `Confermi di impostare la prenotazione #${event.id} come "${label}"?`,
+      confirmLabel: 'Conferma',
+      type: 'primary'
+    }).then(ok => {
+      if (!ok) return;
+      this.actionLoading = true;
+      this.prenotazioniSrv.aggiornaStato(event.id, event.stato).subscribe({
+        next: () => { this.loadPrenotazioni(); this.actionLoading = false; },
+        error: (e) => { this.toastSrv.error(this.parseError(e, 'aggiornamento stato')); this.actionLoading = false; }
+      });
     });
   }
 
@@ -238,10 +247,18 @@ export class PrenotazioniComponent implements OnInit {
       return;
     }
     const info = `#${p.id} — ${p.utente?.cognome ?? ''} ${p.utente?.nome ?? ''}`.trim();
-    if (!confirm(`Eliminare definitivamente la prenotazione ${info}?\nL'operazione è irreversibile.`)) return;
-    this.prenotazioniSrv.delete(p.id).subscribe({
-      next: () => { this.loadPrenotazioni(); },
-      error: (e) => { this.toastSrv.error(this.parseError(e, 'eliminazione')); }
+    this.confirmSrv.confirm({
+      title: 'Elimina prenotazione',
+      message: `Eliminare definitivamente la prenotazione ${info}?`,
+      detail: "L'operazione è irreversibile.",
+      confirmLabel: 'Elimina',
+      type: 'danger'
+    }).then(ok => {
+      if (!ok) return;
+      this.prenotazioniSrv.delete(p.id).subscribe({
+        next: () => { this.loadPrenotazioni(); },
+        error: (e) => { this.toastSrv.error(this.parseError(e, 'eliminazione')); }
+      });
     });
   }
 

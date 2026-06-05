@@ -5,6 +5,7 @@ import { forkJoin, of } from 'rxjs';
 import { PuntiVenditaService } from '../../services/punti-vendita.service';
 import { TipiBiciService } from '../../services/tipi-bici.service';
 import { ToastService } from '../../services/toast.service';
+import { ConfirmModalService } from '../../services/confirm-modal.service';
 import { PuntoVendita, StockBici } from '../../entities/punto-vendita.entity';
 import { TipoBici } from '../../entities/tipo-bici.entity';
 
@@ -17,7 +18,8 @@ import { TipoBici } from '../../entities/tipo-bici.entity';
 export class PuntiVenditaComponent implements OnInit {
   private srv = inject(PuntiVenditaService);
   private tipiBiciSrv = inject(TipiBiciService);
-  private toastSrv = inject(ToastService);
+  private toastSrv   = inject(ToastService);
+  private confirmSrv = inject(ConfirmModalService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
@@ -109,10 +111,18 @@ export class PuntiVenditaComponent implements OnInit {
   }
 
   onDelete(id: number) {
-    if (!confirm('Eliminare questo punto vendita?')) return;
-    this.srv.delete(id).subscribe({
-      next: () => { this.load(); },
-      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
+    this.confirmSrv.confirm({
+      title: 'Elimina punto vendita',
+      message: 'Sei sicuro di voler eliminare questo punto vendita?',
+      detail: "L'operazione è irreversibile.",
+      confirmLabel: 'Elimina',
+      type: 'danger'
+    }).then(ok => {
+      if (!ok) return;
+      this.srv.delete(id).subscribe({
+        next: () => { this.load(); },
+        error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
+      });
     });
   }
 
