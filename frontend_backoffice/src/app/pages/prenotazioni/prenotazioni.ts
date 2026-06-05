@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PrenotazioniService } from '../../services/prenotazioni.service';
 import { PuntiVenditaService } from '../../services/punti-vendita.service';
+import { ToastService } from '../../services/toast.service';
 import { Prenotazione, StatoPrenotazione } from '../../entities/prenotazione.entity';
 import { PuntoVendita } from '../../entities/punto-vendita.entity';
 
@@ -15,6 +16,7 @@ import { PuntoVendita } from '../../entities/punto-vendita.entity';
 export class PrenotazioniComponent implements OnInit {
   private prenotazioniSrv = inject(PrenotazioniService);
   private puntiVenditaSrv = inject(PuntiVenditaService);
+  private toastSrv = inject(ToastService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
@@ -27,7 +29,6 @@ export class PrenotazioniComponent implements OnInit {
   loading = true;
   actionLoading = false;
   saving = false;
-  errorMsg = '';
 
   selectedPrenotazione: Prenotazione | null = null;
   editingPrenotazione: Prenotazione | null = null;
@@ -57,9 +58,10 @@ export class PrenotazioniComponent implements OnInit {
   ];
 
   editForm = this.fb.group({
-    dataRitiro:        ['', Validators.required],
-    oraRitiro:         ['', Validators.required],
-    dataOraRiconsegna: ['', Validators.required]
+    dataRitiro:     ['', Validators.required],
+    oraRitiro:      ['', Validators.required],
+    dataRiconsegna: ['', Validators.required],
+    oraRiconsegna:  ['', Validators.required]
   });
 
   restituzioneForm = this.fb.group({
@@ -77,7 +79,7 @@ export class PrenotazioniComponent implements OnInit {
     this.loading = true;
     this.prenotazioniSrv.getAll().subscribe({
       next: data => { this.prenotazioni = data ?? []; this.loading = false; },
-      error: (e) => { this.errorMsg = this.parseError(e, 'caricamento'); this.loading = false; }
+      error: (e) => { this.toastSrv.error(this.parseError(e, 'caricamento')); this.loading = false; }
     });
   }
 
@@ -145,14 +147,17 @@ export class PrenotazioniComponent implements OnInit {
   // ── Modifica ───────────────────────────────────────────────────────────
   openEdit(p: Prenotazione) {
     if (!this.canModify(p)) {
-      this.errorMsg = 'Modifica non consentita: il ritiro è previsto tra meno di 2 giorni.';
+      this.toastSrv.warn('Modifica non consentita: il ritiro è previsto tra meno di 2 giorni.');
       return;
     }
     this.editingPrenotazione = p;
+    const dtR = p.dataOraRiconsegna ? new Date(p.dataOraRiconsegna) : null;
+    const pad = (n: number) => String(n).padStart(2, '0');
     this.editForm.setValue({
-      dataRitiro:        p.dataRitiro?.slice(0, 10) ?? '',
-      oraRitiro:         p.oraRitiro?.slice(0, 5) ?? '09:00',
-      dataOraRiconsegna: this.toDatetimeLocal(p.dataOraRiconsegna)
+      dataRitiro:     p.dataRitiro?.slice(0, 10) ?? '',
+      oraRitiro:      this.oraFmt(p.oraRitiro) !== '—' ? this.oraFmt(p.oraRitiro) : '09:00',
+      dataRiconsegna: dtR ? `${dtR.getFullYear()}-${pad(dtR.getMonth() + 1)}-${pad(dtR.getDate())}` : '',
+      oraRiconsegna:  dtR ? `${pad(dtR.getHours())}:${pad(dtR.getMinutes())}` : ''
     });
     this.modalSrv.open(this.editModal, { size: 'md', centered: true });
   }
@@ -161,7 +166,7 @@ export class PrenotazioniComponent implements OnInit {
     if (!this.editingPrenotazione || this.editForm.invalid) return;
     // Doppio controllo 2 giorni prima di inviare al server
     if (!this.canModify(this.editingPrenotazione)) {
-      this.errorMsg = 'Modifica non consentita: il ritiro è previsto tra meno di 2 giorni.';
+      this.toastSrv.warn('Modifica non consentita: il ritiro è previsto tra meno di 2 giorni.');
       modal.dismiss();
       return;
     }
@@ -169,7 +174,7 @@ export class PrenotazioniComponent implements OnInit {
     const payload = {
       dataRitiro:        v.dataRitiro!,
       oraRitiro:         v.oraRitiro!.length === 5 ? v.oraRitiro + ':00' : v.oraRitiro!,
-      dataOraRiconsegna: v.dataOraRiconsegna!
+      dataOraRiconsegna: `${v.dataRiconsegna}T${v.oraRiconsegna}:00`
     };
     this.saving = true;
     this.prenotazioniSrv.update(this.editingPrenotazione.id, payload).subscribe({
@@ -180,7 +185,7 @@ export class PrenotazioniComponent implements OnInit {
         this.editingPrenotazione = null;
       },
       error: (e) => {
-        this.errorMsg = this.parseError(e, 'modifica');
+        this.toastSrv.error(this.parseError(e, 'modifica'));
         this.saving = false;
       }
     });
@@ -193,7 +198,7 @@ export class PrenotazioniComponent implements OnInit {
     this.actionLoading = true;
     this.prenotazioniSrv.aggiornaStato(event.id, event.stato).subscribe({
       next: () => { this.loadPrenotazioni(); this.actionLoading = false; },
-      error: (e) => { this.errorMsg = this.parseError(e, 'aggiornamento stato'); this.actionLoading = false; }
+      error: (e) => { this.toastSrv.error(this.parseError(e, 'aggiornamento stato')); this.actionLoading = false; }
     });
   }
 
@@ -201,7 +206,6 @@ export class PrenotazioniComponent implements OnInit {
   openRestituzione(p: Prenotazione): void {
     this.restituendoPrenotazione = p;
     this.restituzioneForm.reset({ stato: 'RESTITUITA', note: '' });
-    this.errorMsg = '';
     this.modalSrv.open(this.restituzioneModal, { size: 'md', centered: true });
   }
 
@@ -221,7 +225,7 @@ export class PrenotazioniComponent implements OnInit {
         this.loadPrenotazioni();
       },
       error: (e) => {
-        this.errorMsg = this.parseError(e, 'aggiornamento stato');
+        this.toastSrv.error(this.parseError(e, 'aggiornamento stato'));
         this.actionLoading = false;
       }
     });
@@ -230,14 +234,14 @@ export class PrenotazioniComponent implements OnInit {
   // ── Elimina ────────────────────────────────────────────────────────────
   onDelete(p: Prenotazione) {
     if (!this.canDelete(p)) {
-      this.errorMsg = 'Eliminazione non consentita: il ritiro è previsto tra meno di 2 giorni.';
+      this.toastSrv.warn('Eliminazione non consentita: il ritiro è previsto tra meno di 2 giorni.');
       return;
     }
     const info = `#${p.id} — ${p.utente?.cognome ?? ''} ${p.utente?.nome ?? ''}`.trim();
     if (!confirm(`Eliminare definitivamente la prenotazione ${info}?\nL'operazione è irreversibile.`)) return;
     this.prenotazioniSrv.delete(p.id).subscribe({
       next: () => { this.loadPrenotazioni(); },
-      error: (e) => { this.errorMsg = this.parseError(e, 'eliminazione'); }
+      error: (e) => { this.toastSrv.error(this.parseError(e, 'eliminazione')); }
     });
   }
 
@@ -289,6 +293,13 @@ export class PrenotazioniComponent implements OnInit {
   dataFmt(d?: string): string {
     if (!d) return '—';
     return new Date(d).toLocaleDateString('it-IT');
+  }
+
+  oraFmt(ora?: string): string {
+    if (!ora) return '—';
+    // oraRitiro può arrivare come ISO completo (1970-01-01T09:00:00.000Z) o come HH:MM:SS
+    const part = ora.includes('T') ? ora.split('T')[1] : ora;
+    return part.slice(0, 5);
   }
 
   dataOraFmt(d?: string): string {

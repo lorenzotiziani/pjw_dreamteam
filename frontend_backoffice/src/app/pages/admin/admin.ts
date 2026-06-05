@@ -7,6 +7,7 @@ import { catchError } from 'rxjs/operators';
 import { OperatoriService }    from '../../services/operatori.service';
 import { LogOperazioniService } from '../../services/log-operazioni.service';
 import { PrenotazioniService }  from '../../services/prenotazioni.service';
+import { ToastService }         from '../../services/toast.service';
 
 import { Operatore }      from '../../entities/operatore.entity';
 import { LogOperazione }  from '../../entities/log-operazione.entity';
@@ -26,6 +27,7 @@ export class AdminComponent implements OnInit {
   private operatoriSrv    = inject(OperatoriService);
   private logSrv          = inject(LogOperazioniService);
   private prenotazioniSrv = inject(PrenotazioniService);
+  private toastSrv        = inject(ToastService);
   private modalSrv        = inject(NgbModal);
   private fb              = inject(FormBuilder);
 
@@ -38,8 +40,6 @@ export class AdminComponent implements OnInit {
 
   loading = true;
   saving  = false;
-  errorMsg   = '';
-  successMsg = '';
 
   // ── Filtri chart ─────────────────────────────────────────
   filtroAnno: number = new Date().getFullYear();
@@ -62,12 +62,11 @@ export class AdminComponent implements OnInit {
 
   loadAll(): void {
     this.loading = true;
-    this.errorMsg = '';
     forkJoin({
       operatori:    this.operatoriSrv.getAll(),
       log:          this.logSrv.getAll().pipe(
         catchError(e => {
-          this.errorMsg = e?.error?.message ?? 'Errore caricamento log operazioni (verifica di avere il ruolo ADMIN)';
+          this.toastSrv.error(e?.error?.message ?? 'Errore caricamento log operazioni (verifica di avere il ruolo ADMIN)');
           return of([] as LogOperazione[]);
         })
       ),
@@ -89,21 +88,18 @@ export class AdminComponent implements OnInit {
   toggleStatus(op: Operatore): void {
     this.operatoriSrv.toggleStatus(op.id, !op.isActive).subscribe({
       next: () => this.loadAll(),
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore aggiornamento stato'; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore aggiornamento stato'); }
     });
   }
 
   openCreate(): void {
     this.createForm.reset();
-    this.errorMsg   = '';
-    this.successMsg = '';
     this.modalSrv.open(this.createModal, { centered: true, size: 'md' });
   }
 
   saveCreate(modal: any): void {
     if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
     this.saving = true;
-    this.errorMsg = '';
     const v = this.createForm.value;
     this.operatoriSrv.create({
       nome:     v.nome!,
@@ -114,12 +110,12 @@ export class AdminComponent implements OnInit {
       next: () => {
         this.saving = false;
         modal.close();
-        this.successMsg = `Utente "${v.nome} ${v.cognome}" creato. Dovrà verificare l'email. Il ruolo OPERATORE va assegnato nel sistema.`;
+        this.toastSrv.success(`Utente "${v.nome} ${v.cognome}" creato. Dovrà verificare l'email.`);
         this.loadAll();
       },
       error: (e) => {
         this.saving = false;
-        this.errorMsg = e?.error?.message ?? 'Errore durante la creazione';
+        this.toastSrv.error(e?.error?.message ?? 'Errore durante la creazione');
       }
     });
   }

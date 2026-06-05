@@ -4,6 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin, of } from 'rxjs';
 import { PuntiVenditaService } from '../../services/punti-vendita.service';
 import { TipiBiciService } from '../../services/tipi-bici.service';
+import { ToastService } from '../../services/toast.service';
 import { PuntoVendita, StockBici } from '../../entities/punto-vendita.entity';
 import { TipoBici } from '../../entities/tipo-bici.entity';
 
@@ -16,6 +17,7 @@ import { TipoBici } from '../../entities/tipo-bici.entity';
 export class PuntiVenditaComponent implements OnInit {
   private srv = inject(PuntiVenditaService);
   private tipiBiciSrv = inject(TipiBiciService);
+  private toastSrv = inject(ToastService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
@@ -26,7 +28,6 @@ export class PuntiVenditaComponent implements OnInit {
   tipiDiBici: TipoBici[] = [];
   loading = true;
   saving = false;
-  errorMsg = '';
 
   editingId: number | null = null;
   selectedPv: PuntoVendita | null = null;
@@ -103,7 +104,7 @@ export class PuntiVenditaComponent implements OnInit {
       : this.srv.create(data);
     obs.subscribe({
       next: () => { this.load(); modal.close(); this.saving = false; },
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore salvataggio'; this.saving = false; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore salvataggio'); this.saving = false; }
     });
   }
 
@@ -111,14 +112,14 @@ export class PuntiVenditaComponent implements OnInit {
     if (!confirm('Eliminare questo punto vendita?')) return;
     this.srv.delete(id).subscribe({
       next: () => { this.load(); },
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore eliminazione'; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
     });
   }
 
   onToggleAttivo(pv: PuntoVendita) {
     this.srv.update(pv.id, { attivo: !pv.attivo }).subscribe({
       next: () => { this.load(); },
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore'; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore aggiornamento stato'); }
     });
   }
 
@@ -173,7 +174,7 @@ export class PuntiVenditaComponent implements OnInit {
           this.saving = false;
         });
       },
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore stock'; this.saving = false; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore stock'); this.saving = false; }
     });
   }
 

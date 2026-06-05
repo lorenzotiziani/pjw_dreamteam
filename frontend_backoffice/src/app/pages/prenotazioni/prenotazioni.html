@@ -20,15 +20,6 @@
     </div>
   </div>
 
-  <!-- Error banner -->
-  <div *ngIf="errorMsg" class="alert alert-danger alert-dismissible d-flex align-items-start gap-2 mb-3" role="alert">
-    <svg width="18" height="18" class="flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-    </svg>
-    <span class="flex-grow-1">{{ errorMsg }}</span>
-    <button type="button" class="btn-close" (click)="errorMsg = ''"></button>
-  </div>
-
   <!-- Filters -->
   <div class="bo-filters-bar">
     <div class="filter-search">
@@ -202,7 +193,7 @@
           </div>
           <div class="detail-row">
             <span class="dl">Ritiro</span>
-            <span class="dv">{{ dataFmt(selectedPrenotazione.dataRitiro) }} ore {{ selectedPrenotazione.oraRitiro?.slice(0,5) }}</span>
+            <span class="dv">{{ dataFmt(selectedPrenotazione.dataRitiro) }} ore {{ oraFmt(selectedPrenotazione.oraRitiro) }}</span>
           </div>
           <div class="detail-row">
             <span class="dl">Riconsegna</span>
@@ -236,7 +227,7 @@
     <button type="button" class="btn btn-outline-primary btn-sm"
       *ngIf="selectedPrenotazione && canModify(selectedPrenotazione)"
       (click)="modal.dismiss(); openEdit(selectedPrenotazione!)">
-      ✏️ Modifica date
+      Modifica date
     </button>
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Chiudi</button>
   </div>
@@ -371,11 +362,20 @@
             </div>
           </div>
         </div>
-        <div class="col-12">
+        <div class="col-sm-6">
           <div class="bo-form-group mb-0">
-            <label class="bo-label">Data e ora riconsegna <span class="text-danger">*</span></label>
-            <input type="datetime-local" class="bo-input" formControlName="dataOraRiconsegna" />
-            <div class="bo-error" *ngIf="editForm.get('dataOraRiconsegna')?.invalid && editForm.get('dataOraRiconsegna')?.touched">
+            <label class="bo-label">Data riconsegna <span class="text-danger">*</span></label>
+            <input type="date" class="bo-input" formControlName="dataRiconsegna" />
+            <div class="bo-error" *ngIf="editForm.get('dataRiconsegna')?.invalid && editForm.get('dataRiconsegna')?.touched">
+              Campo obbligatorio
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="bo-form-group mb-0">
+            <label class="bo-label">Ora riconsegna <span class="text-danger">*</span></label>
+            <input type="time" class="bo-input" formControlName="oraRiconsegna" />
+            <div class="bo-error" *ngIf="editForm.get('oraRiconsegna')?.invalid && editForm.get('oraRiconsegna')?.touched">
               Campo obbligatorio
             </div>
           </div>

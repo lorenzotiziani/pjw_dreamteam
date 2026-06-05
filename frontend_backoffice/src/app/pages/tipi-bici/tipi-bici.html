@@ -2,7 +2,16 @@
 
   <div class="bo-page-header">
     <div class="bo-page-header-left">
-      <span class="bo-page-icon">🚲</span>
+      <span class="bo-page-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="5.5" cy="17" r="3.5"/>
+          <circle cx="18.5" cy="17" r="3.5"/>
+          <path d="M5.5 17L9 8h6l3.5 9"/>
+          <path d="M9 8l3 9"/>
+          <path d="M8 7.5h3"/>
+          <path d="M15 7.5h3.5"/>
+        </svg>
+      </span>
       <div>
         <h1 class="bo-page-title">Tipi di Bicicletta</h1>
         <p class="bo-page-subtitle">Catalogo tipologie e listino prezzi</p>
@@ -11,9 +20,6 @@
     <button class="btn btn-primary" (click)="openCreate()">+ Nuovo tipo</button>
   </div>
 
-  <div *ngIf="errorMsg" class="alert alert-danger alert-dismissible mb-3">
-    {{ errorMsg }} <button class="btn-close" (click)="errorMsg=''"></button>
-  </div>
 
   <div *ngIf="loading" class="bo-loading">
     <div class="spinner-border text-primary"></div><span>Caricamento...</span>

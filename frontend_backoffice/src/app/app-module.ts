@@ -27,6 +27,7 @@ import { CoperatureComponent } from './pages/coperture/coperture';
 import { AdminComponent }      from './pages/admin/admin';
 
 import { OperatoreCardComponent } from './components/operatore-card/operatore-card';
+import { ToastComponent }        from './components/toast/toast';
 
 import { authInterceptor }  from './interceptors/auth-interceptor';
 import { logoutInterceptor } from './interceptors/logout-interceptor';
@@ -48,6 +49,7 @@ import { IfAuthenticatedDirective } from './directives/if-authenticated';
     CoperatureComponent,
     AdminComponent,
     OperatoreCardComponent,
+    ToastComponent,
     IfAuthenticatedDirective,
   ],
   imports: [BrowserModule, AppRoutingModule, NgbModule, FormsModule, ReactiveFormsModule],

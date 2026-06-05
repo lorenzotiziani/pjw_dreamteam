@@ -10,9 +10,6 @@
     </div>
   </div>
 
-  <div *ngIf="successMsg" class="admin-alert admin-alert--success">{{ successMsg }}</div>
-  <div *ngIf="errorMsg"   class="admin-alert admin-alert--danger">{{ errorMsg }}</div>
-
   <!-- ══════════════════════════════════════════════════════════
        SEZIONE 1 — GESTIONE OPERATORI
   ══════════════════════════════════════════════════════════ -->
@@ -190,7 +187,6 @@
       <div class="bo-error" *ngIf="createForm.get('password')?.invalid && createForm.get('password')?.touched">Minimo 8 caratteri</div>
     </div>
 
-    <div *ngIf="errorMsg" class="admin-alert admin-alert--danger">{{ errorMsg }}</div>
 
   </div>
 

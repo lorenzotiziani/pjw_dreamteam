@@ -2,6 +2,7 @@ import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core
 import { FormBuilder, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TipiBiciService } from '../../services/tipi-bici.service';
+import { ToastService } from '../../services/toast.service';
 import { TipoBici, CategoriaBici, Motorizzazione, Taglia } from '../../entities/tipo-bici.entity';
 
 @Component({
@@ -12,6 +13,7 @@ import { TipoBici, CategoriaBici, Motorizzazione, Taglia } from '../../entities/
 })
 export class TipiBiciComponent implements OnInit {
   private srv = inject(TipiBiciService);
+  private toastSrv = inject(ToastService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
@@ -20,7 +22,6 @@ export class TipiBiciComponent implements OnInit {
   tipi: TipoBici[] = [];
   loading = true;
   saving = false;
-  errorMsg = '';
   editingId: number | null = null;
 
   readonly categorie: { value: CategoriaBici; label: string }[] = [
@@ -82,7 +83,7 @@ export class TipiBiciComponent implements OnInit {
     const obs = this.editingId ? this.srv.update(this.editingId, data) : this.srv.create(data);
     obs.subscribe({
       next: () => { this.load(); modal.close(); this.saving = false; },
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore salvataggio'; this.saving = false; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore salvataggio'); this.saving = false; }
     });
   }
 
@@ -90,7 +91,7 @@ export class TipiBiciComponent implements OnInit {
     if (!confirm('Eliminare questo tipo di bicicletta?')) return;
     this.srv.delete(id).subscribe({
       next: () => { this.load(); },
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore eliminazione'; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
     });
   }
 

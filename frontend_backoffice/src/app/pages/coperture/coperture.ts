@@ -2,6 +2,7 @@ import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core
 import { FormBuilder, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CoperatureService } from '../../services/coperture.service';
+import { ToastService } from '../../services/toast.service';
 import { Copertura } from '../../entities/copertura.entity';
 
 @Component({
@@ -12,6 +13,7 @@ import { Copertura } from '../../entities/copertura.entity';
 })
 export class CoperatureComponent implements OnInit {
   private srv = inject(CoperatureService);
+  private toastSrv = inject(ToastService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
@@ -20,7 +22,6 @@ export class CoperatureComponent implements OnInit {
   coperture: Copertura[] = [];
   loading = true;
   saving = false;
-  errorMsg = '';
   editingId: number | null = null;
 
   form = this.fb.group({
@@ -62,7 +63,7 @@ export class CoperatureComponent implements OnInit {
     const obs = this.editingId ? this.srv.update(this.editingId, data) : this.srv.create(data);
     obs.subscribe({
       next: () => { this.load(); modal.close(); this.saving = false; },
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore salvataggio'; this.saving = false; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore salvataggio'); this.saving = false; }
     });
   }
 
@@ -70,7 +71,7 @@ export class CoperatureComponent implements OnInit {
     if (!confirm('Eliminare questa copertura assicurativa?')) return;
     this.srv.delete(id).subscribe({
       next: () => { this.load(); },
-      error: (e) => { this.errorMsg = e?.error?.message ?? 'Errore eliminazione'; }
+      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
     });
   }
 }
