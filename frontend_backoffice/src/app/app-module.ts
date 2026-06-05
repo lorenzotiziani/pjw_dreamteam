@@ -24,8 +24,11 @@ import { PuntiVenditaComponent } from './pages/punti-vendita/punti-vendita';
 import { TipiBiciComponent } from './pages/tipi-bici/tipi-bici';
 import { AccessoriComponent } from './pages/accessori/accessori';
 import { CoperatureComponent } from './pages/coperture/coperture';
+import { AdminComponent }      from './pages/admin/admin';
 
-import { authInterceptor } from './interceptors/auth-interceptor';
+import { OperatoreCardComponent } from './components/operatore-card/operatore-card';
+
+import { authInterceptor }  from './interceptors/auth-interceptor';
 import { logoutInterceptor } from './interceptors/logout-interceptor';
 import { IfAuthenticatedDirective } from './directives/if-authenticated';
 
@@ -43,6 +46,8 @@ import { IfAuthenticatedDirective } from './directives/if-authenticated';
     TipiBiciComponent,
     AccessoriComponent,
     CoperatureComponent,
+    AdminComponent,
+    OperatoreCardComponent,
     IfAuthenticatedDirective,
   ],
   imports: [BrowserModule, AppRoutingModule, NgbModule, FormsModule, ReactiveFormsModule],

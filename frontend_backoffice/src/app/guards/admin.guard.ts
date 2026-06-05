@@ -3,10 +3,8 @@ import { CanActivateFn, Router } from '@angular/router';
 import { filter, map, take } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
-/** Ruoli che possono accedere alle route protette del backoffice. */
-const RUOLI_AMMESSI = ['OPERATORE', 'ADMIN'];
-
-export const roleGuard: CanActivateFn = (route, state) => {
+/** Permette l'accesso solo agli utenti con ruolo ADMIN. */
+export const adminGuard: CanActivateFn = (route, state) => {
   const authSrv = inject(AuthService);
   const router  = inject(Router);
 
@@ -14,9 +12,8 @@ export const roleGuard: CanActivateFn = (route, state) => {
     filter(user => user !== null),
     take(1),
     map(user => {
-      if (!RUOLI_AMMESSI.includes(user!.ruolo)) {
-        authSrv.logout();
-        router.navigate(['/login'], { queryParams: { error: 'forbidden' } });
+      if (user!.ruolo !== 'ADMIN') {
+        router.navigate(['/dashboard']);
         return false;
       }
       return true;

@@ -1,0 +1,204 @@
+<div class="admin-page">
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════════════════ -->
+  <div class="admin-header">
+    <div>
+      <h1 class="admin-title">Dashboard Admin</h1>
+      <p class="admin-subtitle">Gestione operatori, log operazioni e statistiche ricavi</p>
+    </div>
+  </div>
+
+  <div *ngIf="successMsg" class="admin-alert admin-alert--success">{{ successMsg }}</div>
+  <div *ngIf="errorMsg"   class="admin-alert admin-alert--danger">{{ errorMsg }}</div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SEZIONE 1 — GESTIONE OPERATORI
+  ══════════════════════════════════════════════════════════ -->
+  <section class="admin-section">
+
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Operatori
+        </h2>
+        <p class="section-sub">{{ operatori.length }} totali &mdash; {{ operatoriAttiviCount }} attivi</p>
+      </div>
+      <button class="bo-btn bo-btn--primary" (click)="openCreate()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nuovo Operatore
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="admin-loading">
+      <div class="admin-spinner"></div>
+      <span>Caricamento...</span>
+    </div>
+
+    <!-- Grid cards -->
+    <div *ngIf="!loading" class="op-grid">
+      <app-operatore-card
+        *ngFor="let op of operatori"
+        [operatore]="op"
+        (toggle)="toggleStatus($event)">
+      </app-operatore-card>
+
+      <div *ngIf="operatori.length === 0" class="admin-empty">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <p>Nessun operatore trovato</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SEZIONE 2 — LOG OPERAZIONI
+  ══════════════════════════════════════════════════════════ -->
+  <section class="admin-section">
+
+    <div class="section-head">
+      <h2 class="section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Log Operazioni
+      </h2>
+    </div>
+
+    <div *ngIf="!loading" class="bo-table-wrap">
+      <table class="bo-table" *ngIf="logOperazioni.length > 0; else emptyLog">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tipo</th>
+            <th>Prenotazione</th>
+            <th>Operatore</th>
+            <th>Data esecuzione</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of logOperazioni">
+            <td class="log-id">#{{ log.id }}</td>
+            <td>
+              <span class="log-badge" [ngClass]="tipoBadgeClass(log.tipo)">
+                {{ tipoLabel(log.tipo) }}
+              </span>
+            </td>
+            <td>#{{ log.prenotazioneId }}</td>
+            <td>
+              <span *ngIf="log.utente">{{ log.utente.cognome }} {{ log.utente.nome }}</span>
+              <span *ngIf="!log.utente" class="log-id">#{{ log.operatoreId }}</span>
+            </td>
+            <td class="log-date">{{ dataFmt(log.eseguitaIl) }}</td>
+            <td class="log-note">{{ log.note || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyLog>
+        <div class="admin-empty">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <p>Nessun log disponibile</p>
+        </div>
+      </ng-template>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SEZIONE 3 — RICAVI PER MESE (grafico CSS)
+  ══════════════════════════════════════════════════════════ -->
+  <section class="admin-section">
+
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Ricavi per Mese
+        </h2>
+        <p class="section-sub">Solo prenotazioni Ritirate e Restituite</p>
+      </div>
+      <div class="chart-controls">
+        <label class="bo-label mb-0 me-2">Anno</label>
+        <select class="filter-select" [(ngModel)]="filtroAnno">
+          <option *ngFor="let a of anni" [value]="a">{{ a }}</option>
+        </select>
+        <div class="chart-total">
+          Totale {{ filtroAnno }}: <strong>€ {{ totaleAnno }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading" class="chart-wrap">
+      <div class="chart-bars">
+        <div class="chart-col" *ngFor="let m of chartData">
+          <div class="chart-bar-value">
+            <span *ngIf="m.value > 0">€{{ m.value | number:'1.0-0':'it' }}</span>
+          </div>
+          <div class="chart-bar" [style.height.px]="m.height || 2"
+               [class.chart-bar--empty]="m.value === 0">
+          </div>
+          <div class="chart-month">{{ m.label }}</div>
+        </div>
+      </div>
+      <div class="chart-baseline"></div>
+    </div>
+
+  </section>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODAL — Crea Operatore
+══════════════════════════════════════════════════════════ -->
+<ng-template #createModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Nuovo Operatore</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body" [formGroup]="createForm">
+
+    <div class="admin-alert admin-alert--info mb-3" style="font-size:0.8rem;">
+      <strong>Nota:</strong> l'utente verrà creato con ruolo <em>USER</em> e riceverà un'email di verifica.
+      Dopo la verifica, imposta il ruolo <strong>OPERATORE</strong> nel sistema.
+    </div>
+
+    <div class="mb-3">
+      <label class="bo-label">Nome <span class="text-danger">*</span></label>
+      <input class="bo-input" formControlName="nome" placeholder="Mario" />
+      <div class="bo-error" *ngIf="createForm.get('nome')?.invalid && createForm.get('nome')?.touched">Campo obbligatorio</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="bo-label">Cognome <span class="text-danger">*</span></label>
+      <input class="bo-input" formControlName="cognome" placeholder="Rossi" />
+      <div class="bo-error" *ngIf="createForm.get('cognome')?.invalid && createForm.get('cognome')?.touched">Campo obbligatorio</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="bo-label">Email <span class="text-danger">*</span></label>
+      <input class="bo-input" type="email" formControlName="email" placeholder="mario.rossi@bikerent.it" />
+      <div class="bo-error" *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched">Email non valida</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="bo-label">Password temporanea <span class="text-danger">*</span></label>
+      <input class="bo-input" type="password" formControlName="password" placeholder="Min. 8 caratteri" />
+      <div class="bo-error" *ngIf="createForm.get('password')?.invalid && createForm.get('password')?.touched">Minimo 8 caratteri</div>
+    </div>
+
+    <div *ngIf="errorMsg" class="admin-alert admin-alert--danger">{{ errorMsg }}</div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="bo-btn bo-btn--ghost" (click)="modal.dismiss()">Annulla</button>
+    <button class="bo-btn bo-btn--primary" [disabled]="saving" (click)="saveCreate(modal)">
+      <span *ngIf="saving" class="admin-spinner-sm"></span>
+      {{ saving ? 'Creazione...' : 'Crea' }}
+    </button>
+  </div>
+</ng-template>

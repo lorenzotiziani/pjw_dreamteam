@@ -18,13 +18,20 @@
 
         <div class="collapse navbar-collapse" id="navContent">
 
-            <!-- Nav links per operatori autenticati -->
-            <ul class="navbar-nav me-auto gap-1" *ngIf="currentUser$ | async">
+            <!-- Nav links per operatori e admin autenticati -->
+            <ul class="navbar-nav me-auto gap-1" *ngIf="(currentUser$ | async) as navUser">
                 <li class="nav-item">
                     <a class="nav-link" [routerLink]="['/dashboard']" routerLinkActive="active">Dashboard</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" [routerLink]="['/prenotazioni']" routerLinkActive="active">Prenotazioni</a>
+                </li>
+                <!-- Link esclusivo ADMIN -->
+                <li class="nav-item" *ngIf="navUser.ruolo === 'ADMIN'">
+                    <a class="nav-link" [routerLink]="['/admin']" routerLinkActive="active" style="display:flex;align-items:center;gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Admin
+                    </a>
                 </li>
                 <!-- Catalogo dropdown -->
                 <li class="nav-item" ngbDropdown>

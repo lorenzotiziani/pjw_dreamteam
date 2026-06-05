@@ -1,0 +1,128 @@
+.op-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.op-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+  border-color: #cbd5e1;
+}
+
+.op-card--inactive {
+  background: #f8fafc;
+  opacity: 0.75;
+}
+
+/* ── Avatar ─────────────────────────────────────────────── */
+.op-card-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+/* ── Body ───────────────────────────────────────────────── */
+.op-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.op-card-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.op-card-email {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.op-card-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.op-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  letter-spacing: 0.4px;
+}
+
+.op-badge--role {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.op-badge--active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.op-badge--inactive {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ── Actions ────────────────────────────────────────────── */
+.op-card-actions {
+  flex-shrink: 0;
+}
+
+.op-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.op-toggle-btn--disable {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.op-toggle-btn--disable:hover {
+  background: #fecaca;
+}
+
+.op-toggle-btn--enable {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.op-toggle-btn--enable:hover {
+  background: #bbf7d0;
+}
