@@ -31,10 +31,8 @@ export class RegisterComponent {
 
 	register() {
 		if (this.registerForm.invalid) return;
-
-		const newUser = this.registerForm.value;
-
-		this.registerService.register(newUser).subscribe({
+		const {email, password, confirm, nome, cognome} = this.registerForm.value
+		this.registerService.register(email, password, confirm, nome, cognome).subscribe({
 			next: (res: any) => {
 				if (!res.success) {
 					this.registerError = res.error || 'Errore sconosciuto';

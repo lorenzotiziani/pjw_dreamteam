@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Copertura } from '../entities/Copertura';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
+import { ApiResponse } from './response';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,8 @@ export class CoperturaService {
     }
     
     fetch(){
-      this.http.get<Copertura[]>(`/api/coperture`).subscribe(copertura => this._coperture$.next(copertura));
+      return this.http.get<ApiResponse<Copertura[]>>(`/api/coperture`)
+      .pipe(map(response => response.data))
+      .subscribe(copertura => this._coperture$.next(copertura));
     }
 }

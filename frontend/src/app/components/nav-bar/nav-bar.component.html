@@ -10,9 +10,10 @@
       <div class="ms-auto">
         <ul class="navbar-nav align-items-center gap-2">
           <app-nav-user
-            *If="(currentUser$ | async) as currentUser"
+            *ifAuthenticated="let currentUser"
             [user]="currentUser"
             (logout)="logout()"
+            (login)="login()"
           ></app-nav-user>
         </ul>
       </div>

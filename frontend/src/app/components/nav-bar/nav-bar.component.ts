@@ -21,8 +21,12 @@ export class NavBarComponent {
     this.router.navigate([`/booking/form`])
   }
 
-    logout() {
+  logout() {
     this.authSrv.logout();
     this.router.navigate(['/login'])
+  }
+
+  login(){
+    this.router.navigate(['/login']) 
   }
 }
