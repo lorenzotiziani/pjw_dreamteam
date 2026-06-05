@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../api/auth/auth.service';
-import { UnauthorizedError } from '../errors';
+import { UnauthorizedError, ForbiddenError } from '../errors/custom.error';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -41,3 +41,11 @@ export const authMiddleware = async (
     next(error);
   }
 };
+
+export const requireRole = (...roles: string[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as AuthRequest).user;
+    if (!user) return next(new UnauthorizedError('Non autenticato'));
+    if (!roles.includes(user.role)) return next(new ForbiddenError('Accesso negato: ruolo non autorizzato'));
+    next();
+  };

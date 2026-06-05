@@ -28,7 +28,7 @@ export class PrenotazioniController {
 
   static async getMie(req: Request, res: Response, next: NextFunction) {
     try {
-      const utenteId = (req as any).user.id;
+      const utenteId = (req as AuthRequest).user!.userId;
       const prenotazioni = await PrenotazioniService.getMie(utenteId);
       res.json({
         success: true,
@@ -99,8 +99,6 @@ export class PrenotazioniController {
     try {
       const { params, body } = prenotazioneAggiornaStatoSchema.parse({ params: req.params, body: req.body });
       const operatoreId = (req as AuthRequest).user!.userId;
-
-      const operatoreId = req.user!.userId;
       
       await PrenotazioniService.aggiornaStato(params.id, body.stato, operatoreId, body.note);
       res.json({
