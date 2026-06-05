@@ -6,6 +6,7 @@ import tipiBiciRouter from './api/tipi-bici/tipiBici.routes';
 import accessoriRouter from './api/accessori/accessori.routes';
 import copertureRouter from './api/coperture/coperture.routes';
 import prenotazioniRouter from './api/prenotazioni/prenotazioni.routes';
+import logOperazioniRouter from './api/logOperazioni/logOperazioni.routes';
 
 const router=Router();
 
@@ -16,5 +17,6 @@ router.use('/tipi-bici', tipiBiciRouter);
 router.use('/accessori', accessoriRouter);
 router.use('/coperture', copertureRouter);
 router.use('/prenotazioni', prenotazioniRouter);
+router.use('/logOperazioni', logOperazioniRouter);
 
 export default router;

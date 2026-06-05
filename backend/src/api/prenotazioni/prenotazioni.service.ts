@@ -1,4 +1,4 @@
-import { RigaAccessorio, StatoPrenotazione, TipoLogPrenotazione } from "@prisma/client";
+import { RigaAccessorio, StatoPrenotazione } from "@prisma/client";
 import {
   PrenotazioneCreateDTO,
   PrenotazioneUpdateDTO,
@@ -293,7 +293,7 @@ export class PrenotazioniService {
 
   static async aggiornaStato(
     id: number,
-    stato: StatoPrenotazione | TipoLogPrenotazione,
+    stato: StatoPrenotazione,
     operatoreId: number,
     note?: string,
   ): Promise<void> {
@@ -303,8 +303,8 @@ export class PrenotazioniService {
     }
   
     if (
-      stato === TipoLogPrenotazione.DANNO ||
-      stato === TipoLogPrenotazione.RITARDO
+      stato === StatoPrenotazione.DANNO ||
+      stato === StatoPrenotazione.RITARDO
     ) {
       await prisma.logPrenotazione.create({
         data: {
@@ -331,7 +331,7 @@ export class PrenotazioniService {
           data: {
             prenotazioneId: id,
             operatoreId,
-            tipo: TipoLogPrenotazione.RESTITUITA,
+            tipo: StatoPrenotazione.RESTITUITA,
             note,
           },
         });
@@ -357,7 +357,7 @@ export class PrenotazioniService {
           data: {
             prenotazioneId: id,
             operatoreId,
-            tipo: stato as TipoLogPrenotazione,
+            tipo: stato as StatoPrenotazione,
             note,
           },
         });

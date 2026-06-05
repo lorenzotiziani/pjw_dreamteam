@@ -161,6 +161,8 @@ enum StatoPrenotazione {
   RITIRATA
   RESTITUITA
   CANCELLATA
+  DANNO
+  RITARDO
 }
 
 model RigaPrenotazione {
@@ -199,7 +201,7 @@ model LogPrenotazione {
   id              Int            @id @default(autoincrement())
   prenotazioneId  Int
   operatoreId     Int
-  tipo            TipoLogPrenotazione
+  tipo            StatoPrenotazione
   eseguitaIl      DateTime       @default(now())
   note            String?
 
@@ -207,13 +209,4 @@ model LogPrenotazione {
   utente          TUtente      @relation(fields: [operatoreId], references: [id])
 
   @@map("log_operazioni")
-}
-
-enum TipoLogPrenotazione {
-  CONFERMATA
-  RITIRATA
-  RESTITUITA
-  CANCELLATA
-  DANNO
-  RITARDO
 }

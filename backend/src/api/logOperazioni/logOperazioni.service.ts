@@ -2,7 +2,7 @@ import { prisma } from "../../config/prisma";
 
 export class LogOperazioniService {
   static async getAll() {
-    return prisma.operazione.findMany({
+    return prisma.logPrenotazione.findMany({
       include: {
         prenotazione:true,
       }
@@ -10,7 +10,7 @@ export class LogOperazioniService {
   }
 
   static async getByPrenotazioneID(prenotazioneId: number) {
-    return prisma.operazione.findMany({
+    return prisma.logPrenotazione.findMany({
       where: {
         prenotazioneId,
       },
@@ -21,13 +21,13 @@ export class LogOperazioniService {
   }
 
   static async create(data: any) {
-    return prisma.operazione.create({
+    return prisma.logPrenotazione.create({
       data,
     })
   }
   
   static async update(id: number, data: any) {
-    return prisma.operazione.update({
+    return prisma.logPrenotazione.update({
       where: {
         id,
       },
@@ -36,7 +36,7 @@ export class LogOperazioniService {
   }
 
   static async delete(id: number) {
-    return prisma.operazione.delete({
+    return prisma.logPrenotazione.delete({
       where: {
         id,
       },

@@ -1,13 +1,12 @@
-import { TipoLogOperazione } from "@prisma/client";
 import * as z from "zod";
-
+import { StatoPrenotazione } from "@prisma/client";
 const TipoLogOperazioneEnum = z.enum([
-  TipoLogOperazione.CONFERMATA,
-  TipoLogOperazione.RITIRATA,
-  TipoLogOperazione.RESTITUITA,
-  TipoLogOperazione.CANCELLATA,
-  TipoLogOperazione.DANNO,
-  TipoLogOperazione.RITARDO,
+  StatoPrenotazione.CONFERMATA,
+  StatoPrenotazione.RITIRATA,
+  StatoPrenotazione.RESTITUITA,
+  StatoPrenotazione.CANCELLATA,
+  StatoPrenotazione.DANNO,
+  StatoPrenotazione.RITARDO,
 ]);
 
 export const idRequirements = z.object({

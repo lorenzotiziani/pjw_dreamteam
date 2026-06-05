@@ -52,10 +52,10 @@ export class PrenotazioniController {
     }
   }
 
-  static async create(req: Request, res: Response, next: NextFunction) {
+  static async create(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const data = prenotazioneCreateSchema.parse({ body: req.body });
-      const utenteId = (req as AuthRequest).user!.userId;
+      const utenteId = req.user!.userId;
       await PrenotazioniService.create(data, utenteId);
       res.status(201).json({
         success: true,
@@ -95,11 +95,13 @@ export class PrenotazioniController {
     }
   }
 
-  static async aggiornaStato(req: Request, res: Response, next: NextFunction) {
+  static async aggiornaStato(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { params, body } = prenotazioneAggiornaStatoSchema.parse({ params: req.params, body: req.body });
 
-      await PrenotazioniService.aggiornaStato(params.id, body.stato);
+      const operatoreId = req.user!.userId;
+      
+      await PrenotazioniService.aggiornaStato(params.id, body.stato, operatoreId, body.note);
       res.json({
         success: true,
         message: `stato aggiornato a ${body.stato}`

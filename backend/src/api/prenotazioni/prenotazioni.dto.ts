@@ -56,6 +56,7 @@ export const prenotazioneAggiornaStatoSchema = z.object({
   params: z.object({ id: z.coerce.number() }),
   body: z.object({
     stato: z.nativeEnum(StatoPrenotazione),
+    note: z.string().optional(),
   }),
 });
 
