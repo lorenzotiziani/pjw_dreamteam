@@ -108,13 +108,6 @@
                   </svg>
                 </button>
 
-                <!-- Conferma (IN_ATTESA) -->
-                <button class="btn-icon btn-icon-ok" title="Conferma prenotazione"
-                  *ngIf="p.stato === 'IN_ATTESA'" [disabled]="actionLoading"
-                  (click)="onAggiornaStato({id: p.id, stato: 'CONFERMATA'})">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                </button>
-
                 <!-- Segna ritirata (CONFERMATA) -->
                 <button class="btn-icon btn-icon-primary" title="Segna come ritirata"
                   *ngIf="p.stato === 'CONFERMATA'" [disabled]="actionLoading"
@@ -127,13 +120,6 @@
                   *ngIf="p.stato === 'RITIRATA'" [disabled]="actionLoading"
                   (click)="openRestituzione(p)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                </button>
-
-                <!-- Cancella (se > 2 giorni al ritiro) -->
-                <button class="btn-icon btn-icon-warn" title="Cancella prenotazione"
-                  *ngIf="canCancel(p)" [disabled]="actionLoading"
-                  (click)="onAggiornaStato({id: p.id, stato: 'CANCELLATA'})">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
 
                 <!-- Blocco 2 giorni: indicatore visivo quando le azioni sono bloccate -->

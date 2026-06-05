@@ -4,6 +4,7 @@ export type StockBici = {
   tipoBiciId: number;
   quantitaTotale: number;
   quantitaManutenzione: number;
+  quantitaAttuale: number;   // bici effettivamente disponibili ora (aggiornato dal backend ad ogni noleggio/restituzione)
   tipoBici?: { id: number; categoria: string; motorizzazione: string; taglia: string; prezzoMezzaGiornata: number };
 };
 

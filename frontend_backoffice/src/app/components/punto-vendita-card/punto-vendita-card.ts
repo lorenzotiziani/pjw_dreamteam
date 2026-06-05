@@ -21,4 +21,8 @@ export class PuntoVenditaCardComponent {
   get inManutenzione(): number {
     return (this.puntoVendita.stockBici ?? []).reduce((s, i) => s + i.quantitaManutenzione, 0);
   }
+
+  get disponibili(): number {
+    return (this.puntoVendita.stockBici ?? []).reduce((s, i) => s + (i.quantitaAttuale ?? 0), 0);
+  }
 }

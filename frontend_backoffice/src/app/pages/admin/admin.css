@@ -185,6 +185,8 @@
 .bo-table tbody tr:hover td { background: #f8fafc; }
 
 .log-id   { color: #64748b; font-weight: 600; font-size: 0.8rem; }
+.log-pren { font-weight: 700; color: #1d4ed8; font-size: 0.85rem; }
+.log-op   { font-weight: 500; color: #0f172a; font-size: 0.85rem; }
 .log-date { font-size: 0.8rem; color: #64748b; white-space: nowrap; }
 .log-note { color: #64748b; font-size: 0.8rem; max-width: 200px; }
 
@@ -349,6 +351,40 @@
   transition: border-color .2s;
 }
 .log-filter-date:focus { border-color: #2563eb; }
+
+.log-filter-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.log-filter-short {
+  width: 72px;
+  padding: 6px 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  color: #0f172a;
+  background: #fff;
+  outline: none;
+  transition: border-color .2s;
+}
+.log-filter-short:focus { border-color: #2563eb; }
+
+.log-filter-text {
+  padding: 6px 10px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  color: #0f172a;
+  background: #fff;
+  outline: none;
+  min-width: 160px;
+  transition: border-color .2s;
+}
+.log-filter-text:focus { border-color: #2563eb; }
 
 .log-filter-reset {
   display: inline-flex;

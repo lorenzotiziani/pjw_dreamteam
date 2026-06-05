@@ -76,6 +76,7 @@
     <!-- ── Barra filtri ── -->
     <div *ngIf="!loading && logOperazioni.length > 0" class="log-filters">
 
+      <!-- Tipo -->
       <select class="log-filter-select" [(ngModel)]="logFiltroTipo" (ngModelChange)="applyLogFiltri()">
         <option value="">Tutti i tipi</option>
         <option value="CONFERMATA">Confermata</option>
@@ -86,6 +87,20 @@
         <option value="RITARDO">Ritardo</option>
       </select>
 
+      <!-- Prenotazione # -->
+      <div class="log-filter-field">
+        <span class="log-date-label">Pren.</span>
+        <input type="text" inputmode="numeric" class="log-filter-short"
+               placeholder="es. 18"
+               [(ngModel)]="logFiltroPrenotazione" (ngModelChange)="applyLogFiltri()" />
+      </div>
+
+      <!-- Operatore -->
+      <input type="text" class="log-filter-text"
+             placeholder="Cerca operatore..."
+             [(ngModel)]="logFiltroOperatore" (ngModelChange)="applyLogFiltri()" />
+
+      <!-- Date -->
       <div class="log-date-range">
         <span class="log-date-label">Dal</span>
         <input type="date" class="log-filter-date" [(ngModel)]="logFiltroDal" (ngModelChange)="applyLogFiltri()" />
@@ -93,8 +108,8 @@
         <input type="date" class="log-filter-date" [(ngModel)]="logFiltroAl" (ngModelChange)="applyLogFiltri()" />
       </div>
 
-      <button *ngIf="logFiltroTipo || logFiltroDal || logFiltroAl"
-              class="log-filter-reset" (click)="resetLogFiltri()">
+      <!-- Reset -->
+      <button *ngIf="logHasFiltri" class="log-filter-reset" (click)="resetLogFiltri()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         Reset
       </button>
@@ -109,7 +124,6 @@
           <table class="bo-table">
             <thead>
               <tr>
-                <th>#</th>
                 <th>Tipo</th>
                 <th>Prenotazione</th>
                 <th>Operatore</th>
@@ -119,16 +133,15 @@
             </thead>
             <tbody>
               <tr *ngFor="let log of logPaginati">
-                <td class="log-id">#{{ log.id }}</td>
                 <td>
                   <span class="log-badge" [ngClass]="tipoBadgeClass(log.tipo)">
                     {{ tipoLabel(log.tipo) }}
                   </span>
                 </td>
-                <td>#{{ log.prenotazioneId }}</td>
-                <td>
-                  <span *ngIf="log.utente">{{ log.utente.cognome }} {{ log.utente.nome }}</span>
-                  <span *ngIf="!log.utente" class="log-id">#{{ log.operatoreId }}</span>
+                <td class="log-pren">#{{ log.prenotazioneId }}</td>
+                <td class="log-op">
+                  <ng-container *ngIf="log.utente">{{ log.utente.cognome }} {{ log.utente.nome }}</ng-container>
+                  <span *ngIf="!log.utente" class="log-id">Operatore #{{ log.operatoreId }}</span>
                 </td>
                 <td class="log-date">{{ dataFmt(log.eseguitaIl) }}</td>
                 <td class="log-note">{{ log.note || '—' }}</td>

@@ -46,9 +46,11 @@ export class AdminComponent implements OnInit {
   anni: number[] = [];
 
   // ── Filtri log ────────────────────────────────────────────
-  logFiltroTipo  = '';
-  logFiltroDal   = '';
-  logFiltroAl    = '';
+  logFiltroTipo        = '';
+  logFiltroDal         = '';
+  logFiltroAl          = '';
+  logFiltroPrenotazione = '';
+  logFiltroOperatore   = '';
 
   // ── Paginazione log ───────────────────────────────────────
   logPage     = 1;
@@ -135,8 +137,17 @@ export class AdminComponent implements OnInit {
 
   // ── Log: filtri + paginazione ─────────────────────────────
   get logFiltrati(): LogOperazione[] {
+    const prenId   = this.logFiltroPrenotazione.trim();
+    const opTesto  = this.logFiltroOperatore.trim().toLowerCase();
     return this.logOperazioni.filter(l => {
       if (this.logFiltroTipo && l.tipo !== this.logFiltroTipo) return false;
+      if (prenId && !String(l.prenotazioneId).includes(prenId)) return false;
+      if (opTesto) {
+        const nomeCompleto = l.utente
+          ? `${l.utente.cognome} ${l.utente.nome}`.toLowerCase()
+          : `#${l.operatoreId}`;
+        if (!nomeCompleto.includes(opTesto)) return false;
+      }
       if (this.logFiltroDal) {
         const d = l.eseguitaIl ? l.eseguitaIl.slice(0, 10) : '';
         if (!d || d < this.logFiltroDal) return false;
@@ -174,10 +185,17 @@ export class AdminComponent implements OnInit {
   applyLogFiltri(): void { this.logPage = 1; }
 
   resetLogFiltri(): void {
-    this.logFiltroTipo = '';
-    this.logFiltroDal  = '';
-    this.logFiltroAl   = '';
+    this.logFiltroTipo         = '';
+    this.logFiltroDal          = '';
+    this.logFiltroAl           = '';
+    this.logFiltroPrenotazione = '';
+    this.logFiltroOperatore    = '';
     this.logPage = 1;
+  }
+
+  get logHasFiltri(): boolean {
+    return !!(this.logFiltroTipo || this.logFiltroDal || this.logFiltroAl
+           || this.logFiltroPrenotazione || this.logFiltroOperatore);
   }
 
   // ── Chart ricavi ─────────────────────────────────────────
