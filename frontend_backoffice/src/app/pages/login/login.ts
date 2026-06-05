@@ -55,12 +55,16 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authSrv.login(email!, password!)
       .pipe(
         catchError(response => {
-          this.loginError = response?.error?.message ?? 'Credenziali errate';
+          const msg: string = response?.message ?? '';
+          this.loginError = msg.toLowerCase().includes('disabilitat')
+            ? 'Account disabilitato. Contatta un amministratore.'
+            : 'Credenziali errate';
           this.loading = false;
           return throwError(() => response);
         })
       )
       .subscribe(() => {
+        this.loading = false;
         this.router.navigate([this.requestedUrl ?? '/']);
       });
   }
