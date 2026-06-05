@@ -121,12 +121,13 @@ export class AdminComponent implements OnInit {
       next: () => {
         this.saving = false;
         modal.close();
-        this.toastSrv.success(`Utente "${v.nome} ${v.cognome}" creato. Dovrà verificare l'email.`);
+        this.toastSrv.success(`Operatore "${v.nome} ${v.cognome}" creato con successo.`);
         this.loadAll();
       },
       error: (e) => {
         this.saving = false;
-        this.toastSrv.error(e?.error?.message ?? 'Errore durante la creazione');
+        const msg = e?.error?.message ?? e?.error?.error ?? 'Errore durante la creazione. Riprova.';
+        this.toastSrv.error(msg);
       }
     });
   }
