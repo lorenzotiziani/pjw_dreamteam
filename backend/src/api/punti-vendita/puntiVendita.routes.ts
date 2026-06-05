@@ -16,7 +16,7 @@ router.delete('/:id', authMiddleware, requireRole('ADMIN'), PuntiVenditaControll
 
 // Stock
 router.get('/:id/stock', PuntiVenditaController.getStock);
-router.post('/:id/stock', authMiddleware, requireRole('OPERATORE'), validate(createStockSchema), PuntiVenditaController.createStock);
-router.put('/:id/stock/:stockId', authMiddleware, requireRole('OPERATORE'), validate(updateStockSchema), PuntiVenditaController.updateStock);
+router.post('/:id/stock', authMiddleware, requireRole('OPERATORE','ADMIN'), validate(createStockSchema), PuntiVenditaController.createStock);
+router.put('/:id/stock/:stockId', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(updateStockSchema), PuntiVenditaController.updateStock);
 
 export default router;
