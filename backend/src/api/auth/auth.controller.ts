@@ -1,11 +1,17 @@
 import {NextFunction, Request, Response} from 'express';
 import { AuthService } from './auth.service';
 import { loginDTO, registerDTO } from './auth.dto';
+import { AuthRequest } from '../../middleware/auth.middleware';
 
 export class AuthController {
-  static async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async register(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const data: registerDTO = req.body;
+      const role = req.user!.role;
+      let data: registerDTO = req.body;
+      if (role === 'ADMIN') {
+        data = { ...data, role: 'OPERATORE' };
+      }
+      
       const registerResult = await AuthService.register(data);
 
       res.status(201).json({

@@ -41,6 +41,7 @@ export class AuthService {
     const verifyLink = `${process.env.FRONTEND_URL}/verify-email?token=${emailToken}`;
 
     await transporter.sendMail({
+      from: 'no-reply@pjw-dreamteam.it',
       to: user.email,
       subject: "Verifica la tua email",
       html: `
