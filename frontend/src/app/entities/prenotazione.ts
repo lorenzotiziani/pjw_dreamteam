@@ -1,3 +1,5 @@
+import { PuntoVendita } from "./puntoVendita"
+
 export enum StatoPrenotazione {
   IN_ATTESA = 'IN_ATTESA',
   CONFERMATA = 'CONFERMATA',
@@ -10,6 +12,7 @@ export type Prenotazione = {
   id: string,
   utenteId: string,
   puntoVenditaId: number,
+  puntoVendita: PuntoVendita
   dataRitiro: Date,
   oraRitiro: Date,
   dataOraRiconsegna: Date,
