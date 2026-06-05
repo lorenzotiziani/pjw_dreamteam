@@ -6,7 +6,7 @@
   <div class="admin-header">
     <div>
       <h1 class="admin-title">Dashboard Admin</h1>
-      <p class="admin-subtitle">Gestione operatori, log operazioni e statistiche ricavi</p>
+      <p class="admin-subtitle">Gestione operatori e log operazioni</p>
     </div>
   </div>
 
@@ -184,46 +184,6 @@
 
   </section>
 
-  <!-- ══════════════════════════════════════════════════════════
-       SEZIONE 3 — RICAVI PER MESE (grafico CSS)
-  ══════════════════════════════════════════════════════════ -->
-  <section class="admin-section">
-
-    <div class="section-head">
-      <div>
-        <h2 class="section-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Ricavi per Mese
-        </h2>
-        <p class="section-sub">Solo prenotazioni Ritirate e Restituite</p>
-      </div>
-      <div class="chart-controls">
-        <label class="bo-label mb-0 me-2">Anno</label>
-        <select class="filter-select" [(ngModel)]="filtroAnno">
-          <option *ngFor="let a of anni" [value]="a">{{ a }}</option>
-        </select>
-        <div class="chart-total">
-          Totale {{ filtroAnno }}: <strong>€ {{ totaleAnno }}</strong>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="!loading" class="chart-wrap">
-      <div class="chart-bars">
-        <div class="chart-col" *ngFor="let m of chartData">
-          <div class="chart-bar-value">
-            <span *ngIf="m.value > 0">€{{ m.value | number:'1.0-0':'it' }}</span>
-          </div>
-          <div class="chart-bar" [style.height.px]="m.height || 2"
-               [class.chart-bar--empty]="m.value === 0">
-          </div>
-          <div class="chart-month">{{ m.label }}</div>
-        </div>
-      </div>
-      <div class="chart-baseline"></div>
-    </div>
-
-  </section>
 
 </div>
 

@@ -12,6 +12,7 @@ import { TipiBiciComponent }    from './pages/tipi-bici/tipi-bici';
 import { AccessoriComponent }   from './pages/accessori/accessori';
 import { CoperatureComponent }  from './pages/coperture/coperture';
 import { AdminComponent }       from './pages/admin/admin';
+import { StatisticheComponent } from './pages/statistiche/statistiche';
 
 const routes: Routes = [
     { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -25,8 +26,9 @@ const routes: Routes = [
     { path: 'accessori',     component: AccessoriComponent,    canActivate: [authGuard, roleGuard] },
     { path: 'coperture',     component: CoperatureComponent,   canActivate: [authGuard, roleGuard] },
 
-    // Route esclusiva ADMIN
-    { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
+    // Route esclusive ADMIN
+    { path: 'admin',       component: AdminComponent,       canActivate: [authGuard, adminGuard] },
+    { path: 'statistiche', component: StatisticheComponent, canActivate: [authGuard, adminGuard] },
 ];
 
 @NgModule({

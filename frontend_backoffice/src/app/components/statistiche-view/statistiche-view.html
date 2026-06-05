@@ -1,0 +1,140 @@
+<div class="sv-page">
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════════════════ -->
+  <div class="sv-header">
+    <div>
+      <h1 class="sv-title">Statistiche</h1>
+      <p class="sv-subtitle">Panoramica ricavi e prenotazioni</p>
+    </div>
+    <div class="sv-anno-ctrl">
+      <label class="sv-label">Anno</label>
+      <select class="sv-select" [ngModel]="filtroAnno" (ngModelChange)="onAnnoChange($event)">
+        <option *ngFor="let a of anni" [value]="a">{{ a }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="sv-loading">
+    <div class="sv-spinner"></div>
+    <span>Caricamento statistiche...</span>
+  </div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- ══════════════════════════════════════════════════════════
+         KPI CARDS
+    ══════════════════════════════════════════════════════════ -->
+    <div class="sv-kpi-grid">
+
+      <div class="sv-kpi-card sv-kpi-card--blue">
+        <div class="sv-kpi-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="sv-kpi-body">
+          <span class="sv-kpi-label">Ricavi {{ filtroAnno }}</span>
+          <span class="sv-kpi-value">€ {{ kpis.ricaviTotali | number:'1.2-2':'it' }}</span>
+        </div>
+      </div>
+
+      <div class="sv-kpi-card sv-kpi-card--purple">
+        <div class="sv-kpi-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="sv-kpi-body">
+          <span class="sv-kpi-label">Prenotazioni {{ filtroAnno }}</span>
+          <span class="sv-kpi-value">{{ kpis.prenotazioniTotali }}</span>
+        </div>
+      </div>
+
+      <div class="sv-kpi-card sv-kpi-card--green">
+        <div class="sv-kpi-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="sv-kpi-body">
+          <span class="sv-kpi-label">Completate {{ filtroAnno }}</span>
+          <span class="sv-kpi-value">{{ kpis.completate }}</span>
+        </div>
+      </div>
+
+      <div class="sv-kpi-card sv-kpi-card--orange">
+        <div class="sv-kpi-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="sv-kpi-body">
+          <span class="sv-kpi-label">Ricavo Medio</span>
+          <span class="sv-kpi-value">€ {{ kpis.mediaRicavo | number:'1.2-2':'it' }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         GRAFICO RICAVI PER MESE
+    ══════════════════════════════════════════════════════════ -->
+    <section class="sv-section">
+
+      <div class="sv-section-head">
+        <div>
+          <h2 class="sv-section-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Ricavi per Mese — {{ filtroAnno }}
+          </h2>
+          <p class="sv-section-sub">Solo prenotazioni Ritirate e Restituite</p>
+        </div>
+      </div>
+
+      <div class="sv-chart-wrap">
+        <div class="sv-chart-bars">
+          <div class="sv-chart-col" *ngFor="let m of chartData">
+            <div class="sv-chart-bar-value">
+              <span *ngIf="m.value > 0">€{{ m.value | number:'1.0-0':'it' }}</span>
+            </div>
+            <div class="sv-chart-bar"
+                 [style.height.px]="m.height || 2"
+                 [class.sv-chart-bar--empty]="m.value === 0">
+            </div>
+            <div class="sv-chart-month">{{ m.label }}</div>
+          </div>
+        </div>
+        <div class="sv-chart-baseline"></div>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         BREAKDOWN PER STATO — storico completo
+    ══════════════════════════════════════════════════════════ -->
+    <section class="sv-section">
+
+      <div class="sv-section-head">
+        <div>
+          <h2 class="sv-section-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Prenotazioni per Stato
+          </h2>
+          <p class="sv-section-sub">Storico completo di tutti gli anni</p>
+        </div>
+      </div>
+
+      <div class="sv-stato-list">
+        <div class="sv-stato-row" *ngFor="let s of statoBreakdown">
+          <div class="sv-stato-label">{{ s.label }}</div>
+          <div class="sv-stato-bar-wrap">
+            <div class="sv-stato-bar"
+                 [style.width.%]="s.percent"
+                 [style.background]="s.colore">
+            </div>
+          </div>
+          <div class="sv-stato-count">{{ s.count }}</div>
+          <div class="sv-stato-pct">{{ s.percent }}%</div>
+        </div>
+      </div>
+
+    </section>
+
+  </ng-container>
+
+</div>

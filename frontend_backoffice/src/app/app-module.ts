@@ -24,7 +24,9 @@ import { PuntiVenditaComponent } from './pages/punti-vendita/punti-vendita';
 import { TipiBiciComponent } from './pages/tipi-bici/tipi-bici';
 import { AccessoriComponent } from './pages/accessori/accessori';
 import { CoperatureComponent } from './pages/coperture/coperture';
-import { AdminComponent }      from './pages/admin/admin';
+import { AdminComponent }        from './pages/admin/admin';
+import { StatisticheComponent }  from './pages/statistiche/statistiche';
+import { StatisticheViewComponent } from './components/statistiche-view/statistiche-view';
 
 import { OperatoreCardComponent } from './components/operatore-card/operatore-card';
 import { ToastComponent }        from './components/toast/toast';
@@ -49,6 +51,8 @@ import { IfAuthenticatedDirective } from './directives/if-authenticated';
     AccessoriComponent,
     CoperatureComponent,
     AdminComponent,
+    StatisticheComponent,
+    StatisticheViewComponent,
     OperatoreCardComponent,
     ToastComponent,
     ConfirmModalComponent,
