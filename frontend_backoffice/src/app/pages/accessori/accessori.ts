@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AccessoriService } from '../../services/accessori.service';
 import { ToastService } from '../../services/toast.service';
+import { ConfirmModalService } from '../../services/confirm-modal.service';
 import { Accessorio } from '../../entities/accessorio.entity';
 
 @Component({
@@ -13,7 +14,8 @@ import { Accessorio } from '../../entities/accessorio.entity';
 })
 export class AccessoriComponent implements OnInit {
   private srv = inject(AccessoriService);
-  private toastSrv = inject(ToastService);
+  private toastSrv   = inject(ToastService);
+  private confirmSrv = inject(ConfirmModalService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
@@ -63,10 +65,18 @@ export class AccessoriComponent implements OnInit {
   }
 
   onDelete(id: number) {
-    if (!confirm('Eliminare questo accessorio?')) return;
-    this.srv.delete(id).subscribe({
-      next: () => { this.load(); },
-      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
+    this.confirmSrv.confirm({
+      title: 'Elimina accessorio',
+      message: 'Sei sicuro di voler eliminare questo accessorio?',
+      detail: "L'operazione è irreversibile.",
+      confirmLabel: 'Elimina',
+      type: 'danger'
+    }).then(ok => {
+      if (!ok) return;
+      this.srv.delete(id).subscribe({
+        next: () => { this.load(); },
+        error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
+      });
     });
   }
 }

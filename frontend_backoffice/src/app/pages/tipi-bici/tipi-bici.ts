@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TipiBiciService } from '../../services/tipi-bici.service';
 import { ToastService } from '../../services/toast.service';
+import { ConfirmModalService } from '../../services/confirm-modal.service';
 import { TipoBici, CategoriaBici, Motorizzazione, Taglia } from '../../entities/tipo-bici.entity';
 
 @Component({
@@ -13,7 +14,8 @@ import { TipoBici, CategoriaBici, Motorizzazione, Taglia } from '../../entities/
 })
 export class TipiBiciComponent implements OnInit {
   private srv = inject(TipiBiciService);
-  private toastSrv = inject(ToastService);
+  private toastSrv    = inject(ToastService);
+  private confirmSrv  = inject(ConfirmModalService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
 
@@ -88,10 +90,18 @@ export class TipiBiciComponent implements OnInit {
   }
 
   onDelete(id: number) {
-    if (!confirm('Eliminare questo tipo di bicicletta?')) return;
-    this.srv.delete(id).subscribe({
-      next: () => { this.load(); },
-      error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
+    this.confirmSrv.confirm({
+      title: 'Elimina tipo bicicletta',
+      message: 'Sei sicuro di voler eliminare questo tipo di bicicletta?',
+      detail: "L'operazione è irreversibile.",
+      confirmLabel: 'Elimina',
+      type: 'danger'
+    }).then(ok => {
+      if (!ok) return;
+      this.srv.delete(id).subscribe({
+        next: () => { this.load(); },
+        error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione'); }
+      });
     });
   }
 

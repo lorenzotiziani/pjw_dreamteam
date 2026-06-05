@@ -28,6 +28,7 @@ import { AdminComponent }      from './pages/admin/admin';
 
 import { OperatoreCardComponent } from './components/operatore-card/operatore-card';
 import { ToastComponent }        from './components/toast/toast';
+import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal';
 
 import { authInterceptor }  from './interceptors/auth-interceptor';
 import { logoutInterceptor } from './interceptors/logout-interceptor';
@@ -50,6 +51,7 @@ import { IfAuthenticatedDirective } from './directives/if-authenticated';
     AdminComponent,
     OperatoreCardComponent,
     ToastComponent,
+    ConfirmModalComponent,
     IfAuthenticatedDirective,
   ],
   imports: [BrowserModule, AppRoutingModule, NgbModule, FormsModule, ReactiveFormsModule],
