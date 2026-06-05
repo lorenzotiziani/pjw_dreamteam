@@ -12,4 +12,5 @@ export class StatCardComponent {
   @Input() value: string | number = '';
   @Input() subtitle = '';
   @Input() accent = '#2563eb';
+  @Input() compact = false;
 }

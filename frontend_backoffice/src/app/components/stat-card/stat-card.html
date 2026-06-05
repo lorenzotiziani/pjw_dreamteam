@@ -4,7 +4,7 @@
   </div>
   <div class="sc-body">
     <div class="sc-label">{{ label }}</div>
-    <div class="sc-value" [style.color]="accent">{{ value }}</div>
+    <div class="sc-value" [class.sc-value--compact]="compact" [style.color]="accent">{{ value }}</div>
     <div class="sc-sub" *ngIf="subtitle">{{ subtitle }}</div>
   </div>
 </div>

@@ -38,5 +38,13 @@
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: .15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Modalità compatta: font scalato per valori lunghi (es. ricavi con 7+ cifre) */
+.sc-value--compact {
+  font-size: 1.35rem;
+  letter-spacing: -.3px;
 }
 .sc-sub { font-size: .78rem; color: #94a3b8; }

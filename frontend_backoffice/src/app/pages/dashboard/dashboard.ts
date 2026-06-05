@@ -41,7 +41,7 @@ export class DashboardComponent implements OnInit {
     const tot = this.prenotazioni
       .filter(p => p.stato === 'RITIRATA' || p.stato === 'RESTITUITA')
       .reduce((s, p) => s + Number(p.totale), 0);
-    return tot.toFixed(2);
+    return tot.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   get prenotazioniOggi(): number {
