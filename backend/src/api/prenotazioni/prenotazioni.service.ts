@@ -328,12 +328,10 @@ export class PrenotazioniService {
     if (existing.stato === stato) {
       throw new Error(`La prenotazione è già ${stato}`);
     }
-  
+
+    
     if (stato === StatoPrenotazione.RITIRATA) {
       await prisma.$transaction(async (tx) => {
-        for (const riga of existing.righe) {
-          await prenotaBici(tx, existing.puntoVenditaId, riga.tipoBiciId);
-        }
         await tx.prenotazione.update({
           where: { id: id },
           data: { stato },
