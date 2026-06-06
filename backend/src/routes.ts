@@ -7,6 +7,7 @@ import accessoriRouter from './api/accessori/accessori.routes';
 import copertureRouter from './api/coperture/coperture.routes';
 import prenotazioniRouter from './api/prenotazioni/prenotazioni.routes';
 import logOperazioniRouter from './api/logOperazioni/logOperazioni.routes';
+import statisticheRouter from './api/statistiche/statistiche.routes';
 
 const router=Router();
 
@@ -18,5 +19,6 @@ router.use('/accessori', accessoriRouter);
 router.use('/coperture', copertureRouter);
 router.use('/prenotazioni', prenotazioniRouter);
 router.use('/logOperazioni', logOperazioniRouter);
+router.use('/statistiche', statisticheRouter);
 
 export default router;
