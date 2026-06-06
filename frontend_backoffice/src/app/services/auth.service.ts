@@ -35,7 +35,7 @@ interface RegisterResponse {
 interface JwtPayload {
     userId: number;
     email: string;
-    role: string;   // ← il backend usa "role", il backoffice usa "ruolo"
+    ruolo: string;   // ← il backend usa "ruolo", il backoffice usa "ruolo"
     exp?: number;
     iat?: number;
 }
@@ -119,7 +119,7 @@ export class AuthService {
         return {
             id: String(payload.userId),
             email: payload.email,
-            ruolo: payload.role,        // mapping role → ruolo
+            ruolo: payload.ruolo,        // mapping role → ruolo
             nome: '',                   // placeholder: fetchUser() aggiornerà
             cognome: '',                // placeholder: fetchUser() aggiornerà
             creatoIl: new Date()

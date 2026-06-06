@@ -1,6 +1,7 @@
 import * as z from "zod"
+import { Ruolo } from "@prisma/client";
 
-// Password requirements
+
 const passwordRequirements = z.string()
     .min(8, "La password deve essere lunga almeno 8 caratteri")
     .max(128, "La password è troppo lunga")
@@ -45,8 +46,7 @@ export const registerRequirements = z.object({
         .max(50, "Il cognome è troppo lungo")
         .trim()
         .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Il cognome contiene caratteri non validi"),
-    ruolo: z.string()
-        .optional()
+    ruolo: z.nativeEnum(Ruolo).optional()
   })
       .refine((data) => data.password === data.confirm, {
         message: "Le password non coincidono",

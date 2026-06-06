@@ -9,11 +9,12 @@ import { BadRequestError, UnauthorizedError } from "../../errors";
 import { AuthResponse, JwtPayload } from "../entities/authEntity";
 import { User } from "../entities/userEntity";
 import { transporter } from "../../config/mailSender";
+import { Ruolo } from "@prisma/client";
 
 export class AuthService {
   static async register(
     data: registerDTO,
-  ): Promise<{ message: string; user: any }> {
+  ): Promise<{ message: string; user: Omit<User, "pwd" | "emailVerificationToken" | "emailVerificationExpires"> }> {
     const existingUser = await UserModel.findByEmail(data.email);
     if (existingUser) {
       throw new BadRequestError("Email già registrata");
@@ -27,13 +28,13 @@ export class AuthService {
 
     const emailToken = crypto.randomBytes(32).toString("hex");
     const expires = new Date(Date.now() + 1000 * 60 * 60 * 24);
-
+    
     const user = await UserModel.create({
       email: data.email,
       pwd: hashedPassword,
       nome: data.nome,
       cognome: data.cognome,
-      ruolo: data.ruolo === "ADMIN" ? "ADMIN" : "USER",
+      ruolo: (data.ruolo as Ruolo),
       emailVerificationToken: emailToken,
       emailVerificationExpires: expires,
     });
@@ -157,7 +158,7 @@ export class AuthService {
     const payload: JwtPayload = {
       userId: user.id,
       email: user.email,
-      role: user.ruolo ?? 'USER',
+      ruolo: user.ruolo ?? 'USER',
     };
 
     const accessTokenOptions: jwt.SignOptions = {
