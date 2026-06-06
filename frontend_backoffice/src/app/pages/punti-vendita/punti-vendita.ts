@@ -195,6 +195,28 @@ export class PuntiVenditaComponent implements OnInit {
     this.stockForm.reset({ tipoBiciId: null, quantitaTotale: 1, quantitaManutenzione: 0 });
   }
 
+  onDeleteStock(s: StockBici) {
+    if (!this.selectedPv) return;
+    this.confirmSrv.confirm({
+      title: 'Elimina stock',
+      message: `Sei sicuro di voler eliminare lo stock per "${this.tipoBiciLabel(s.tipoBiciId)}"?`,
+      detail: "L'operazione è irreversibile.",
+      confirmLabel: 'Elimina',
+      type: 'danger'
+    }).then(ok => {
+      if (!ok) return;
+      this.srv.deleteStock(this.selectedPv!.id, s.id).subscribe({
+        next: () => {
+          this.stockList = this.stockList.filter(x => x.id !== s.id);
+          this.puntiVendita = this.puntiVendita.map(pv =>
+            pv.id === this.selectedPv!.id ? { ...pv, stockBici: [...this.stockList] } : pv
+          );
+        },
+        error: (e) => { this.toastSrv.error(e?.error?.message ?? 'Errore eliminazione stock'); }
+      });
+    });
+  }
+
   tipoBiciLabel(id: number): string {
     const t = this.tipiDiBici.find(x => x.id === id);
     if (!t) return String(id);

@@ -162,7 +162,7 @@ export class AuthService {
         return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, { email, password })
             .pipe(
                 tap(res => {
-                    if (!res.success) throw new BadRequestError(res.error || 'Login fallito');
+                    if (!res.success) throw new Error(res.error || 'Login fallito');
                 }),
                 tap(res => {
                     this.jwtSrv.setToken(res.data.accessToken, res.data.refreshToken);

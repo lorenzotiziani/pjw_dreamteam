@@ -38,4 +38,8 @@ export class PuntiVenditaService {
   updateStock(puntoVenditaId: number, stockId: number, data: { quantitaTotale?: number; quantitaManutenzione?: number }) {
     return this.http.put<any>(`/api/punti-vendita/${puntoVenditaId}/stock/${stockId}`, data);
   }
+
+  deleteStock(puntoVenditaId: number, stockId: number) {
+    return this.http.delete<any>(`/api/punti-vendita/${puntoVenditaId}/stock/${stockId}`);
+  }
 }
