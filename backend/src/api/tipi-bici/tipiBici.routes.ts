@@ -9,8 +9,8 @@ const router = Router();
 
 router.get('/', TipiBiciController.getAll);
 router.get('/:id', TipiBiciController.getById);
-router.post('/', authMiddleware, requireRole('OPERATORE'), validate(createTipoBiciSchema), TipiBiciController.create);
-router.put('/:id', authMiddleware, requireRole('OPERATORE'), validate(updateTipoBiciSchema), TipiBiciController.update);
-router.delete('/:id', authMiddleware, requireRole('OPERATORE'), TipiBiciController.delete);
+router.post('/', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(createTipoBiciSchema), TipiBiciController.create);
+router.put('/:id', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(updateTipoBiciSchema), TipiBiciController.update);
+router.delete('/:id', authMiddleware, requireRole('OPERATORE', 'ADMIN'), TipiBiciController.delete);
 
 export default router;

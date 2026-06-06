@@ -9,8 +9,8 @@ const router = Router();
 
 router.get('/', CopertureController.getAll);
 router.get('/:id', CopertureController.getById);
-router.post('/', authMiddleware, requireRole('OPERATORE'), validate(createCoperturaSchema), CopertureController.create);
-router.put('/:id', authMiddleware, requireRole('OPERATORE'), validate(updateCoperturaSchema), CopertureController.update);
-router.delete('/:id', authMiddleware, requireRole('OPERATORE'), CopertureController.delete);
+router.post('/', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(createCoperturaSchema), CopertureController.create);
+router.put('/:id', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(updateCoperturaSchema), CopertureController.update);
+router.delete('/:id', authMiddleware, requireRole('OPERATORE', 'ADMIN'), CopertureController.delete);
 
 export default router;

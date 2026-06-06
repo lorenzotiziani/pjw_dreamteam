@@ -9,8 +9,8 @@ const router = Router();
 
 router.get('/', AccessoriController.getAll);
 router.get('/:id', AccessoriController.getById);
-router.post('/', authMiddleware, requireRole('OPERATORE'), validate(createAccessorioSchema), AccessoriController.create);
-router.put('/:id', authMiddleware, requireRole('OPERATORE'), validate(updateAccessorioSchema), AccessoriController.update);
-router.delete('/:id', authMiddleware, requireRole('OPERATORE'), AccessoriController.delete);
+router.post('/', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(createAccessorioSchema), AccessoriController.create);
+router.put('/:id', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(updateAccessorioSchema), AccessoriController.update);
+router.delete('/:id', authMiddleware, requireRole('OPERATORE', 'ADMIN'), AccessoriController.delete);
 
 export default router;
