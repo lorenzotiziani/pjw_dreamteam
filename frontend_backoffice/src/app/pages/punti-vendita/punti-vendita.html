@@ -17,8 +17,8 @@
   </div>
 
   <!-- Loading -->
-  <div *ngIf="loading" class="bo-loading">
-    <div class="spinner-border text-primary"></div><span>Caricamento...</span>
+  <div *ngIf="loading" class="bo-loading" role="status">
+    <div class="spinner-border text-primary" aria-hidden="true"></div><span>Caricamento...</span>
   </div>
 
   <!-- Contenuto -->
@@ -59,17 +59,17 @@
   <div class="modal-body">
     <form [formGroup]="form">
       <div class="bo-form-group">
-        <label class="bo-label">Nome sede <span class="text-danger">*</span></label>
-        <input class="bo-input" formControlName="nome" placeholder="Es. BikeRent Centro" />
+        <label class="bo-label" for="pv-nome">Nome sede <span class="text-danger">*</span></label>
+        <input id="pv-nome" class="bo-input" formControlName="nome" placeholder="Es. BikeRent Centro" />
         <div class="bo-error" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">Campo obbligatorio</div>
       </div>
       <div class="bo-form-group">
-        <label class="bo-label">Indirizzo <span class="text-danger">*</span></label>
-        <input class="bo-input" formControlName="indirizzo" placeholder="Via Roma 1" />
+        <label class="bo-label" for="pv-indirizzo">Indirizzo <span class="text-danger">*</span></label>
+        <input id="pv-indirizzo" class="bo-input" formControlName="indirizzo" placeholder="Via Roma 1" />
       </div>
       <div class="bo-form-group">
-        <label class="bo-label">Città <span class="text-danger">*</span></label>
-        <input class="bo-input" formControlName="citta" placeholder="Milano" />
+        <label class="bo-label" for="pv-citta">Città <span class="text-danger">*</span></label>
+        <input id="pv-citta" class="bo-input" formControlName="citta" placeholder="Milano" />
       </div>
     </form>
   </div>
@@ -89,15 +89,16 @@
     <button class="btn-close btn-close-white" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
-    <div *ngIf="stockLoading" class="text-center py-3">
-      <div class="spinner-border text-primary"></div>
+    <div *ngIf="stockLoading" class="text-center py-3" role="status">
+      <div class="spinner-border text-primary" aria-hidden="true"></div>
+      <span class="visually-hidden">Caricamento stock...</span>
     </div>
     <ng-container *ngIf="!stockLoading">
       <!-- Stock list -->
       <div class="stock-table-wrap" *ngIf="stockList.length > 0">
         <table class="bo-table mb-3">
           <thead>
-            <tr><th>Tipo bici</th><th>Totale</th><th>Manutenzione</th><th>Disponibili</th><th></th></tr>
+            <tr><th scope="col">Tipo bici</th><th scope="col">Totale</th><th scope="col">Manutenzione</th><th scope="col">Disponibili</th><th scope="col"><span class="visually-hidden">Azioni</span></th></tr>
           </thead>
           <tbody>
             <tr *ngFor="let s of stockList">
@@ -106,8 +107,8 @@
               <td class="text-center text-warning fw-600">{{ s.quantitaManutenzione }}</td>
               <td class="text-center text-success fw-600">{{ s.quantitaAttuale }}</td>
               <td>
-                <button class="btn-icon btn-edit" (click)="editStock(s)" title="Modifica">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="btn-icon btn-edit" (click)="editStock(s)" title="Modifica quantità" aria-label="Modifica quantità stock">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                   </svg>
@@ -124,19 +125,19 @@
         <form [formGroup]="stockForm" (ngSubmit)="saveStock()">
           <div class="row g-2 align-items-end">
             <div class="col-12 col-sm-5" *ngIf="!editingStockId">
-              <label class="bo-label">Tipo bici</label>
-              <select class="bo-input" formControlName="tipoBiciId">
+              <label class="bo-label" for="stock-tipo">Tipo bici</label>
+              <select id="stock-tipo" class="bo-input" formControlName="tipoBiciId">
                 <option [ngValue]="null">Seleziona...</option>
                 <option *ngFor="let t of availableTipi()" [ngValue]="t.id">{{ tipoBiciLabel(t.id) }}</option>
               </select>
             </div>
             <div class="col-6 col-sm-3">
-              <label class="bo-label">Totale</label>
-              <input type="number" class="bo-input" formControlName="quantitaTotale" min="0" />
+              <label class="bo-label" for="stock-totale">Totale</label>
+              <input id="stock-totale" type="number" class="bo-input" formControlName="quantitaTotale" min="0" />
             </div>
             <div class="col-6 col-sm-3">
-              <label class="bo-label">Manutenzione</label>
-              <input type="number" class="bo-input" formControlName="quantitaManutenzione" min="0" />
+              <label class="bo-label" for="stock-man">Manutenzione</label>
+              <input id="stock-man" type="number" class="bo-input" formControlName="quantitaManutenzione" min="0" />
             </div>
             <div class="col-12 col-sm-1 d-flex gap-1">
               <button type="submit" class="btn btn-primary btn-sm" [disabled]="stockForm.invalid || saving">

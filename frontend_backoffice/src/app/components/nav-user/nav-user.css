@@ -8,7 +8,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.03em;
-  color: #fff;
+  color: var(--surface);
   margin-right: 8px;
   border: 2px solid rgba(255, 255, 255, 0.7);
   flex-shrink: 0;
@@ -18,16 +18,16 @@
 .nav-link {
   display: flex;
   align-items: center;
-  color: #fff;
+  color: var(--surface);
   cursor: pointer;
 }
 
 .dropdown-menu {
   min-width: 160px;
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: var(--surface);
+  border-radius: var(--radius-sm);
   padding: 8px 0;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .dropdown-menu button {
@@ -36,11 +36,11 @@
   padding: 8px 16px;
   background: none;
   border: none;
-  color: #333;
+  color: var(--text);
   font-weight: 500;
   transition: background-color 0.2s ease;
 }
 
 .dropdown-menu button:hover {
-  background-color: #f1f1f1;
+  background-color: var(--bg);
 }

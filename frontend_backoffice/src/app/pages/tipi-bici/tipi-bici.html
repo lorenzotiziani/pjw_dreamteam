@@ -21,8 +21,8 @@
   </div>
 
 
-  <div *ngIf="loading" class="bo-loading">
-    <div class="spinner-border text-primary"></div><span>Caricamento...</span>
+  <div *ngIf="loading" class="bo-loading" role="status">
+    <div class="spinner-border text-primary" aria-hidden="true"></div><span>Caricamento tipi di bicicletta...</span>
   </div>
 
   <div *ngIf="!loading" class="bo-card p-0">
@@ -35,11 +35,11 @@
       <table class="bo-table">
         <thead>
           <tr>
-            <th>Categoria</th>
-            <th>Motorizzazione</th>
-            <th>Taglia</th>
-            <th>Prezzo mezza giornata</th>
-            <th style="width:100px">Azioni</th>
+            <th scope="col">Categoria</th>
+            <th scope="col">Motorizzazione</th>
+            <th scope="col">Taglia</th>
+            <th scope="col">Prezzo mezza giornata</th>
+            <th scope="col" style="width:100px">Azioni</th>
           </tr>
         </thead>
         <tbody>
@@ -54,14 +54,14 @@
             <td class="prezzo-cell">€ {{ (+t.prezzoMezzaGiornata).toFixed(2) }}</td>
             <td>
               <div class="row-actions">
-                <button class="btn-icon btn-edit" title="Modifica" (click)="openEdit(t)">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="btn-icon btn-edit" title="Modifica" aria-label="Modifica tipo bici" (click)="openEdit(t)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                   </svg>
                 </button>
-                <button class="btn-icon btn-danger" title="Elimina" (click)="onDelete(t.id)">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="btn-icon btn-danger" title="Elimina" aria-label="Elimina tipo bici" (click)="onDelete(t.id)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/>
                   </svg>
                 </button>
@@ -85,26 +85,26 @@
     <form [formGroup]="form">
       <div class="row g-3">
         <div class="col-12 col-sm-6">
-          <label class="bo-label">Categoria <span class="text-danger">*</span></label>
-          <select class="bo-input" formControlName="categoria">
+          <label class="bo-label" for="tb-categoria">Categoria <span class="text-danger">*</span></label>
+          <select id="tb-categoria" class="bo-input" formControlName="categoria">
             <option *ngFor="let c of categorie" [value]="c.value">{{ c.label }}</option>
           </select>
         </div>
         <div class="col-12 col-sm-6">
-          <label class="bo-label">Motorizzazione <span class="text-danger">*</span></label>
-          <select class="bo-input" formControlName="motorizzazione">
+          <label class="bo-label" for="tb-motorizzazione">Motorizzazione <span class="text-danger">*</span></label>
+          <select id="tb-motorizzazione" class="bo-input" formControlName="motorizzazione">
             <option *ngFor="let m of motorizzazioni" [value]="m.value">{{ m.label }}</option>
           </select>
         </div>
         <div class="col-12 col-sm-6">
-          <label class="bo-label">Taglia <span class="text-danger">*</span></label>
-          <select class="bo-input" formControlName="taglia">
+          <label class="bo-label" for="tb-taglia">Taglia <span class="text-danger">*</span></label>
+          <select id="tb-taglia" class="bo-input" formControlName="taglia">
             <option *ngFor="let t of taglie" [value]="t">{{ t }}</option>
           </select>
         </div>
         <div class="col-12 col-sm-6">
-          <label class="bo-label">Prezzo mezza giornata (€) <span class="text-danger">*</span></label>
-          <input type="number" class="bo-input" formControlName="prezzoMezzaGiornata" min="0" step="0.50" placeholder="0.00" />
+          <label class="bo-label" for="tb-prezzo">Prezzo mezza giornata (€) <span class="text-danger">*</span></label>
+          <input id="tb-prezzo" type="number" class="bo-input" formControlName="prezzoMezzaGiornata" min="0" step="0.50" placeholder="0.00" />
           <div class="bo-error" *ngIf="form.get('prezzoMezzaGiornata')?.invalid && form.get('prezzoMezzaGiornata')?.touched">
             Inserisci un prezzo valido
           </div>

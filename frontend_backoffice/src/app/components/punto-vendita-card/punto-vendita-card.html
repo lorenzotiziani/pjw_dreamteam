@@ -20,9 +20,12 @@
           <circle [attr.cx]="puntoVendita.attivo ? 17 : 7" cy="12" r="4" fill="currentColor"/>
         </svg>
       </button>
-      <button class="btn-icon btn-primary" title="Gestisci stock" (click)="manageStock.emit(puntoVendita)">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+      <button class="btn-icon pv-stock-btn" title="Gestisci stock" (click)="manageStock.emit(puntoVendita)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#2563eb" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.5"/>
         </svg>
       </button>
       <button class="btn-icon btn-danger" title="Elimina" (click)="delete.emit(puntoVendita.id)">

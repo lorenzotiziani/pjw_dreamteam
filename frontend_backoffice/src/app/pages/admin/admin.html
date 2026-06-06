@@ -5,7 +5,7 @@
   ══════════════════════════════════════════════════════════ -->
   <div class="admin-header">
     <div>
-      <h1 class="admin-title">Dashboard Admin</h1>
+      <h1 class="admin-title">Amministrazione</h1>
       <p class="admin-subtitle">Gestione operatori e log operazioni</p>
     </div>
   </div>
@@ -30,8 +30,8 @@
     </div>
 
     <!-- Loading -->
-    <div *ngIf="loading" class="admin-loading">
-      <div class="admin-spinner"></div>
+    <div *ngIf="loading" class="admin-loading" role="status">
+      <div class="admin-spinner" aria-hidden="true"></div>
       <span>Caricamento...</span>
     </div>
 
@@ -77,7 +77,8 @@
     <div *ngIf="!loading && logOperazioni.length > 0" class="log-filters">
 
       <!-- Tipo -->
-      <select class="log-filter-select" [(ngModel)]="logFiltroTipo" (ngModelChange)="applyLogFiltri()">
+      <select class="log-filter-select" [(ngModel)]="logFiltroTipo" (ngModelChange)="applyLogFiltri()"
+        aria-label="Filtra per tipo operazione">
         <option value="">Tutti i tipi</option>
         <option value="CONFERMATA">Confermata</option>
         <option value="RITIRATA">Ritirata</option>
@@ -89,23 +90,25 @@
 
       <!-- Prenotazione # -->
       <div class="log-filter-field">
-        <span class="log-date-label">Pren.</span>
-        <input type="text" inputmode="numeric" class="log-filter-short"
-               placeholder="es. 18"
+        <label class="log-date-label" for="log-pren">ID</label>
+        <input id="log-pren" type="text" inputmode="numeric" class="log-filter-short"
+               placeholder="es. 18" aria-label="Numero prenotazione"
                [(ngModel)]="logFiltroPrenotazione" (ngModelChange)="applyLogFiltri()" />
       </div>
 
       <!-- Operatore -->
       <input type="text" class="log-filter-text"
-             placeholder="Cerca operatore..."
+             placeholder="Cerca operatore..." aria-label="Cerca per operatore"
              [(ngModel)]="logFiltroOperatore" (ngModelChange)="applyLogFiltri()" />
 
       <!-- Date -->
       <div class="log-date-range">
-        <span class="log-date-label">Dal</span>
-        <input type="date" class="log-filter-date" [(ngModel)]="logFiltroDal" (ngModelChange)="applyLogFiltri()" />
-        <span class="log-date-label">Al</span>
-        <input type="date" class="log-filter-date" [(ngModel)]="logFiltroAl" (ngModelChange)="applyLogFiltri()" />
+        <label class="log-date-label" for="log-dal">Dal</label>
+        <input id="log-dal" type="date" class="log-filter-date" aria-label="Dal"
+          [(ngModel)]="logFiltroDal" (ngModelChange)="applyLogFiltri()" />
+        <label class="log-date-label" for="log-al">Al</label>
+        <input id="log-al" type="date" class="log-filter-date" aria-label="Al"
+          [(ngModel)]="logFiltroAl" (ngModelChange)="applyLogFiltri()" />
       </div>
 
       <!-- Reset -->
@@ -124,11 +127,11 @@
           <table class="bo-table">
             <thead>
               <tr>
-                <th>Tipo</th>
-                <th>Prenotazione</th>
-                <th>Operatore</th>
-                <th>Data esecuzione</th>
-                <th>Note</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Prenotazione</th>
+                <th scope="col">Operatore</th>
+                <th scope="col">Data esecuzione</th>
+                <th scope="col">Note</th>
               </tr>
             </thead>
             <tbody>
@@ -176,7 +179,7 @@
       <ng-template #emptyLog>
         <div class="admin-empty">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <p>{{ logOperazioni.length === 0 ? 'Nessun log disponibile' : 'Nessun risultato per i filtri selezionati' }}</p>
+          <p>{{ logOperazioni.length === 0 ? 'Nessun log disponibile' : 'Nessun risultato con i filtri applicati' }}</p>
         </div>
       </ng-template>
 
@@ -199,30 +202,30 @@
   <div class="modal-body" [formGroup]="createForm">
 
     <div class="admin-alert admin-alert--info mb-3" style="font-size:0.8rem;">
-      <strong>Nota:</strong> l'operatore riceverà un'email e dovrà verificare il proprio account prima di poter accedere al sistema.
+      L'operatore riceverà un'email di verifica prima di poter accedere al sistema.
     </div>
 
     <div class="mb-3">
-      <label class="bo-label">Nome <span class="text-danger">*</span></label>
-      <input class="bo-input" formControlName="nome" placeholder="Mario" />
+      <label class="bo-label" for="op-nome">Nome <span class="text-danger">*</span></label>
+      <input id="op-nome" class="bo-input" formControlName="nome" placeholder="Mario" autocomplete="given-name" />
       <div class="bo-error" *ngIf="createForm.get('nome')?.invalid && createForm.get('nome')?.touched">Campo obbligatorio</div>
     </div>
 
     <div class="mb-3">
-      <label class="bo-label">Cognome <span class="text-danger">*</span></label>
-      <input class="bo-input" formControlName="cognome" placeholder="Rossi" />
+      <label class="bo-label" for="op-cognome">Cognome <span class="text-danger">*</span></label>
+      <input id="op-cognome" class="bo-input" formControlName="cognome" placeholder="Rossi" autocomplete="family-name" />
       <div class="bo-error" *ngIf="createForm.get('cognome')?.invalid && createForm.get('cognome')?.touched">Campo obbligatorio</div>
     </div>
 
     <div class="mb-3">
-      <label class="bo-label">Email <span class="text-danger">*</span></label>
-      <input class="bo-input" type="email" formControlName="email" placeholder="mario.rossi@bikerent.it" />
-      <div class="bo-error" *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched">Email non valida</div>
+      <label class="bo-label" for="op-email">Email <span class="text-danger">*</span></label>
+      <input id="op-email" class="bo-input" type="email" formControlName="email" placeholder="mario.rossi@bikerent.it" autocomplete="email" />
+      <div class="bo-error" *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched">Inserisci un'email valida</div>
     </div>
 
     <div class="mb-3">
-      <label class="bo-label">Password<span class="text-danger">*</span></label>
-      <input class="bo-input" type="password" formControlName="password" placeholder="Min. 8 caratteri" />
+      <label class="bo-label" for="op-password">Password <span class="text-danger">*</span></label>
+      <input id="op-password" class="bo-input" type="password" formControlName="password" placeholder="Min. 8 caratteri" autocomplete="new-password" />
       <div class="bo-error" *ngIf="createForm.get('password')?.invalid && createForm.get('password')?.touched">Minimo 8 caratteri</div>
     </div>
 
@@ -239,7 +242,7 @@
     <button class="bo-btn bo-btn--ghost" (click)="modal.dismiss()">Annulla</button>
     <button class="bo-btn bo-btn--primary" [disabled]="saving" (click)="saveCreate(modal)">
       <span *ngIf="saving" class="admin-spinner-sm"></span>
-      {{ saving ? 'Creazione...' : 'Crea' }}
+      {{ saving ? 'Creazione...' : 'Crea operatore' }}
     </button>
   </div>
 </ng-template>

@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { PuntoVendita } from '../../entities/punto-vendita.entity';
 
 @Component({
   selector: 'app-punto-vendita-card',
   standalone: false,
   templateUrl: './punto-vendita-card.html',
-  styleUrl: './punto-vendita-card.css'
+  styleUrl: './punto-vendita-card.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PuntoVenditaCardComponent {
   @Input() puntoVendita!: PuntoVendita;

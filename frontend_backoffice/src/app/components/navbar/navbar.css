@@ -81,6 +81,15 @@
 }
 
 /* ── Dropdown Catalogo ───────────────────────────────────── */
+@keyframes dropdown-appear {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+.nav-dropdown-menu.show {
+  animation: dropdown-appear 0.18s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
 .nav-dropdown-menu {
   background: #ffffff !important;
   border: 1px solid #e4e8ef !important;
@@ -143,8 +152,16 @@
 .navbar-toggler {
   border-color: rgba(255,255,255,0.2);
   padding: 4px 8px;
+  min-height: 44px;
+  min-width: 44px;
 }
 .navbar-toggler-icon { filter: invert(1); }
+
+/* ── Mobile nav ──────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .navbar { padding: 0 16px; }
+  .navbar-nav .nav-link { padding: 10px 14px; }
+}
 
 /* ── Login button ────────────────────────────────────────── */
 .nav-btn-login {

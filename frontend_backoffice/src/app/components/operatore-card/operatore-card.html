@@ -9,11 +9,11 @@
     <div class="op-card-email">{{ operatore.email }}</div>
 
     <div class="op-card-badges">
-      <span class="op-badge op-badge--role">OPERATORE</span>
+      <span class="op-badge op-badge--role">Operatore</span>
       <span class="op-badge"
             [class.op-badge--active]="operatore.isActive"
             [class.op-badge--inactive]="!operatore.isActive">
-        {{ operatore.isActive ? 'Attivo' : 'Non attivo' }}
+        {{ operatore.isActive ? 'Attivo' : 'Disattivo' }}
       </span>
     </div>
   </div>

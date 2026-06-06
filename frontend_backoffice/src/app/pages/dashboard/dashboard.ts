@@ -18,10 +18,28 @@ export class DashboardComponent implements OnInit {
   prenotazioni: Prenotazione[] = [];
   puntiVendita: PuntoVendita[] = [];
   loading = true;
+  error = false;
 
   readonly oggi = new Date().toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
+  readonly statoItems: Array<{ stato: string; label: string; color: string }> = [
+    { stato: 'IN_ATTESA',   label: 'In attesa',   color: '#f59e0b' },
+    { stato: 'CONFERMATA',  label: 'Confermata',  color: '#3b82f6' },
+    { stato: 'RITIRATA',    label: 'Ritirata',    color: '#1d4ed8' },
+    { stato: 'RESTITUITA',  label: 'Restituita',  color: '#10b981' },
+    { stato: 'CANCELLATA',  label: 'Cancellata',  color: '#ef4444' },
+    { stato: 'DANNO',       label: 'Danno',       color: '#dc2626' },
+    { stato: 'RITARDO',     label: 'Ritardo',     color: '#d97706' },
+  ];
+
+  readonly iconClipboard = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>`;
+  readonly iconTrendingUp = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`;
+  readonly iconCalendarCheck = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>`;
+  readonly iconMapPin = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+
   ngOnInit() {
+    this.loading = true;
+    this.error = false;
     forkJoin({
       prenotazioni: this.prenotazioniSrv.getAll(),
       puntiVendita: this.puntiVenditaSrv.getAll()
@@ -31,9 +49,14 @@ export class DashboardComponent implements OnInit {
         this.puntiVendita = puntiVendita ?? [];
         this.loading = false;
       },
-      error: () => { this.loading = false; }
+      error: () => {
+        this.loading = false;
+        this.error = true;
+      }
     });
   }
+
+  reload() { this.ngOnInit(); }
 
   get totalePrenotazioni(): number { return this.prenotazioni.length; }
 
@@ -106,4 +129,8 @@ export class DashboardComponent implements OnInit {
   getPercentuale(stato: string): number { return this.percentualeStato[stato as StatoPrenotazione] ?? 0; }
 
   dataFmt(d: string): string { return new Date(d).toLocaleDateString('it-IT'); }
+
+  trackByStato(_: number, item: { stato: string }): string { return item.stato; }
+  trackByPv(_: number, pv: PuntoVendita): number { return pv.id; }
+  trackByPren(_: number, p: Prenotazione): number { return p.id; }
 }

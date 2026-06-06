@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Operatore } from '../../entities/operatore.entity';
 
 @Component({
   selector: 'app-operatore-card',
   standalone: false,
   templateUrl: './operatore-card.html',
-  styleUrl:    './operatore-card.css'
+  styleUrl:    './operatore-card.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OperatoreCardComponent {
   @Input() operatore!: Operatore;

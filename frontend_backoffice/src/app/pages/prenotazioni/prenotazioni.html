@@ -21,27 +21,30 @@
   </div>
 
   <!-- Filters -->
-  <div class="bo-filters-bar">
+  <div class="bo-filters-bar" role="search" aria-label="Filtri prenotazioni">
     <div class="filter-search">
-      <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+      <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" aria-hidden="true">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
-      <input type="text" class="filter-input" placeholder="Cerca per cliente, email, ID…" [(ngModel)]="filtroTesto" />
+      <input type="text" class="filter-input" placeholder="Cerca per cliente, email, ID…"
+        aria-label="Cerca per cliente, email o ID prenotazione"
+        [(ngModel)]="filtroTesto" />
     </div>
-    <select class="filter-select" [(ngModel)]="filtroStato">
+    <select class="filter-select" [(ngModel)]="filtroStato" aria-label="Filtra per stato">
       <option *ngFor="let s of statiList" [value]="s.value">{{ s.label }}</option>
     </select>
-    <select class="filter-select" [(ngModel)]="filtroSede">
+    <select class="filter-select" [(ngModel)]="filtroSede" aria-label="Filtra per sede">
       <option value="">Tutte le sedi</option>
       <option *ngFor="let pv of puntiVendita" [value]="pv.id">{{ pv.nome }}</option>
     </select>
-    <input type="date" class="filter-select" [(ngModel)]="filtroData" title="Filtra per data ritiro" />
+    <input type="date" class="filter-select" [(ngModel)]="filtroData"
+      title="Filtra per data ritiro" aria-label="Filtra per data ritiro" />
     <button class="btn btn-sm btn-outline-secondary" (click)="resetFiltri()">Reset</button>
   </div>
 
   <!-- Loading -->
-  <div *ngIf="loading" class="bo-loading">
-    <div class="spinner-border text-primary" role="status"></div>
+  <div *ngIf="loading" class="bo-loading" role="status">
+    <div class="spinner-border text-primary" aria-hidden="true"></div>
     <span>Caricamento prenotazioni…</span>
   </div>
 
@@ -58,14 +61,14 @@
       <table class="bo-table">
         <thead>
           <tr>
-            <th style="width:55px">#</th>
-            <th>Cliente</th>
-            <th>Sede</th>
-            <th>Ritiro</th>
-            <th>Riconsegna</th>
-            <th>Stato</th>
-            <th>Totale</th>
-            <th style="width:220px">Azioni</th>
+            <th scope="col" style="width:55px">#</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Sede</th>
+            <th scope="col">Ritiro</th>
+            <th scope="col">Riconsegna</th>
+            <th scope="col">Stato</th>
+            <th scope="col">Totale</th>
+            <th scope="col" style="width:220px">Azioni</th>
           </tr>
         </thead>
         <tbody>
@@ -93,16 +96,20 @@
               <div class="pren-actions">
 
                 <!-- Dettaglio (sempre visibile) -->
-                <button class="btn-icon btn-view" title="Visualizza dettaglio" (click)="openDetail(p)">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="btn-icon btn-view" title="Visualizza dettaglio"
+                  [attr.aria-label]="'Visualizza dettaglio prenotazione #' + p.id"
+                  (click)="openDetail(p)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
                   </svg>
                 </button>
 
                 <!-- Modifica date (solo se > 2 giorni al ritiro e stato attivo) -->
-                <button class="btn-icon btn-edit" title="Modifica date" *ngIf="canModify(p)"
+                <button class="btn-icon btn-edit" title="Modifica date"
+                  [attr.aria-label]="'Modifica date prenotazione #' + p.id"
+                  *ngIf="canModify(p)"
                   (click)="openEdit(p)" [disabled]="actionLoading">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                   </svg>
@@ -110,29 +117,32 @@
 
                 <!-- Segna ritirata (CONFERMATA) -->
                 <button class="btn-icon btn-icon-primary" title="Segna come ritirata"
+                  [attr.aria-label]="'Segna prenotazione #' + p.id + ' come ritirata'"
                   *ngIf="p.stato === 'CONFERMATA'" [disabled]="actionLoading"
                   (click)="onAggiornaStato({id: p.id, stato: 'RITIRATA'})">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
 
                 <!-- Restituzione (RITIRATA) → apre modale -->
                 <button class="btn-icon btn-icon-ok" title="Registra restituzione"
+                  [attr.aria-label]="'Registra restituzione prenotazione #' + p.id"
                   *ngIf="p.stato === 'RITIRATA'" [disabled]="actionLoading"
                   (click)="openRestituzione(p)">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 </button>
 
                 <!-- Blocco 2 giorni: indicatore visivo quando le azioni sono bloccate -->
-                <span *ngIf="isBlocked(p)" class="pren-lock"
-                  title="Modifica/cancellazione bloccata: mancano meno di 2 giorni al ritiro">
+                <span *ngIf="isBlocked(p)" class="pren-lock" role="img"
+                  [attr.aria-label]="'Prenotazione #' + p.id + ': modifiche bloccate, mancano meno di 2 giorni al ritiro'">
                   🔒
                 </span>
 
                 <!-- Elimina (DELETE, regola 2 giorni o già cancellata) -->
                 <button class="btn-icon btn-icon-danger" title="Elimina definitivamente"
+                  [attr.aria-label]="'Elimina prenotazione #' + p.id"
                   *ngIf="canDelete(p)" [disabled]="actionLoading"
                   (click)="onDelete(p)">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/>
                   </svg>
                 </button>
@@ -273,8 +283,8 @@
 
       <!-- Note -->
       <div class="mb-1">
-        <label class="bo-label">Note <span class="text-muted fw-400">(facoltative)</span></label>
-        <textarea class="bo-input" formControlName="note" rows="3"
+        <label class="bo-label" for="rest-note">Note <span class="text-muted fw-400">(facoltative)</span></label>
+        <textarea id="rest-note" class="bo-input" formControlName="note" rows="3"
           placeholder="Es. graffio sul telaio, riconsegna con 2 ore di ritardo…"></textarea>
       </div>
 
@@ -286,7 +296,7 @@
     <button type="button" class="btn btn-primary" (click)="saveRestituzione(modal)"
       [disabled]="restituzioneForm.invalid || actionLoading">
       <span *ngIf="actionLoading" class="spinner-border spinner-border-sm me-1"></span>
-      Conferma
+      Salva restituzione
     </button>
   </div>
 </ng-template>
@@ -325,44 +335,44 @@
         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
         <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
       </svg>
-      <small>Le modifiche sono consentite <strong>fino a 2 giorni prima</strong> della data di ritiro.</small>
+      <small>Puoi modificare le date <strong>fino a 2 giorni prima</strong> del ritiro.</small>
     </div>
 
     <form [formGroup]="editForm">
       <div class="row g-3">
         <div class="col-sm-6">
           <div class="bo-form-group mb-0">
-            <label class="bo-label">Data ritiro <span class="text-danger">*</span></label>
-            <input type="date" class="bo-input" formControlName="dataRitiro" />
+            <label class="bo-label" for="edit-data-ritiro">Data ritiro <span class="text-danger">*</span></label>
+            <input id="edit-data-ritiro" type="date" class="bo-input" formControlName="dataRitiro" />
             <div class="bo-error" *ngIf="editForm.get('dataRitiro')?.invalid && editForm.get('dataRitiro')?.touched">
-              Campo obbligatorio
+              Seleziona la data di ritiro
             </div>
           </div>
         </div>
         <div class="col-sm-6">
           <div class="bo-form-group mb-0">
-            <label class="bo-label">Ora ritiro <span class="text-danger">*</span></label>
-            <input type="time" class="bo-input" formControlName="oraRitiro" />
+            <label class="bo-label" for="edit-ora-ritiro">Ora ritiro <span class="text-danger">*</span></label>
+            <input id="edit-ora-ritiro" type="time" class="bo-input" formControlName="oraRitiro" />
             <div class="bo-error" *ngIf="editForm.get('oraRitiro')?.invalid && editForm.get('oraRitiro')?.touched">
-              Campo obbligatorio
+              Seleziona l'orario di ritiro
             </div>
           </div>
         </div>
         <div class="col-sm-6">
           <div class="bo-form-group mb-0">
-            <label class="bo-label">Data riconsegna <span class="text-danger">*</span></label>
-            <input type="date" class="bo-input" formControlName="dataRiconsegna" />
+            <label class="bo-label" for="edit-data-riconsegna">Data riconsegna <span class="text-danger">*</span></label>
+            <input id="edit-data-riconsegna" type="date" class="bo-input" formControlName="dataRiconsegna" />
             <div class="bo-error" *ngIf="editForm.get('dataRiconsegna')?.invalid && editForm.get('dataRiconsegna')?.touched">
-              Campo obbligatorio
+              Seleziona la data di riconsegna
             </div>
           </div>
         </div>
         <div class="col-sm-6">
           <div class="bo-form-group mb-0">
-            <label class="bo-label">Ora riconsegna <span class="text-danger">*</span></label>
-            <input type="time" class="bo-input" formControlName="oraRiconsegna" />
+            <label class="bo-label" for="edit-ora-riconsegna">Ora riconsegna <span class="text-danger">*</span></label>
+            <input id="edit-ora-riconsegna" type="time" class="bo-input" formControlName="oraRiconsegna" />
             <div class="bo-error" *ngIf="editForm.get('oraRiconsegna')?.invalid && editForm.get('oraRiconsegna')?.touched">
-              Campo obbligatorio
+              Seleziona l'orario di riconsegna
             </div>
           </div>
         </div>

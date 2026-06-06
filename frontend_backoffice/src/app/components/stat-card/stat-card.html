@@ -1,6 +1,6 @@
 <div class="sc-card">
   <div class="sc-icon-wrap" [style.background]="accent + '18'" [style.color]="accent">
-    {{ icon }}
+    <span [innerHTML]="safeIcon" aria-hidden="true"></span>
   </div>
   <div class="sc-body">
     <div class="sc-label">{{ label }}</div>
