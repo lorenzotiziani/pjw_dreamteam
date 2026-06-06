@@ -148,10 +148,14 @@
               <input id="stock-man" type="number" class="bo-input" formControlName="quantitaManutenzione" min="0" />
             </div>
             <div class="col-12 col-sm-1 d-flex gap-1">
-              <button type="submit" class="btn btn-primary btn-sm" [disabled]="stockForm.invalid || saving">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <button type="submit" style="background:#2563eb;border:none;color:#fff;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border-radius:6px;cursor:pointer;flex-shrink:0;" [disabled]="stockForm.invalid || saving">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
               </button>
-              <button *ngIf="editingStockId" type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelEditStock()">✕</button>
+              <button *ngIf="editingStockId" type="button" style="background:#f87171;border:none;color:#fff;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border-radius:6px;cursor:pointer;flex-shrink:0;" (click)="cancelEditStock()" title="Annulla">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
             </div>
           </div>
         </form>
