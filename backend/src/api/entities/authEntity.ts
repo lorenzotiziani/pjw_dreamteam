@@ -9,7 +9,7 @@ export interface AuthResponse {
 export interface JwtPayload {
   userId: number;
   email: string;
-  role: string;
+  ruolo: string;
   iat?: number;
   exp?: number;
 }

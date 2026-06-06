@@ -2,6 +2,7 @@ import {NextFunction, Request, Response} from 'express';
 import { AuthService } from './auth.service';
 import { loginDTO, registerDTO } from './auth.dto';
 import { AuthRequest } from '../../middleware/auth.middleware';
+import { Ruolo } from '@prisma/client';
 
 export class AuthController {
   static async register(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -20,12 +21,7 @@ export class AuthController {
 
   static async registerOperatore(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const role = req.user!.role;
-      let data: registerDTO = req.body;
-      if (role === 'ADMIN') {
-        data = { ...data, ruolo: 'OPERATORE' };
-      }
-      
+      const data: registerDTO = { ...req.body, ruolo: Ruolo.OPERATORE };
       const registerResult = await AuthService.register(data);
 
       res.status(201).json({

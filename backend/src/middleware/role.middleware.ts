@@ -11,7 +11,7 @@ export const requireRole = (...roles: string[]) =>
       return;
     }
 
-    if (!roles.includes(user.role)) {
+    if (!roles.includes(user.ruolo)) {
       next(new ForbiddenError('Non hai i permessi per eseguire questa operazione'));
       return;
     }

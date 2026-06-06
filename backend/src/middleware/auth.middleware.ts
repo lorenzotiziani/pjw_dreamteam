@@ -6,7 +6,7 @@ export interface AuthRequest extends Request {
   user?: {
     userId: number;
     email: string;
-    role: string;
+    ruolo: string;
   };
 }
 
@@ -33,7 +33,7 @@ export const authMiddleware = async (
     (req as AuthRequest).user = {
       userId: decoded.userId,
       email: decoded.email,
-      role: decoded.role,
+      ruolo: decoded.ruolo,
     };
 
     next();
@@ -46,6 +46,6 @@ export const requireRole = (...roles: string[]) =>
   (req: Request, res: Response, next: NextFunction) => {
     const user = (req as AuthRequest).user;
     if (!user) return next(new UnauthorizedError('Non autenticato'));
-    if (!roles.includes(user.role)) return next(new ForbiddenError('Accesso negato: ruolo non autorizzato'));
+    if (!roles.includes(user.ruolo)) return next(new ForbiddenError('Accesso negato: ruolo non autorizzato'));
     next();
   };
