@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PuntiVenditaController } from './puntiVendita.controller';
 import { validate } from '../../middleware/validate.middleware';
-import { createPuntoVenditaSchema, updatePuntoVenditaSchema, createStockSchema, updateStockSchema } from './puntiVendita.dto';
+import { createPuntoVenditaSchema, updatePuntoVenditaSchema, createStockSchema, updateStockSchema, idRequirements } from './puntiVendita.dto';
 import { authMiddleware } from '../../middleware/auth.middleware';
 import { requireRole } from '../../middleware/role.middleware';
 
@@ -18,5 +18,6 @@ router.delete('/:id', authMiddleware, requireRole('ADMIN'), PuntiVenditaControll
 router.get('/:id/stock', PuntiVenditaController.getStock);
 router.post('/:id/stock', authMiddleware, requireRole('OPERATORE','ADMIN'), validate(createStockSchema), PuntiVenditaController.createStock);
 router.put('/:id/stock/:stockId', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(updateStockSchema), PuntiVenditaController.updateStock);
+router.delete('/:id/stock/:stockId', authMiddleware, requireRole('OPERATORE', 'ADMIN'), validate(idRequirements), PuntiVenditaController.deleteStock);
 
 export default router;

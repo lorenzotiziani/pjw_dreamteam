@@ -37,7 +37,7 @@ export const connectDB = async (): Promise<sql.ConnectionPool> => {
 
 export const getPool = (): sql.ConnectionPool => {
   if (!pool) {
-    throw new Error('Database non inizializzato');
+    throw new BadRequestError('Database non inizializzato');
   }
   return pool;
 };

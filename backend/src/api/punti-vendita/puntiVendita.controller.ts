@@ -112,4 +112,20 @@ export class PuntiVenditaController {
       next(error);
     }
   }
+
+  static async deleteStock(req: Request, res: Response, next: NextFunction) {
+    try {
+      const puntoVenditaId = parseId(req.params.id);
+      const stockId = parseId(req.params.stockId);
+      
+      await PuntiVenditaService.deleteStock(puntoVenditaId, stockId);
+      res.json({
+        success: true,
+        message: 'Stock eliminato'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  
 }

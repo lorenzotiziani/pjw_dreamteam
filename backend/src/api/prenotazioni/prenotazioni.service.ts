@@ -9,6 +9,7 @@ import { startOfDay, addDays } from "date-fns";
 import { TipiBiciService } from "../tipi-bici/tipiBici.service";
 import { CopertureService } from "../coperture/coperture.service";
 import { AccessoriService } from "../accessori/accessori.service";
+import { BadRequestError } from "../../errors";
 
 function buildOraRitiro(dataRitiro: Date, oraRitiro: string): Date {
   const [hours, minutes, seconds] = oraRitiro.split(":").map(Number);
@@ -24,7 +25,7 @@ function twoDaysFromNow(): Date {
 function calcolaMezzeGiornate(dataOraRitiro: Date, dataOraRiconsegna: Date): number {
   const diffMs = dataOraRiconsegna.getTime() - dataOraRitiro.getTime();
   if (diffMs <= 0) {
-    throw new Error("La data di riconsegna deve essere successiva al ritiro.");
+    throw new BadRequestError("La data di riconsegna deve essere successiva al ritiro.");
   }
   const diffOre = diffMs / (1000 * 60 * 60);
   return Math.ceil(diffOre / 6);
@@ -44,7 +45,7 @@ async function prenotaBici(
     data: { quantitaAttuale: { decrement: 1 } },
   });
   if (result.count === 0) {
-    throw new Error(`Bici ${tipoBiciId} non disponibile nel punto vendita.`);
+    throw new BadRequestError(`Bici ${tipoBiciId} non disponibile nel punto vendita.`);
   }
 }
 
@@ -66,21 +67,21 @@ async function rilasciaBici(
 
 async function calcolaRiga(riga: any, mezzeGiornate: number) {
   const tipoBici = await TipiBiciService.getById(riga.tipoBiciId);
-  if (!tipoBici) throw new Error(`Tipo bici ${riga.tipoBiciId} non trovato`);
+  if (!tipoBici) throw new BadRequestError(`Tipo bici ${riga.tipoBiciId} non trovato`);
 
   let subtotale = Number(tipoBici.prezzoMezzaGiornata) * mezzeGiornate;
 
   if (riga.coperturaId) {
     const copertura = await CopertureService.getById(riga.coperturaId);
     if (!copertura)
-      throw new Error(`Copertura ${riga.coperturaId} non trovata`);
+      throw new BadRequestError(`Copertura ${riga.coperturaId} non trovata`);
     subtotale += Number(copertura.prezzo);
   }
 
   for (const acc of riga.accessori) {
     const accessorio = await AccessoriService.getById(acc.accessorioId);
     if (!accessorio)
-      throw new Error(`Accessorio ${acc.accessorioId} non trovato`);
+      throw new BadRequestError(`Accessorio ${acc.accessorioId} non trovato`);
     subtotale += Number(accessorio.prezzo) * acc.quantita * mezzeGiornate;
   }
 
@@ -161,7 +162,7 @@ export class PrenotazioniService {
         operazioni: true,
       },
     });
-    if (!prenotazione) throw new Error(`Prenotazione ${id} non trovata`);
+    if (!prenotazione) throw new BadRequestError(`Prenotazione ${id} non trovata`);
     return prenotazione;
   }
 
@@ -228,7 +229,7 @@ export class PrenotazioniService {
     const prenotazione = await PrenotazioniService.getById(params.id);
 
     if (prenotazione.dataRitiro <= twoDaysFromNow()) {
-      throw new Error(
+      throw new BadRequestError(
         "Impossibile modificare: mancano meno di 2 giorni al ritiro.",
       );
     }
@@ -301,7 +302,7 @@ export class PrenotazioniService {
     const prenotazione = await PrenotazioniService.getById(id);
 
     if (prenotazione.dataRitiro <= twoDaysFromNow()) {
-      throw new Error(
+      throw new BadRequestError(
         "Impossibile eliminare: mancano meno di 2 giorni al ritiro.",
       );
     }
@@ -322,11 +323,11 @@ export class PrenotazioniService {
   ): Promise<void> {
     const existing = await PrenotazioniService.getById(id);
     if (!existing) {
-      throw new Error(`La prenotazione non esiste`);
+      throw new BadRequestError(`La prenotazione non esiste`);
     }
   
     if (existing.stato === stato) {
-      throw new Error(`La prenotazione è già ${stato}`);
+      throw new BadRequestError(`La prenotazione è già ${stato}`);
     }
 
     
@@ -355,9 +356,9 @@ export class PrenotazioniService {
             },
           });
           
-          if (!stock) throw new Error(`Stock non trovato per bici ${riga.tipoBiciId}`);
+          if (!stock) throw new BadRequestError(`Stock non trovato per bici ${riga.tipoBiciId}`);
           if (stock.quantitaAttuale + stock.quantitaManutenzione + 1 > stock.quantitaTotale) {
-            throw new Error(`Impossibile segnalare danno: tutte le bici sono già state restituite`);
+            throw new BadRequestError(`Impossibile segnalare danno: tutte le bici sono già state restituite`);
           }
           
           await tx.stockBici.update({
@@ -393,9 +394,9 @@ export class PrenotazioniService {
             },
           });
           
-          if (!stock) throw new Error(`Stock non trovato per bici ${riga.tipoBiciId}`);
+          if (!stock) throw new BadRequestError(`Stock non trovato per bici ${riga.tipoBiciId}`);
           if (stock.quantitaAttuale + 1  + stock.quantitaManutenzione > stock.quantitaTotale) {
-            throw new Error(`Impossibile restituire: si supererebbe la quantità totale`);
+            throw new BadRequestError(`Impossibile restituire: si supererebbe la quantità totale`);
           }
 
           await tx.stockBici.update({

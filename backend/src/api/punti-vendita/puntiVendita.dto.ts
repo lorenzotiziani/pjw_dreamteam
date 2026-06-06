@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { id } from 'zod/v4/locales';
 
 export const createPuntoVenditaSchema = z.object({
   body: z.object({
@@ -40,6 +41,13 @@ export const updateStockSchema = z.object({
     data => data.quantitaTotale !== undefined || data.quantitaManutenzione !== undefined,
     { message: 'Almeno un campo è obbligatorio' }
   ),
+});
+
+export const idRequirements = z.object({
+  params: z.object({
+    id: z.coerce.number(),
+    stockId: z.coerce.number(),
+  }),
 });
 
 export type CreateStockDTO = z.infer<typeof createStockSchema>['body'];

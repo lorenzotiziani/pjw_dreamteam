@@ -90,13 +90,34 @@ export class PuntiVenditaService {
       const nuovaTotale       = data.quantitaTotale       ?? existing.quantitaTotale;
       const nuovaManutenzione = data.quantitaManutenzione ?? existing.quantitaManutenzione;
 
-      if (nuovaManutenzione > nuovaTotale)
+      const nuovaAttuale = nuovaTotale - nuovaManutenzione;
+
+      if (nuovaManutenzione + nuovaAttuale > nuovaTotale)
         throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
 
+      data = { ...data, quantitaAttuale: nuovaAttuale}
+      
       return await prisma.stockBici.update({
         where: { id: stockId },
         data,
         include: { tipoBici: true },
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')
+        throw new NotFoundError('Stock non trovato');
+      throw e;
+    }
+  }
+
+  static async deleteStock(puntoVenditaId: number, stockId: number) {
+    try {
+      await prisma.stockBici.delete({
+        where: {
+          id: stockId,
+          puntoVendita: {
+            id: puntoVenditaId
+          }
+        },
       });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')

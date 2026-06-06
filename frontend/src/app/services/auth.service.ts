@@ -49,7 +49,7 @@ export class AuthService {
   refresh() {
     const authTokens = this.jwtSrv.getToken();
     if (!authTokens) {
-      throw new Error('Missing refresh token');
+      throw new BadRequestError('Missing refresh token');
     }
     return this.http.post<{token: string, refreshToken: string}>('/api/refresh', {refreshToken: authTokens.refreshToken})
       .pipe(

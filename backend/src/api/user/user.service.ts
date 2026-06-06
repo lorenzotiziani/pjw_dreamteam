@@ -2,6 +2,8 @@ import bcrypt from 'bcrypt';
 import { UserModel } from './user.model';
 import { RefreshTokenModel } from '../../models/RefreshToken';
 import { User, UserSafe } from '../entities/userEntity';
+import { BadRequestError } from "../../errors";
+
 
 export interface UpdateUserData {
   firstName?: string;
@@ -34,18 +36,18 @@ export class UserService {
     // Verifica la pwd attuale
     const user = await UserModel.findById(userId);
     if (!user) {
-      throw new Error('Utente non trovato');
+      throw new BadRequestError('Utente non trovato');
     }
 
     const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.pwd);
     if (!isCurrentPasswordValid) {
-      throw new Error('pwd attuale non corretta');
+      throw new BadRequestError('pwd attuale non corretta');
     }
 
     // Verifica che la nuova pwd sia diversa da quella attuale
     const isSamePassword = await bcrypt.compare(newPassword, user.pwd);
     if (isSamePassword) {
-      throw new Error('La nuova pwd deve essere diversa da quella attuale');
+      throw new BadRequestError('La nuova pwd deve essere diversa da quella attuale');
     }
 
     // Hash della nuova pwd
@@ -61,7 +63,7 @@ export class UserService {
   static async deleteUser(userId: number): Promise<void> {
     const user = await UserModel.findById(userId);
     if (!user) {
-      throw new Error('Utente non trovato');
+      throw new BadRequestError('Utente non trovato');
     }
 
     await UserModel.delete(userId);
@@ -78,7 +80,7 @@ export class UserService {
   static async changeStatus(userId: number, isActive: boolean): Promise<void> {
     const user = await UserModel.findById(userId);
     if (!user) {
-      throw new Error('Utente non trovato');
+      throw new BadRequestError('Utente non trovato');
     }
     await UserModel.update(userId, { isActive });
   }
