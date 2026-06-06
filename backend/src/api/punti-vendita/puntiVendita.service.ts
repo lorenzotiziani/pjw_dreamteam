@@ -92,9 +92,9 @@ export class PuntiVenditaService {
 
       const nuovaAttuale = nuovaTotale - nuovaManutenzione;
 
-      if (nuovaManutenzione + nuovaAttuale > nuovaTotale)
+      if (nuovaManutenzione > nuovaTotale)
         throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
-
+      
       data = { ...data, quantitaAttuale: nuovaAttuale}
       
       return await prisma.stockBici.update({
