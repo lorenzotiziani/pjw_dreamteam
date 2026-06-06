@@ -298,6 +298,41 @@
   text-align: right;
 }
 
+/* ── PV breakdown ────────────────────────────────────────── */
+.sv-pv-list { display: flex; flex-direction: column; gap: 8px; }
+
+.sv-pv-row {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: var(--radius-md);
+}
+
+.sv-pv-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.sv-pv-nome { font-size: .85rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sv-pv-citta { font-size: .72rem; color: var(--text-muted); }
+
+.sv-pv-bar-wrap {
+  height: 8px;
+  background: var(--border-subtle);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.sv-pv-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 99px;
+  min-width: 2px;
+  transition: width .4s ease;
+}
+
+.sv-pv-stats { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
+.sv-pv-count { font-size: .8rem; color: var(--text-muted); white-space: nowrap; }
+.sv-pv-ricavi { font-size: .9rem; font-weight: 700; color: var(--primary-dark); white-space: nowrap; min-width: 80px; text-align: right; }
+
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 767px) {
   .sv-page { padding: 1.1rem .9rem 2.5rem; }
