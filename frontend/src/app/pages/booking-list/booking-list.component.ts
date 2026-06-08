@@ -36,11 +36,17 @@ export class BookingListComponent implements OnInit{
     this.caricaPrenotazioni();
   }
 
-  openModal(id: string) {
-    const modalRef = this.modalService.open(EditBookingComponent);
-    modalRef.componentInstance.prenotazioneId = id;
-    modalRef.result.catch(() => {}); // evita errore unhandled promise
-  }
+openModal(id: string) {
+  const modalRef = this.modalService.open(EditBookingComponent, {
+    backdrop: 'static',     // opzionale: impedisce la chiusura cliccando fuori
+    keyboard: true          // permette chiusura con ESC
+  });
+  modalRef.componentInstance.prenotazioneId = id;
+  const triggerButton = document.activeElement as HTMLElement;
+  modalRef.result
+    .finally(() => triggerButton?.focus())
+    .catch(() => {});
+}
 
   caricaPrenotazioni() {
     this.prenotazioniSrv.mie().subscribe({
@@ -71,14 +77,5 @@ export class BookingListComponent implements OnInit{
         alert('Errore durante la cancellazione.');
       }
     });
-  }
-
-  scadenza(date: Date): boolean {
-    if (!date) return false;
-    const now = new Date();
-    const diffMs = date.getTime() - now.getTime();
-    const diffDays = diffMs / (1000 * 60 * 60 * 24);
-    
-    return diffMs > 0 && diffDays < 2;
   }
 }

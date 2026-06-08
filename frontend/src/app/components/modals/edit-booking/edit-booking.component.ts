@@ -204,7 +204,7 @@ export class EditBookingComponent implements OnInit, OnDestroy {
 
     this.modal.close(updated);
   }
-
+  
   dismiss() {
     this.modal.dismiss();
   }

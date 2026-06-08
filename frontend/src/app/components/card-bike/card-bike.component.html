@@ -34,14 +34,32 @@
 
     <hr class="my-3">
 
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <div>
+    <div class="d-flex row align-items-center mb-2">
+      <div class="row">
         <i class="bi bi-bicycle me-1 text-secondary"></i>
         <span class="text-muted">Bicicletta:</span>
         <strong>{{ prenotazione.righe?.[0]?.tipoBici?.categoria || '—' }}</strong>
       </div>
-      <div>
-        <span class="fs-5 fw-bold text-primary">€{{ prenotazione.totale }}</span>
+
+      <div *ngIf="prenotazione.righe?.[0]?.accessori?.length" class="row">
+        <i class="bi bi-backpack me-1 text-secondary"></i>
+        <span class="text-muted">Accessori:</span>
+        <ul class="list-unstyled mb-0 mt-1">
+          <li *ngFor="let acc of prenotazione.righe[0].accessori">
+            <strong>{{ acc.accessorio?.nome }} - {{ acc.accessorio?.prezzo | currency}}</strong>
+          </li>
+        </ul>
+      </div>
+
+      <div class="row">
+        <i class="bi bi-bicycle me-1 text-secondary"></i>
+        <span class="text-muted">Assicurazione:</span>
+        <strong>{{ prenotazione.righe?.[0]?.copertura?.nome }} - {{ prenotazione.righe?.[0]?.copertura?.prezzo | currency}}</strong>
+        <p>( {{ prenotazione.righe?.[0]?.copertura?.descrizione }} )</p>
+      </div>
+
+      <div class="row">
+        <span class="fs-5 fw-bold text-primary">Totale: {{prenotazione.totale | currency}}</span>
       </div>
     </div>
 
@@ -51,12 +69,18 @@
   </div>
 
   <!-- Piede della card con bottoni -->
-  <div class="card-footer bg-transparent border-top-0 p-3 pt-0 d-flex gap-2" *ngIf="showActions">
+  <div class="card-footer bg-transparent border-top-0 p-3 pt-0 d-flex gap-2" *ngIf="showActions && scadenza(prenotazione.dataRitiro)">
     <button class="btn btn-sm btn-outline-danger flex-fill" (click)="onCancella()">
       <i class="bi bi-trash3 me-1"></i> Cancella
     </button>
     <button class="btn btn-sm btn-primary flex-fill" (click)="onModifica()">
       <i class="bi bi-pencil-square me-1"></i> Modifica
     </button>
+  </div>
+
+  <div class="card-footer bg-transparent border-top-0 p-3 pt-0 text-center text-muted" *ngIf="showActions && !scadenza(prenotazione.dataRitiro)">
+    <small>
+      <i class="bi bi-info-circle me-1"></i> Modifica e cancellazione non consentite: mancano meno di 2 giorni al ritiro.
+    </small>
   </div>
 </div>

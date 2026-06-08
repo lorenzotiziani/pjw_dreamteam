@@ -15,7 +15,7 @@
     <button class="btn btn-primary mt-3" routerLink="/booking/form">Prenota ora</button>
   </div>
 
-  <div *ngIf="!loading && prenotazioni.length > 0" class="row g-4">
+  <div *ngIf="!loading && prenotazioni.length> 0" class="row g-4">
     <div class="col-md-6 col-lg-4" *ngFor="let p of prenotazioni">
       <app-card-bike
         [prenotazione]="p"

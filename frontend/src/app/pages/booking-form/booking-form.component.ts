@@ -59,6 +59,12 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     coperturaId: ['']
   });
 
+  ngOnInit() {
+    this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
+    this.setupOrariRiconsegnaListener();
+    this.restoreFormState();
+  }
+
   bikesDisponibili$ = combineLatest([
     this.bookingForm.get('puntoVendita')!.valueChanges.pipe(startWith(''))
   ]).pipe(
@@ -81,10 +87,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     })
   );
 
-  ngOnInit() {
-    this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
-    this.setupOrariRiconsegnaListener();
-  }
 
   ngOnDestroy() {
     this.destroyed$.next();
@@ -177,7 +179,33 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  login() {
-    this.router.navigate(['/login']);
+  private readonly FORM_STORAGE_KEY = 'booking_form_data';
+
+  saveFormState() {
+    sessionStorage.setItem(this.FORM_STORAGE_KEY, JSON.stringify(this.bookingForm.value));
   }
+
+  restoreFormState() {
+    const saved = sessionStorage.getItem(this.FORM_STORAGE_KEY);
+    if (saved) {
+      try {
+        const formData = JSON.parse(saved);
+        this.bookingForm.patchValue(formData);
+        sessionStorage.removeItem(this.FORM_STORAGE_KEY);
+      } catch (e) {
+        console.error('Errore nel ripristino del form', e);
+      }
+    }
+  }
+
+onLoginClick() {
+  this.saveFormState();  // salva i dati del form
+  this.router.navigate(['/login'], { queryParams: { requestedUrl: '/booking/form' } });
+}
+
+onRegisterClick() {
+  this.saveFormState();
+  this.router.navigate(['/register'], { queryParams: { requestedUrl: '/booking/form' } });
+}
+
 }

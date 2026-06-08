@@ -24,4 +24,15 @@ export class CardBikeComponent {
   onModifica() {
     this.modifica.emit(this.prenotazione.id);
   }
+
+  scadenza(date: string): boolean {
+    if (!date) return false;
+    const dataRitiro = new Date(date);
+    const oggi = new Date();
+    oggi.setHours(0, 0, 0, 0);
+    dataRitiro.setHours(0, 0, 0, 0);
+    const diffMs = dataRitiro.getTime() - oggi.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    return diffDays > 2; // mostra bottoni se mancano meno di 2 giorni (incluso oggi)
+  }
 }

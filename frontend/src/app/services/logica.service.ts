@@ -123,4 +123,19 @@ export class LogicaService {
     return `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1).toString().padStart(2, '0')}:00`;
   }
 
+
+  public isModificaConsentita(dataRitiro: string | null | undefined ): boolean {
+    if (!dataRitiro) return false;
+    // Parse della data come UTC (YYYY-MM-DD)
+    const oggi = new Date();
+    oggi.setUTCHours(0, 0, 0, 0);
+    const ritiro = new Date(dataRitiro);
+    ritiro.setUTCHours(0, 0, 0, 0);
+    const diffMs = ritiro.getTime() - oggi.getTime();
+    const diffGiorni = diffMs / (1000 * 60 * 60 * 24);
+    // Mostra i pulsanti solo se mancano più di 2 giorni
+    console.log('dataRitiro:', dataRitiro, 'diffGiorni:', diffGiorni, 'consentita:', diffGiorni > 2);
+    return diffGiorni > 2;
+  }
+
 }

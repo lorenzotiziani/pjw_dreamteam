@@ -51,7 +51,7 @@
         <select class="form-select" formControlName="tipoBiciId">
           <option value="" disabled selected>Seleziona una bici</option>
           <option *ngFor="let bike of bikesDisponibili$ | async" [value]="bike.id">
-            {{ bike.categoria }} - {{ bike.taglia }} - {{ bike.motorizzazione }}
+            {{ bike.categoria }} - {{ bike.taglia }} - {{ bike.motorizzazione }} - {{bike.prezzoMezzaGiornata | currency}}
           </option>
         </select>
       </div>
@@ -102,13 +102,13 @@
       </ng-container>
 
       <ng-template #noAuth>
-        <div class="text-center p-4 bg-light rounded">
+        <div class="d-flex row justify-content-center text-center p-4 bg-light rounded">
           <div>
-            <p>Effettua il login prima di confermare la prenotazione</p> 
-            <a routerLink="/register">o registrati</a>
+            <p>Effettua il login prima di confermare la prenotazione</p>
+            <button class="btn btn-link p-0" (click)="onRegisterClick()">Registrati</button>
           </div>
           <div class="m-4">
-            <button class="btn btn-primary" (click)="login()">Login</button>
+            <button class="btn btn-primary" (click)="onLoginClick()">Login</button>
           </div>
         </div>
       </ng-template>

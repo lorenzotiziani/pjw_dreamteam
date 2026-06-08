@@ -1,4 +1,6 @@
+import { Accessorio } from "./Accessorio";
 import { TipoBici } from "./Bike";
+import { Copertura } from "./Copertura";
 import { PuntoVendita } from "./puntoVendita"
 
 
@@ -13,9 +15,10 @@ export enum StatoPrenotazione {
 export type RigaPrenotazione = {
   tipoBiciId: string;
   tipoBici: TipoBici
+  copertura: Copertura
   coperturaId: string | null;
   subtotale: string;
-  accessori: { accessorioId: string; quantita: number }[];
+  accessori: { accessorioId: string; accessorio: Accessorio }[];
 };
 
 export type Prenotazione = {

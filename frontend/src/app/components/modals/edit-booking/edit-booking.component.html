@@ -55,7 +55,7 @@
       </select>
     </div>
 
-    <!-- Bicicletta (dinamica in base al punto vendita) -->
+    <!-- Bicicletta (dinamica in base al punto vendita) 
     <div class="mb-3">
       <label class="form-label">Bicicletta</label>
       <select class="form-select" formControlName="tipoBiciId">
@@ -65,8 +65,8 @@
         </option>
       </select>
     </div>
+    -->
 
-    <!-- Copertura (radio) -->
     <div class="mb-3">
       <label class="form-label">Copertura aggiuntiva (una sola)</label>
       <div *ngFor="let cop of coperture$ | async" class="form-check">
@@ -81,7 +81,10 @@
     </div>
   </form>
 </div>
-<div class="modal-footer" *ngIf="!isLoading && !errorMessage">
-  <button type="button" class="btn btn-secondary" (click)="dismiss()">Annulla</button>
-  <button type="button" class="btn btn-primary" (click)="confermaModifica()">Salva modifiche</button>
-</div>
+
+<ng-container *ngIf="!isLoading && !errorMessage">
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="dismiss()">Annulla</button>
+    <button type="button" class="btn btn-primary" (click)="confermaModifica()">Salva modifiche</button>
+  </div>
+</ng-container>
