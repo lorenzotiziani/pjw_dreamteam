@@ -78,7 +78,7 @@
     </button>
   </div>
 
-  <div class="card-footer bg-transparent border-top-0 p-3 pt-0 text-center text-muted" *ngIf="showActions && !scadenza(prenotazione.dataRitiro)">
+  <div class="card-footer bg-transparent border rounded p-2 m-3 text-center text-muted" *ngIf="showActions && !scadenza(prenotazione.dataRitiro)">
     <small>
       <i class="bi bi-info-circle me-1"></i> Modifica e cancellazione non consentite: mancano meno di 2 giorni al ritiro.
     </small>

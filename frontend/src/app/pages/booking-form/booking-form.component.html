@@ -40,7 +40,7 @@
         <label for="fascia-oraria-riconsegna" class="form-label fw-semibold">Orario riconsegna <span class="text-danger">*</span></label>
         <select class="form-select" id="fascia-oraria-riconsegna" formControlName="oraRiconsegna">
           <option value="" disabled selected>Seleziona un orario</option>
-          <option *ngFor="let orario of orariRiconsegna" [value]="orario">
+          <option *ngFor="let orario of orariDisponibili" [value]="orario">
             {{ orario }}
           </option>
         </select>
@@ -91,6 +91,10 @@
 
       <div class="mb-4 text-end">
         <strong class="fs-5">Totale: €{{ prezzoTotale }}</strong>
+      </div>
+
+      <div *ngIf="formError" class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i> {{ formError }}
       </div>
 
       <ng-container *ngIf="user$ | async as user; else noAuth">

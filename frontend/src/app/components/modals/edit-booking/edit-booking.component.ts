@@ -1,8 +1,8 @@
 import { Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subject, firstValueFrom, takeUntil, combineLatest, of } from 'rxjs';
-import { map, switchMap, startWith, tap } from 'rxjs/operators';
+import { Subject, firstValueFrom, takeUntil, of } from 'rxjs';
+import { map, switchMap, startWith } from 'rxjs/operators';
 import { PuntoVenditaService } from '../../../services/punto-vendita.service';
 import { PrenotazioneService } from '../../../services/prenotazione.service';
 import { AccessorioService } from '../../../services/accessorio.service';
@@ -18,27 +18,30 @@ import { LogicaService } from '../../../services/logica.service';
 export class EditBookingComponent implements OnInit, OnDestroy {
   @Input() prenotazioneId!: number;
 
-  private fb = inject(FormBuilder);
-  private modal = inject(NgbActiveModal);
-  private prenotazioniSrv = inject(PrenotazioneService);
-  private puntiVenditaSrv = inject(PuntoVenditaService);
-  private bikeSrv = inject(BikeService);
-  private accessorioSrv = inject(AccessorioService);
-  private coperturaSrv = inject(CoperturaService);
-  private logicSrv = inject(LogicaService);
+  protected fb = inject(FormBuilder);
+  protected modal = inject(NgbActiveModal);
+  protected prenotazioniSrv = inject(PrenotazioneService);
+  protected puntiVenditaSrv = inject(PuntoVenditaService);
+  protected accessorioSrv = inject(AccessorioService);
+  protected coperturaSrv = inject(CoperturaService);
+  protected logicSrv = inject(LogicaService);
 
-  private destroy$ = new Subject<void>();
+  protected destroy$ = new Subject<void>();
 
   FormControl = FormControl;
   isLoading = true;
   errorMessage = '';
 
   orariDisponibili: string[] = [];
-  orariRiconsegna: string[] = [];
+  orariRiconsegna: string[] = []; // Ora popolato con tutti gli orari
 
   puntiVendita$ = this.puntiVenditaSrv.puntoVendita$;
   coperture$ = this.coperturaSrv.coperture$;
   accessori$ = this.accessorioSrv.accessorio$;
+
+  // Liste locali per il calcolo del totale
+  bikesDisponibiliList: any[] = [];
+  copertureList: any[] = [];
 
   updateForm = this.fb.group({
     dataRitiro: ['', Validators.required],
@@ -53,12 +56,10 @@ export class EditBookingComponent implements OnInit, OnDestroy {
 
   bikesDisponibili$ = this.updateForm.get('puntoVenditaId')!.valueChanges.pipe(
     startWith(''),
-    tap(id => console.log('puntoVenditaId cambiato:', id)),
     switchMap(puntoVenditaId => {
       const id = puntoVenditaId;
       if (!id) return of([]);
       return this.puntiVenditaSrv.stock(id).pipe(
-        tap(stock => console.log('Stock ricevuto:', stock)),
         map(stockArray =>
           stockArray.map(s => ({
             ...s.tipoBici,
@@ -77,8 +78,19 @@ export class EditBookingComponent implements OnInit, OnDestroy {
   listaAccessori: any[] = [];
 
   async ngOnInit() {
+    // Inizializza entrambi gli array con tutti gli orari disponibili
     this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
-    this.setupOrariRiconsegnaListener();
+    this.orariRiconsegna = [...this.orariDisponibili]; // Mostra tutte le ore, nessun filtro
+
+    // Sottoscrizioni per tenere aggiornate le liste locali
+    this.bikesDisponibili$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(list => this.bikesDisponibiliList = list);
+
+    this.coperture$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(list => this.copertureList = list);
+
     await this.caricaAccessoriPerCheckbox();
     await this.caricaPrenotazione();
   }
@@ -86,19 +98,6 @@ export class EditBookingComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  setupOrariRiconsegnaListener() {
-    this.updateForm.get('oraRitiro')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(oraRitiro => {
-        if (!oraRitiro) return;
-        this.orariRiconsegna = this.logicSrv.generaOrariRiconsegna(oraRitiro);
-        const current = this.updateForm.get('oraRiconsegna')?.value;
-        if (current && !this.orariRiconsegna.includes(current)) {
-          this.updateForm.patchValue({ oraRiconsegna: '' });
-        }
-      });
   }
 
   async caricaPrenotazione() {
@@ -112,8 +111,11 @@ export class EditBookingComponent implements OnInit, OnDestroy {
       const dataRitiro = pren.dataRitiro?.split('T')[0] ?? '';
       const dataRiconsegna = pren.dataOraRiconsegna?.split('T')[0] ?? '';
 
+      // Estrazione corretta dell'ora di ritiro dal formato ISO
       const oraTime = this.logicSrv.extractTimeFromISO(pren.oraRitiro);
       const oraRitiroFascia = this.logicSrv.formatOraInFasciaFromTime(oraTime);
+      
+      // Per la riconsegna: usiamo formatDateTimeToFascia come prima
       const oraRiconsegnaFascia = this.logicSrv.formatDateTimeToFascia(pren.dataOraRiconsegna);
 
       this.updateForm.patchValue({
@@ -126,7 +128,7 @@ export class EditBookingComponent implements OnInit, OnDestroy {
         coperturaId: pren.righe?.[0]?.coperturaId?.toString() ?? ''
       });
 
-      // Forza l'aggiornamento del controllo punto vendita per attivare il filtro
+      // Forza l'aggiornamento del controllo punto vendita per attivare il filtro bici
       this.updateForm.get('puntoVenditaId')?.updateValueAndValidity();
 
       const accessoriIds = pren.righe?.[0]?.accessori?.map((a: any) => a.accessorioId) ?? [];
@@ -162,11 +164,35 @@ export class EditBookingComponent implements OnInit, OnDestroy {
   }
 
   getTotale(): number {
-    // Calcolo totale: prezzo bici + copertura + accessori
     const form = this.updateForm.value;
     const tipoBiciId = form.tipoBiciId;
+    const coperturaId = form.coperturaId;
+
     let totale = 0;
-    // Puoi implementare la logica di calcolo usando i dati correnti
+
+    // Prezzo bici
+    if (tipoBiciId && this.bikesDisponibiliList.length) {
+      const bici = this.bikesDisponibiliList.find(b => b.id == tipoBiciId);
+      if (bici) {
+        totale += Number(bici.prezzoMezzaGiornata);
+      }
+    }
+
+    // Prezzo copertura
+    if (coperturaId && this.copertureList.length) {
+      const cop = this.copertureList.find(c => c.id == coperturaId);
+      if (cop) {
+        totale += Number(cop.prezzo);
+      }
+    }
+
+    // Prezzi accessori
+    this.accessoriArray.controls.forEach((ctrl, idx) => {
+      if (ctrl.value && this.listaAccessori[idx]) {
+        totale += Number(this.listaAccessori[idx].prezzo);
+      }
+    });
+
     return totale;
   }
 
@@ -204,8 +230,10 @@ export class EditBookingComponent implements OnInit, OnDestroy {
 
     this.modal.close(updated);
   }
-  
+
   dismiss() {
+    this.updateForm.reset();
+    this.updateForm.markAsPristine();
     this.modal.dismiss();
   }
 }

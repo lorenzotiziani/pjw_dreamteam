@@ -14,7 +14,7 @@ import { LogicaService } from '../../services/logica.service';
   templateUrl: './booking-list.component.html',
   styleUrl: './booking-list.component.css',
 })
-export class BookingListComponent implements OnInit{
+export class BookingListComponent implements OnInit {
   protected prenotazioniSrv = inject(PrenotazioneService);
   protected authSrv = inject(AuthService);
   protected router = inject(Router);
@@ -36,17 +36,49 @@ export class BookingListComponent implements OnInit{
     this.caricaPrenotazioni();
   }
 
-openModal(id: string) {
-  const modalRef = this.modalService.open(EditBookingComponent, {
-    backdrop: 'static',     // opzionale: impedisce la chiusura cliccando fuori
-    keyboard: true          // permette chiusura con ESC
-  });
-  modalRef.componentInstance.prenotazioneId = id;
-  const triggerButton = document.activeElement as HTMLElement;
-  modalRef.result
-    .finally(() => triggerButton?.focus())
-    .catch(() => {});
-}
+  openModal(id: string) {
+    const modalRef = this.modalService.open(EditBookingComponent, {
+      backdrop: 'static',
+      keyboard: true
+    });
+    modalRef.componentInstance.prenotazioneId = id;
+    const triggerButton = document.activeElement as HTMLElement;
+
+    modalRef.result.then((updatedData: any) => {
+      // Recupera la prenotazione originale per ottenere lo stato attuale
+      const prenotazioneOriginale = this.prenotazioni.find(p => p.id === id);
+      if (!prenotazioneOriginale) {
+        alert('Prenotazione non trovata nella lista.');
+        return;
+      }
+
+      // Chiama il servizio con tutti i 10 parametri richiesti
+      this.prenotazioniSrv.update(
+        Number(id),
+        updatedData.dataRitiro,
+        updatedData.puntoVenditaId,
+        updatedData.oraRitiro,
+        updatedData.dataOraRiconsegna,
+        updatedData.totale,
+        prenotazioneOriginale.stato,
+        updatedData.tipoBiciId,
+        updatedData.coperturaId ?? null, 
+        updatedData.accessoriPayload 
+      ).subscribe({
+        next: () => {
+          this.caricaPrenotazioni();
+        },
+        error: (err) => {
+          console.error('Errore aggiornamento', err);
+          alert('Errore durante il salvataggio delle modifiche.');
+        }
+      });
+    }).catch(() => {
+      // Modale chiuso con dismiss (annulla)
+    }).finally(() => {
+      triggerButton?.focus();
+    });
+  }
 
   caricaPrenotazioni() {
     this.prenotazioniSrv.mie().subscribe({
@@ -69,7 +101,6 @@ openModal(id: string) {
 
     this.prenotazioniSrv.delete(Number(id)).subscribe({
       next: () => {
-        // Rimuovi dalla lista locale
         this.prenotazioni = this.prenotazioni.filter(p => p.id !== id);
       },
       error: (err) => {

@@ -40,7 +40,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   prezzoTotale = 0;
 
   orariDisponibili: string[] = [];
-  orariRiconsegna: string[] = [];
 
   coperturaSelezionata: Copertura | null = null;
   accessoriSelezionati: Accessorio[] = [];
@@ -48,6 +47,8 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   puntoVendita$ = this.puntiVenditaSrv.puntoVendita$;
   accessori$ = this.accessorioSrv.accessorio$;
   coperture$ = this.coperturaSrv.coperture$;
+
+  formError = '';
 
   bookingForm = this.fb.group({
     data: ['', Validators.required],
@@ -61,8 +62,24 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
-    this.setupOrariRiconsegnaListener();
     this.restoreFormState();
+
+    // Combina valore del select bici e lista bici disponibili
+    combineLatest([
+      this.bookingForm.get('tipoBiciId')!.valueChanges.pipe(
+        startWith(this.bookingForm.get('tipoBiciId')!.value) // valore iniziale
+      ),
+      this.bikesDisponibili$
+    ]).pipe(
+      takeUntil(this.destroyed$),
+      map(([tipoBiciId, bikes]) => {
+        // Se l'array è vuoto o non c'è match, restituisce null
+        return bikes.find(b => b.id === tipoBiciId) || null;
+      })
+    ).subscribe(bici => {
+      this.biciSelezionata = bici;
+      this.calcolaTotale();
+    });
   }
 
   bikesDisponibili$ = combineLatest([
@@ -87,30 +104,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     })
   );
 
-
-  ngOnDestroy() {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
-
-  setupOrariRiconsegnaListener(): void {
-    this.bookingForm.get('ora')?.valueChanges
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(oraRitiro => {
-        this.orariRiconsegna = this.logicSrv.generaOrariRiconsegna(oraRitiro!);
-        const current = this.bookingForm.get('oraRiconsegna')?.value;
-        if (current && !this.orariRiconsegna.includes(current)) {
-          this.bookingForm.patchValue({ oraRiconsegna: '' });
-        }
-      });
-  }
-
-  onBiciChange(tipoBiciId: string) {
-    this.bikesDisponibili$.pipe(takeUntil(this.destroyed$)).subscribe(bikes => {
-      this.biciSelezionata = bikes.find(b => b.id === tipoBiciId) || null;
-      this.calcolaTotale();
-    });
-  }
 
   onAccessorioChange(event: any, accessorio: Accessorio) {
     if (event.target.checked) {
@@ -175,7 +168,9 @@ export class BookingFormComponent implements OnInit, OnDestroy {
       accessoriPayload
     ).subscribe({
       next: () => this.router.navigate(['/booking/list']),
-      error: err => console.error(err)
+      error: (err) => {
+      this.formError = err.error?.message || 'Errore sconosciuto durante la prenotazione.';
+  }
     });
   }
 
@@ -198,14 +193,19 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     }
   }
 
-onLoginClick() {
-  this.saveFormState();  // salva i dati del form
-  this.router.navigate(['/login'], { queryParams: { requestedUrl: '/booking/form' } });
-}
+  onLoginClick() {
+    this.saveFormState();  // salva i dati del form
+    this.router.navigate(['/login'], { queryParams: { requestedUrl: '/booking/form' } });
+  }
 
-onRegisterClick() {
-  this.saveFormState();
-  this.router.navigate(['/register'], { queryParams: { requestedUrl: '/booking/form' } });
-}
+  onRegisterClick() {
+    this.saveFormState();
+    this.router.navigate(['/register'], { queryParams: { requestedUrl: '/booking/form' } });
+  }
+
+  ngOnDestroy() {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
 
 }

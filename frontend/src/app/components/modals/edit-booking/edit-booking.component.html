@@ -2,7 +2,9 @@
   <h4 class="modal-title">Modifica prenotazione #{{ prenotazioneId }}</h4>
   <button type="button" class="btn-close" (click)="dismiss()"></button>
 </div>
+
 <div class="modal-body">
+  <!-- Loading spinner -->
   <div *ngIf="isLoading" class="text-center p-4">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Caricamento...</span>
@@ -10,25 +12,18 @@
     <p class="mt-2">Caricamento prenotazione...</p>
   </div>
 
+  <!-- Messaggio di errore -->
   <div *ngIf="errorMessage" class="alert alert-danger">
     {{ errorMessage }}
     <button class="btn btn-sm btn-outline-danger mt-2" (click)="caricaPrenotazione()">Riprova</button>
   </div>
 
+  <!-- Form di modifica -->
   <form [formGroup]="updateForm" *ngIf="!isLoading && !errorMessage">
     <!-- Data ritiro -->
     <div class="mb-3">
       <label class="form-label">Data ritiro</label>
       <input type="date" class="form-control" formControlName="dataRitiro">
-    </div>
-
-    <!-- Punto vendita -->
-    <div class="mb-3">
-      <label class="form-label">Punto vendita</label>
-      <select class="form-select" formControlName="puntoVenditaId">
-        <option value="">Seleziona</option>
-        <option *ngFor="let pv of puntiVendita$ | async" [value]="pv.id">{{ pv.nome }}</option>
-      </select>
     </div>
 
     <!-- Orario ritiro -->
@@ -51,22 +46,11 @@
       <label class="form-label">Orario riconsegna</label>
       <select class="form-select" formControlName="oraRiconsegna">
         <option value="">Seleziona</option>
-        <option *ngFor="let o of orariRiconsegna" [value]="o">{{ o }}</option>
+        <option *ngFor="let o of orariDisponibili" [value]="o">{{ o }}</option>
       </select>
     </div>
 
-    <!-- Bicicletta (dinamica in base al punto vendita) 
-    <div class="mb-3">
-      <label class="form-label">Bicicletta</label>
-      <select class="form-select" formControlName="tipoBiciId">
-        <option value="">Seleziona</option>
-        <option *ngFor="let bike of bikesDisponibili$ | async" [value]="bike.id">
-          {{ bike.categoria }} - {{ bike.taglia }}
-        </option>
-      </select>
-    </div>
-    -->
-
+    <!-- Copertura aggiuntiva -->
     <div class="mb-3">
       <label class="form-label">Copertura aggiuntiva (una sola)</label>
       <div *ngFor="let cop of coperture$ | async" class="form-check">
@@ -75,9 +59,29 @@
       </div>
     </div>
 
+    <!-- Accessori (checkbox) -->
+    <div class="mb-3">
+      <label class="form-label">Accessori</label>
 
+      <!-- Se la lista è in caricamento (o vuota prima del fetch) -->
+      <div *ngIf="listaAccessori.length === 0 && !isLoading" class="text-muted small">
+        Nessun accessorio disponibile.
+      </div>
+
+      <!-- Checkbox per ogni accessorio -->
+      <div *ngFor="let acc of listaAccessori; let i = index" class="form-check">
+        <input class="form-check-input" type="checkbox"
+              [formControlName]="i"
+              [id]="'acc-' + i">
+        <label class="form-check-label" [for]="'acc-' + i">
+          {{ acc.nome }} (+€{{ acc.prezzo }})
+        </label>
+      </div>
+    </div>
+
+    <!-- Totale calcolato -->
     <div class="mt-3 text-end">
-      <strong>Totale: €{{ getTotale() }}</strong>
+      <strong>Totale: €{{ getTotale() | number:'1.2-2' }}</strong>
     </div>
   </form>
 </div>
