@@ -56,41 +56,32 @@ delete(id: number){
   return this.http.delete<Prenotazione>(`/api/prenotazioni/${id}`);
 }
 
-update(  
-  id: number,
-  dataRitiro: Date,            // Date dal componente
-  puntoVenditaId: number,
-  oraRitiro: string,           // "HH:MM:SS"
-  dataOraRiconsegna: Date,     // Date dal componente
-  totale: number,
-  stato: StatoPrenotazione,
-  tipoBiciId: number,
-  coperturaId: number | null,
-  accessori: { accessorioId: number; quantita: number }[]){
-  const dataRitiroStr = dataRitiro.toISOString().split('T')[0];
-
-  const dataOraRiconsegnaStr = dataOraRiconsegna.toISOString().replace('Z', '').slice(0, 19);
-
+update(id: number, dataRitiro: string, puntoVenditaId: number, oraRitiro: string,
+       dataOraRiconsegna: string, totale: number, stato: StatoPrenotazione,
+       tipoBiciId: number, coperturaId: number | null,
+       accessori: { accessorioId: number; quantita: number }[]) {
   const body = {
-    dataRitiro: dataRitiroStr,
-    oraRitiro,
-    dataOraRiconsegna: dataOraRiconsegnaStr,
+    dataRitiro,
     puntoVenditaId,
-    stato,
+    oraRitiro,
+    dataOraRiconsegna,
     totale,
+    stato,
     righe: [
       {
         tipoBiciId,
-        coperturaId,
+        coperturaId: coperturaId ?? null,
         subtotale: totale,
         accessori
       }
     ]
   };
-  
   return this.http.put<Prenotazione>(`/api/prenotazioni/${id}`, body);
 }
 
+getById(id: number){
+  return this.http.get<ApiResponse<Prenotazione>>(`/api/prenotazioni/${id}`);
+}
 
 }
 

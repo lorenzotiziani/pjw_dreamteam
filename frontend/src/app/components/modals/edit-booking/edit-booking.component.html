@@ -1,40 +1,87 @@
-
-<div class="p-3">
-  <div class="modal-header">
-    <h2 class="modal-title">Modifica prenotazione</h2>
-    <button type="button" class="btn-close" (click)="dismissModal()"></button>
+<div class="modal-header">
+  <h4 class="modal-title">Modifica prenotazione #{{ prenotazioneId }}</h4>
+  <button type="button" class="btn-close" (click)="dismiss()"></button>
+</div>
+<div class="modal-body">
+  <div *ngIf="isLoading" class="text-center p-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Caricamento...</span>
+    </div>
+    <p class="mt-2">Caricamento prenotazione...</p>
   </div>
 
-  <form [formGroup]="sessionForm">
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+    <button class="btn btn-sm btn-outline-danger mt-2" (click)="caricaPrenotazione()">Riprova</button>
+  </div>
 
-    <div class="mb-4">
-      <label class="form-label">Title:</label>
-      <input type="text" class="form-control" formControlName="title" required/>
+  <form [formGroup]="updateForm" *ngIf="!isLoading && !errorMessage">
+    <!-- Data ritiro -->
+    <div class="mb-3">
+      <label class="form-label">Data ritiro</label>
+      <input type="date" class="form-control" formControlName="dataRitiro">
     </div>
 
-    <div class="mb-4">
-      <label class="form-label">Starts at:</label>
-      <input type="date" class="form-control" formControlName="startsAt"
-      />
+    <!-- Punto vendita -->
+    <div class="mb-3">
+      <label class="form-label">Punto vendita</label>
+      <select class="form-select" formControlName="puntoVenditaId">
+        <option value="">Seleziona</option>
+        <option *ngFor="let pv of puntiVendita$ | async" [value]="pv.id">{{ pv.nome }}</option>
+      </select>
     </div>
 
-    <div class="mb-4">
-      <label class="form-label">Duration minutes:</label>
-      <input type="number" class="form-control" min="10" formControlName="durationMinutes" />
+    <!-- Orario ritiro -->
+    <div class="mb-3">
+      <label class="form-label">Orario ritiro</label>
+      <select class="form-select" formControlName="oraRitiro">
+        <option value="">Seleziona</option>
+        <option *ngFor="let o of orariDisponibili" [value]="o">{{ o }}</option>
+      </select>
     </div>
 
-    <div class="mb-4">
-      <label class="form-label">Max participants:</label>
-      <input type="number" class="form-control" min="5" formControlName="maxParticipants" />
+    <!-- Data riconsegna -->
+    <div class="mb-3">
+      <label class="form-label">Data riconsegna</label>
+      <input type="date" class="form-control" formControlName="dataRiconsegna">
     </div>
 
-    <div class="d-grid">
-      <button 
-        type="button" 
-        class="btn btn-primary" 
-        (click)="closeModal()"
-        [disabled]="!sessionForm.valid"
-      >Add</button>
+    <!-- Orario riconsegna -->
+    <div class="mb-3">
+      <label class="form-label">Orario riconsegna</label>
+      <select class="form-select" formControlName="oraRiconsegna">
+        <option value="">Seleziona</option>
+        <option *ngFor="let o of orariRiconsegna" [value]="o">{{ o }}</option>
+      </select>
+    </div>
+
+    <!-- Bicicletta (dinamica in base al punto vendita) -->
+    <div class="mb-3">
+      <label class="form-label">Bicicletta</label>
+      <select class="form-select" formControlName="tipoBiciId">
+        <option value="">Seleziona</option>
+        <option *ngFor="let bike of bikesDisponibili$ | async" [value]="bike.id">
+          {{ bike.categoria }} - {{ bike.taglia }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Copertura (radio) -->
+    <div class="mb-3">
+      <label class="form-label">Copertura aggiuntiva (una sola)</label>
+      <div *ngFor="let cop of coperture$ | async" class="form-check">
+        <input class="form-check-input" type="radio" formControlName="coperturaId" [value]="cop.id">
+        <label class="form-check-label">{{ cop.nome }} (+€{{ cop.prezzo }})</label>
+      </div>
+    </div>
+
+
+    <div class="mt-3 text-end">
+      <strong>Totale: €{{ getTotale() }}</strong>
     </div>
   </form>
+</div>
+<div class="modal-footer" *ngIf="!isLoading && !errorMessage">
+  <button type="button" class="btn btn-secondary" (click)="dismiss()">Annulla</button>
+  <button type="button" class="btn btn-primary" (click)="confermaModifica()">Salva modifiche</button>
 </div>

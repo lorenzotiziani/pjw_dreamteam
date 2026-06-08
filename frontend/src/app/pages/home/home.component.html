@@ -10,7 +10,7 @@
     </div>  
       <!-- Messaggio user autenticato -->
       <ng-container *ngIf="user$ | async as user">
-        <div class="alert alert-light d-inline-flex align-items-center gap-2 shadow-sm" role="alert">
+        <div class="alert alert-light d-inline-flex align-items-center gap-2 shadow-sm m-4" role="alert">
           <i class="fas fa-user-circle fs-5"></i>
           <span class="fw-semibold">{{ user.email }}</span>
         </div>

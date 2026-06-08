@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditBookingComponent } from '../../components/modals/edit-booking/edit-booking.component';
 import { Accessorio } from '../../entities/Accessorio';
+import { LogicaService } from '../../services/logica.service';
 
 @Component({
   selector: 'app-booking-list',
@@ -18,6 +19,8 @@ export class BookingListComponent implements OnInit{
   protected authSrv = inject(AuthService);
   protected router = inject(Router);
   protected modalService = inject(NgbModal);
+  protected logicSrv = inject(LogicaService);
+
   prenotazioni: Prenotazione[] = [];
   loading = false;
   error: string | null = null;
@@ -33,13 +36,10 @@ export class BookingListComponent implements OnInit{
     this.caricaPrenotazioni();
   }
 
-  openModal(id: number) {
-    this.modalService.open(EditBookingComponent).result
-      .then((formValues) => {
-        this.prenotazioniSrv.update(id, formValues.dataRitiro, formValues.puntoVenditaId, formValues.oraRitiro, formValues.dataOraRiconsegna,
-         formValues.totale, StatoPrenotazione.CONFERMATA, formValues.tipoBiciId,  formValues.coperturaId,  this.accessoriPayload
-        );
-      });
+  openModal(id: string) {
+    const modalRef = this.modalService.open(EditBookingComponent);
+    modalRef.componentInstance.prenotazioneId = id;
+    modalRef.result.catch(() => {}); // evita errore unhandled promise
   }
 
   caricaPrenotazioni() {
@@ -57,14 +57,14 @@ export class BookingListComponent implements OnInit{
     });
   }
 
-  async cancellaPrenotazione(id: number) {
+  async cancellaPrenotazione(id: string) {
     const conferma = confirm('Sei sicuro di voler cancellare questa prenotazione?');
     if (!conferma) return;
 
-    this.prenotazioniSrv.delete(id).subscribe({
+    this.prenotazioniSrv.delete(Number(id)).subscribe({
       next: () => {
         // Rimuovi dalla lista locale
-        this.prenotazioni = this.prenotazioni.filter(p => Number(p.id) !== id);
+        this.prenotazioni = this.prenotazioni.filter(p => p.id !== id);
       },
       error: (err) => {
         console.error('Errore cancellazione', err);

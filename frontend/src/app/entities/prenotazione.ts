@@ -1,4 +1,6 @@
+import { TipoBici } from "./Bike";
 import { PuntoVendita } from "./puntoVendita"
+
 
 export enum StatoPrenotazione {
   IN_ATTESA = 'IN_ATTESA',
@@ -8,15 +10,24 @@ export enum StatoPrenotazione {
   CANCELLATA = 'CANCELLATA'
 }
 
+export type RigaPrenotazione = {
+  tipoBiciId: string;
+  tipoBici: TipoBici
+  coperturaId: string | null;
+  subtotale: string;
+  accessori: { accessorioId: string; quantita: number }[];
+};
+
 export type Prenotazione = {
-  id: string,
-  utenteId: string,
-  puntoVenditaId: number,
-  puntoVendita: PuntoVendita
-  dataRitiro: Date,
-  oraRitiro: Date,
-  dataOraRiconsegna: Date,
-  stato: StatoPrenotazione,
-  totale: number,
-  creataIl: Date
-}
+  id: string;
+  utenteId: string;
+  puntoVenditaId: string;
+  puntoVendita: PuntoVendita;
+  dataRitiro: string;
+  oraRitiro: string;
+  dataOraRiconsegna: string;
+  stato: StatoPrenotazione;
+  totale: number;
+  creataIl: string;
+  righe: RigaPrenotazione[];
+};

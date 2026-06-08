@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { combineLatest, firstValueFrom, map, of, startWith, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { combineLatest, firstValueFrom, map, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { Accessorio } from '../../entities/Accessorio';
 import { TipoBici } from '../../entities/Bike';
 import { Copertura } from '../../entities/Copertura';
@@ -12,6 +12,7 @@ import { BikeService } from '../../services/bike.service';
 import { CoperturaService } from '../../services/copertura.service';
 import { PrenotazioneService } from '../../services/prenotazione.service';
 import { PuntoVenditaService } from '../../services/punto-vendita.service';
+import { LogicaService } from '../../services/logica.service';
 
 @Component({
   selector: 'app-booking-form',
@@ -21,13 +22,15 @@ import { PuntoVenditaService } from '../../services/punto-vendita.service';
 })
 export class BookingFormComponent implements OnInit, OnDestroy {
   protected fb = inject(FormBuilder);
+  protected authSrv = inject(AuthService);
+  protected router = inject(Router);
+
   protected puntiVenditaSrv = inject(PuntoVenditaService);
   protected bikeSrv = inject(BikeService);
   protected coperturaSrv = inject(CoperturaService);
-  protected authSrv = inject(AuthService);
-  protected router = inject(Router);
   protected prenotazioneSrv = inject(PrenotazioneService);
   protected accessorioSrv = inject(AccessorioService);
+  protected logicSrv = inject(LogicaService); 
 
   protected destroyed$ = new Subject<void>();
 
@@ -48,6 +51,7 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
   bookingForm = this.fb.group({
     data: ['', Validators.required],
+    dataRiconsegna: ['', Validators.required], 
     puntoVendita: ['', Validators.required],
     ora: ['', Validators.required],
     oraRiconsegna: ['', Validators.required],
@@ -55,7 +59,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     coperturaId: ['']
   });
 
-  // Observable delle bici disponibili (con stock)
   bikesDisponibili$ = combineLatest([
     this.bookingForm.get('puntoVendita')!.valueChanges.pipe(startWith(''))
   ]).pipe(
@@ -66,8 +69,8 @@ export class BookingFormComponent implements OnInit, OnDestroy {
           stockArray
             .map(s => ({
               ...s.tipoBici,
-              id: String(s.tipoBici.id),                         // number → string
-              prezzoMezzaGiornata: Number(s.tipoBici.prezzoMezzaGiornata) // string → number
+              id: String(s.tipoBici.id),
+              prezzoMezzaGiornata: Number(s.tipoBici.prezzoMezzaGiornata)
             }))
             .filter(bike => {
               const stockItem = stockArray.find(s => String(s.tipoBici.id) === bike.id);
@@ -79,44 +82,29 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   );
 
   ngOnInit() {
-    this.generaOrariDisponibili();
+    this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
     this.setupOrariRiconsegnaListener();
   }
 
-  // Genera orari di ritiro dalle 9 alle 18
-  generaOrariDisponibili(): void {
-    for (let ora = 9; ora <= 17; ora++) {
-      this.orariDisponibili.push(`${ora.toString().padStart(2, '0')}:00 - ${(ora + 1).toString().padStart(2, '0')}:00`);
-    }
+  ngOnDestroy() {
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
-  // Ascolta i cambi dell'orario di ritiro e popola di conseguenza gli orari di riconsegna
   setupOrariRiconsegnaListener(): void {
     this.bookingForm.get('ora')?.valueChanges
       .pipe(takeUntil(this.destroyed$))
       .subscribe(oraRitiro => {
-        if (!oraRitiro) {
-          this.orariRiconsegna = [];
-          return;
-        }
-        // Estrae l'ora di fine della fascia di ritiro (es. "09:00 - 10:00" -> "10:00")
-        const fineRitiro = oraRitiro.split(' - ')[1];
-        const oraFine = parseInt(fineRitiro.split(':')[0]);
-        this.orariRiconsegna = [];
-        for (let ora = oraFine; ora <= 17; ora++) {
-          this.orariRiconsegna.push(`${ora.toString().padStart(2, '0')}:00 - ${(ora + 1).toString().padStart(2, '0')}:00`);
-        }
-        // Resetta il campo oraRiconsegna se il valore selezionato non è più valido
-        const currentRiconsegna = this.bookingForm.get('oraRiconsegna')?.value;
-        if (currentRiconsegna && !this.orariRiconsegna.includes(currentRiconsegna)) {
+        this.orariRiconsegna = this.logicSrv.generaOrariRiconsegna(oraRitiro!);
+        const current = this.bookingForm.get('oraRiconsegna')?.value;
+        if (current && !this.orariRiconsegna.includes(current)) {
           this.bookingForm.patchValue({ oraRiconsegna: '' });
         }
       });
   }
 
-  // Quando si seleziona una bici
   onBiciChange(tipoBiciId: string) {
-    this.bikesDisponibili$.pipe(take(1)).subscribe(bikes => {
+    this.bikesDisponibili$.pipe(takeUntil(this.destroyed$)).subscribe(bikes => {
       this.biciSelezionata = bikes.find(b => b.id === tipoBiciId) || null;
       this.calcolaTotale();
     });
@@ -138,113 +126,58 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   }
 
   calcolaTotale() {
-    let totale = Number(this.biciSelezionata?.prezzoMezzaGiornata || 0);
-    if (this.coperturaSelezionata) {
-      totale += Number(this.coperturaSelezionata.prezzo);
-    }
-    for (const acc of this.accessoriSelezionati) {
-      totale += Number(acc.prezzo);
-    }
-    this.prezzoTotale = totale;
+    const prezzoBici = Number(this.biciSelezionata?.prezzoMezzaGiornata || 0);
+    const prezzoCopertura = Number(this.coperturaSelezionata?.prezzo || 0);
+    const prezziAccessori = this.accessoriSelezionati.map(a => Number(a.prezzo));
+    this.prezzoTotale = this.logicSrv.calcolaTotale(prezzoBici, prezzoCopertura, prezziAccessori);
   }
 
-async addPrenotazione() {
-  if (this.bookingForm.invalid) {
-    console.warn('Form invalido');
-    return;
+  async addPrenotazione() {
+    if (this.bookingForm.invalid) return;
+
+    const user = await firstValueFrom(this.user$);
+    if (!user || !user.id) return;
+
+    const form = this.bookingForm.value;
+
+    // Data ritiro
+    const dataRitiro = new Date(form.data!);
+    const dataRiconsegna = new Date(form.dataRiconsegna!);
+    // Orari
+    const oraRitiroTime = this.logicSrv.fasciaToOraTime(form.ora!);
+    const dataOraRiconsegna = this.logicSrv.fasciaToDate(dataRiconsegna, form.oraRiconsegna!);
+
+    // ID numerici
+    const utenteIdNum = Number(user.id);
+    const puntoVenditaIdNum = Number(form.puntoVendita);
+    const tipoBiciIdNum = Number(form.tipoBiciId);
+    const coperturaIdNum = this.coperturaSelezionata?.id ? Number(this.coperturaSelezionata.id) : null;
+
+    const accessoriPayload = this.accessoriSelezionati.map(acc => ({
+      accessorioId: Number(acc.id),
+      quantita: 1
+    }));
+
+    const totale = this.prezzoTotale;
+
+    this.prenotazioneSrv.add(
+      utenteIdNum,
+      dataRitiro,
+      puntoVenditaIdNum,
+      oraRitiroTime,
+      dataOraRiconsegna,
+      totale,
+      StatoPrenotazione.CONFERMATA,
+      tipoBiciIdNum,
+      coperturaIdNum,
+      accessoriPayload
+    ).subscribe({
+      next: () => this.router.navigate(['/booking/list']),
+      error: err => console.error(err)
+    });
   }
 
-  const user = await firstValueFrom(this.user$);
-  if (!user || !user.id) {
-    console.error('Utente non autenticato o ID mancante');
-    return;
-  }
-
-  const formValue = this.bookingForm.value;
-
-  // Data ritiro
-  const dataRitiroStr = formValue.data; // è già in formato YYYY-MM-DD
-  if (!dataRitiroStr) {
-    console.error('Data ritiro mancante');
-    return;
-  }
-
-  // Ora ritiro (es. "09:00 - 10:00" -> "09:00:00")
-  const oraFasciaRitiro = formValue.ora;
-  if (!oraFasciaRitiro) {
-    console.error('Orario ritiro mancante');
-    return;
-  }
-  const oraInizioRitiro = oraFasciaRitiro.split(' - ')[0];
-  const oraRitiroStr = `${oraInizioRitiro}:00`;
-
-  // Ora riconsegna
-  const oraFasciaRiconsegna = formValue.oraRiconsegna;
-  if (!oraFasciaRiconsegna) {
-    console.error('Orario riconsegna mancante');
-    return;
-  }
-  const oraInizioRiconsegna = oraFasciaRiconsegna.split(' - ')[0];
-  const dataOraRiconsegna = new Date(dataRitiroStr);
-  const [ore, minuti] = oraInizioRiconsegna.split(':').map(Number);
-  dataOraRiconsegna.setHours(ore, minuti, 0, 0);
-  const dataOraRiconsegnaStr = dataOraRiconsegna.toISOString();
-
-  const dataRitiroDate = new Date(formValue.data!);  // "2026-06-14" → Date
-  const dataOraRiconsegnaDate = new Date(dataOraRiconsegnaStr); // stringa ISO → Date
-
-  // ID numerici
-  const utenteIdNum = Number(user.id);
-  const puntoVenditaIdNum = Number(formValue.puntoVendita);
-  const tipoBiciIdNum = Number(formValue.tipoBiciId);
-  const coperturaIdNum = this.coperturaSelezionata?.id ? Number(this.coperturaSelezionata.id) : null;
-
-  // Accessori
-  const accessoriPayload = this.accessoriSelezionati.map(acc => ({
-    accessorioId: Number(acc.id),
-    quantita: 1
-  }));
-
-  const totale = Number(this.prezzoTotale);
-  if (isNaN(totale)) {
-    console.error('Totale non valido');
-    return;
-  }
-
-  // Verifica che nessun ID sia NaN
-  if (isNaN(utenteIdNum) || isNaN(puntoVenditaIdNum) || isNaN(tipoBiciIdNum)) {
-    console.error('Uno o più ID non sono numeri validi');
-    return;
-  }
-
-  // Chiamata al service
-  this.prenotazioneSrv.add(
-    utenteIdNum,
-    dataRitiroDate,
-    puntoVenditaIdNum,
-    oraRitiroStr,
-    dataOraRiconsegnaDate,
-    totale,
-    StatoPrenotazione.CONFERMATA,
-    tipoBiciIdNum,
-    coperturaIdNum,
-    accessoriPayload
-  ).subscribe({
-    next: (res) => {
-      console.log('Prenotazione creata', res);
-      this.router.navigate(['/booking/list']);
-    },
-    error: (err) => {
-      console.error('Errore dettagliato:', err);
-      if (err.error?.details) console.error('Details:', err.error.details);
-    }
-  });
-}
   login() {
     this.router.navigate(['/login']);
-  }
-    ngOnDestroy() {
-    this.destroyed$.next();
-    this.destroyed$.complete();
   }
 }

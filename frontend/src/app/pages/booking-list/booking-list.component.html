@@ -1,44 +1,27 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Le mie prenotazioni</h2>
+    <h2 class="fw-semibold">
+      <i class="bi bi-calendar-check me-2"></i>Le mie prenotazioni
+    </h2>
   </div>
 
-  <div *ngIf="error" class="alert alert-danger">
-    {{ error }}
+  <div *ngIf="error" class="alert alert-danger d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
   </div>
 
-  <div *ngIf="!loading && prenotazioni.length === 0" class="alert alert-info">
-    Non hai ancora effettuato nessuna prenotazione.
+  <div *ngIf="!loading && prenotazioni.length === 0" class="alert alert-info text-center py-5">
+    <i class="bi bi-emoji-frown fs-1 d-block mb-3"></i>
+    <p class="mb-0">Non hai ancora effettuato nessuna prenotazione.</p>
+    <button class="btn btn-primary mt-3" routerLink="/booking/form">Prenota ora</button>
   </div>
 
-  <div class="row">
-    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let p of prenotazioni">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">Prenotazione #{{ p.id }}</h5>
-          <p class="card-text">
-            <strong>Negozio</strong> {{ p.puntoVendita.nome }} - ({{ p.puntoVendita.citta }})<br>
-            <strong>Data ritiro:</strong> {{ p.dataRitiro | date:'dd/MM/yyyy' }}<br>
-            <strong>Orario ritiro:</strong> {{ p.oraRitiro |date:'HH:mm' }}<br>
-            <strong>Riconsegna:</strong> {{ p.dataOraRiconsegna | date:'dd/MM/yyyy HH:mm' }}<br>
-            <strong>Totale:</strong> €{{ p.totale }}<br>
-            <strong>Stato:</strong>
-            <span class="badge" [ngClass]="{
-              'bg-warning': p.stato === 'IN_ATTESA',
-              'bg-success': p.stato === 'CONFERMATA',
-              'bg-danger': p.stato === 'CANCELLATA'
-            }">{{ p.stato }}</span>
-          </p>
-        </div>
-        <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between">
-            <button class="btn btn-sm btn-outline-danger" (click)="cancellaPrenotazione(+p.id)">
-              <i class="bi bi-trash"></i> Cancella
-            </button>
-            <button class="btn btn-primary" (click)="openModal(+p.id)">
-              <i class="bi bi-trash"></i> Modifica
-            </button>
-        </div>
-      </div>
+  <div *ngIf="!loading && prenotazioni.length > 0" class="row g-4">
+    <div class="col-md-6 col-lg-4" *ngFor="let p of prenotazioni">
+      <app-card-bike
+        [prenotazione]="p"
+        (cancella)="cancellaPrenotazione($event)"
+        (modifica)="openModal($event)">
+      </app-card-bike>
     </div>
   </div>
 </div>
