@@ -38,7 +38,7 @@
       <div class="row">
         <i class="bi bi-bicycle me-1 text-secondary"></i>
         <span class="text-muted">Bicicletta:</span>
-        <strong>{{ prenotazione.righe?.[0]?.tipoBici?.categoria || '—' }}</strong>
+        <strong>{{ prenotazione.righe?.[0]?.tipoBici?.categoria }} - ({{ prenotazione.righe?.[0]?.tipoBici?.prezzoMezzaGiornata | currency}})</strong>
       </div>
 
       <div *ngIf="prenotazione.righe?.[0]?.accessori?.length" class="row">
