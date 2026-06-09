@@ -59,24 +59,21 @@
       </div>
     </div>
 
-    <!-- Accessori (checkbox) -->
     <div class="mb-3">
       <label class="form-label">Accessori</label>
-
-      <!-- Se la lista è in caricamento (o vuota prima del fetch) -->
-      <div *ngIf="listaAccessori.length === 0 && !isLoading" class="text-muted small">
-        Nessun accessorio disponibile.
-      </div>
-
-      <!-- Checkbox per ogni accessorio -->
-      <div *ngFor="let acc of listaAccessori; let i = index" class="form-check">
-        <input class="form-check-input" type="checkbox"
-              [formControlName]="i"
-              [id]="'acc-' + i">
-        <label class="form-check-label" [for]="'acc-' + i">
-          {{ acc.nome }} (+€{{ acc.prezzo }})
-        </label>
-      </div>
+      <div *ngIf="listaAccessori.length === 0" class="text-muted small">Nessun accessorio disponibile.</div>
+      
+      <!-- Mostra le checkbox solo se ci sono accessori e il FormArray è pronto -->
+      <ng-container *ngIf="listaAccessori.length > 0 && accessoriArray.length > 0">
+        <div *ngFor="let acc of listaAccessori; let i = index" class="form-check">
+          <input class="form-check-input" type="checkbox"
+            [formControl]="getAccessorioControl(i)"
+            [id]="'acc-' + i">
+          <label class="form-check-label" [for]="'acc-' + i">
+            {{ acc.nome }} (+€{{ acc.prezzo }})
+          </label>
+        </div>
+      </ng-container>
     </div>
 
     <!-- Totale calcolato -->

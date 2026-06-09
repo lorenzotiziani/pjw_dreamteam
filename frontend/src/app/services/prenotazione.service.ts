@@ -47,6 +47,39 @@ add(
   return this.http.post<Prenotazione>('/api/prenotazioni', body);
 }
 
+addMultiRighe(
+  utenteId: number,
+  dataRitiro: Date,
+  puntoVenditaId: number,
+  oraRitiro: string,
+  dataOraRiconsegna: Date,
+  totale: number,
+  stato: StatoPrenotazione,
+  coperturaId: number | null,
+  accessori: { accessorioId: number; quantita: number }[],
+  righe: { tipoBiciId: number; quantita: number }[]
+) {
+  const dataRitiroStr = dataRitiro.toISOString().split('T')[0];
+  const dataOraRiconsegnaStr = dataOraRiconsegna.toISOString().replace('Z', '').slice(0, 19);
+
+  const body = {
+    utenteId,
+    puntoVenditaId,
+    dataRitiro: dataRitiroStr,
+    oraRitiro,
+    dataOraRiconsegna: dataOraRiconsegnaStr,
+    stato,
+    totale,
+    righe: righe.map(r => ({
+      tipoBiciId: r.tipoBiciId,
+      coperturaId: coperturaId, // stessa copertura per tutte le righe
+      subtotale: 0, // il subtotale sarà calcolato dal backend o puoi calcolarlo qui per ogni riga
+      accessori: accessori // stesso set di accessori per tutte le righe (oppure no, dipende dal backend)
+    }))
+  };
+
+  return this.http.post<Prenotazione>('/api/prenotazioni', body);
+}
 mie(){
   return this.http.get<ApiResponse<Prenotazione[]>>('/api/prenotazioni/mie')
   .pipe(map(response => response.data));

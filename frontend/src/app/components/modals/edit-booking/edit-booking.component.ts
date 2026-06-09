@@ -75,6 +75,10 @@ export class EditBookingComponent implements OnInit, OnDestroy {
     return this.updateForm.get('accessori') as FormArray;
   }
 
+  getAccessorioControl(i: number): FormControl {
+  return this.accessoriArray.controls[i] as FormControl;
+  }
+
   listaAccessori: any[] = [];
 
   async ngOnInit() {

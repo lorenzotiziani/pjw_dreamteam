@@ -74,7 +74,6 @@ export class BookingListComponent implements OnInit {
         }
       });
     }).catch(() => {
-      // Modale chiuso con dismiss (annulla)
     }).finally(() => {
       triggerButton?.focus();
     });

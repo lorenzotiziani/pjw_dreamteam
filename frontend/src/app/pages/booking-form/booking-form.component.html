@@ -46,14 +46,38 @@
         </select>
       </div>
 
+      <!-- Sezione Biciclette -->
       <div class="mb-4">
-        <label for="tipologiaBicicletta" class="form-label fw-semibold">Bicicletta <span class="text-danger">*</span></label>
-        <select class="form-select" formControlName="tipoBiciId">
-          <option value="" disabled selected>Seleziona una bici</option>
-          <option *ngFor="let bike of bikesDisponibili$ | async" [value]="bike.id">
-            {{ bike.categoria }} - {{ bike.taglia }} - {{ bike.motorizzazione }} - {{bike.prezzoMezzaGiornata | currency}}
-          </option>
-        </select>
+        <label class="form-label fw-semibold">Biciclette <span class="text-danger">*</span></label>
+        
+        <div formArrayName="righe">
+          <div *ngFor="let riga of righeArray.controls; let i = index" 
+              [formGroupName]="i"
+              class="row g-2 align-items-center mb-2 p-2 border rounded">
+            <div class="col-md-8">
+              <select class="form-select" formControlName="tipoBiciId">
+                <option value="">Seleziona bici</option>
+                <!-- Usa bikesDisponibiliList (array sincrono) -->
+                <option *ngFor="let bike of bikesDisponibiliList" [value]="bike.id">
+                  {{ bike.categoria }} - {{ bike.taglia }} (€{{ bike.prezzoMezzaGiornata }})
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="number" class="form-control" formControlName="quantita" min="1" placeholder="Qtà">
+            </div>
+            <div class="col-md-1">
+              <button type="button" class="btn btn-outline-danger btn-sm" (click)="rimuoviRiga(i)"
+                      *ngIf="righeArray.length > 1">
+                Elimina
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" (click)="aggiungiRiga()">
+          + Aggiungi altra bici
+        </button>
       </div>
 
       <div class="mb-4">
