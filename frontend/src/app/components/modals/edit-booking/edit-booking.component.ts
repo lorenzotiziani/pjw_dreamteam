@@ -77,7 +77,7 @@ export class EditBookingComponent implements OnInit, OnDestroy {
 
   getAccessorioControl(i: number): FormControl {
   return this.accessoriArray.controls[i] as FormControl;
-  }
+}
 
   listaAccessori: any[] = [];
 

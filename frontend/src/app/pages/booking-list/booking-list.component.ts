@@ -1,11 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { PrenotazioneService } from '../../services/prenotazione.service';
-import { Prenotazione, StatoPrenotazione } from '../../entities/prenotazione';
+import { Prenotazione } from '../../entities/prenotazione';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditBookingComponent } from '../../components/modals/edit-booking/edit-booking.component';
-import { Accessorio } from '../../entities/Accessorio';
 import { LogicaService } from '../../services/logica.service';
 
 @Component({
@@ -24,13 +23,7 @@ export class BookingListComponent implements OnInit {
   prenotazioni: Prenotazione[] = [];
   loading = false;
   error: string | null = null;
-
-  accessoriSelezionati: Accessorio[] = [];
-
-  accessoriPayload = this.accessoriSelezionati.map(acc => ({
-    accessorioId: Number(acc.id),
-    quantita: 1
-  }));
+  cancellingId: string | null = null;  
 
   ngOnInit(): void {
     this.caricaPrenotazioni();
@@ -45,14 +38,12 @@ export class BookingListComponent implements OnInit {
     const triggerButton = document.activeElement as HTMLElement;
 
     modalRef.result.then((updatedData: any) => {
-      // Recupera la prenotazione originale per ottenere lo stato attuale
       const prenotazioneOriginale = this.prenotazioni.find(p => p.id === id);
       if (!prenotazioneOriginale) {
         alert('Prenotazione non trovata nella lista.');
         return;
       }
 
-      // Chiama il servizio con tutti i 10 parametri richiesti
       this.prenotazioniSrv.update(
         Number(id),
         updatedData.dataRitiro,
@@ -62,29 +53,29 @@ export class BookingListComponent implements OnInit {
         updatedData.totale,
         prenotazioneOriginale.stato,
         updatedData.tipoBiciId,
-        updatedData.coperturaId ?? null, 
-        updatedData.accessoriPayload 
+        updatedData.coperturaId ?? null,
+        updatedData.accessoriPayload
       ).subscribe({
-        next: () => {
-          this.caricaPrenotazioni();
-        },
+        next: () => this.caricaPrenotazioni(),
         error: (err) => {
           console.error('Errore aggiornamento', err);
           alert('Errore durante il salvataggio delle modifiche.');
         }
       });
     }).catch(() => {
+      // modal dismiss
     }).finally(() => {
       triggerButton?.focus();
     });
   }
 
   caricaPrenotazioni() {
+    this.loading = true;
+    this.error = null;
     this.prenotazioniSrv.mie().subscribe({
       next: (data) => {
         this.prenotazioni = data;
         this.loading = false;
-        console.log(data);
       },
       error: (err) => {
         console.error('Errore nel caricamento', err);
@@ -94,17 +85,20 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  async cancellaPrenotazione(id: string) {
+  cancellaPrenotazione(id: string) {
     const conferma = confirm('Sei sicuro di voler cancellare questa prenotazione?');
     if (!conferma) return;
 
+    this.cancellingId = id;
     this.prenotazioniSrv.delete(Number(id)).subscribe({
       next: () => {
         this.prenotazioni = this.prenotazioni.filter(p => p.id !== id);
+        this.cancellingId = null;
       },
       error: (err) => {
         console.error('Errore cancellazione', err);
         alert('Errore durante la cancellazione.');
+        this.cancellingId = null;
       }
     });
   }

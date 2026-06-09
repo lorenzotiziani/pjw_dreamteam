@@ -6,13 +6,15 @@
   <div class="card-body p-4">
     <form [formGroup]="bookingForm" (ngSubmit)="addPrenotazione()">
 
+      <!-- Data ritiro -->
       <div class="mb-4">
         <label class="form-label fw-semibold">Data ritiro <span class="text-danger">*</span></label>
         <input type="date" class="form-control" formControlName="data">
       </div>
 
+      <!-- Punto vendita -->
       <div class="mb-4">
-        <label for="puntoVendita" class="form-label fw-semibold">Punto vendita <span class="text-danger">*</span></label>
+        <label class="form-label fw-semibold">Punto vendita <span class="text-danger">*</span></label>
         <select class="form-select" formControlName="puntoVendita">
           <option value="" disabled selected>Seleziona un punto vendita</option>
           <option *ngFor="let p of puntoVendita$ | async" [value]="p.id">
@@ -21,43 +23,41 @@
         </select>
       </div>
 
+      <!-- Orario ritiro -->
       <div class="mb-4">
-        <label for="fascia-oraria" class="form-label fw-semibold">Orario ritiro <span class="text-danger">*</span></label>
-        <select class="form-select" id="fascia-oraria" formControlName="ora">
+        <label class="form-label fw-semibold">Orario ritiro <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="ora">
           <option value="" disabled selected>Seleziona un orario</option>
-          <option *ngFor="let orario of orariDisponibili" [value]="orario">
-            {{ orario }}
-          </option>
+          <option *ngFor="let orario of orariDisponibili" [value]="orario">{{ orario }}</option>
         </select>
       </div>
 
+      <!-- Data riconsegna -->
       <div class="mb-4">
         <label class="form-label fw-semibold">Data riconsegna <span class="text-danger">*</span></label>
         <input type="date" class="form-control" formControlName="dataRiconsegna">
       </div>
 
+      <!-- Orario riconsegna -->
       <div class="mb-4">
-        <label for="fascia-oraria-riconsegna" class="form-label fw-semibold">Orario riconsegna <span class="text-danger">*</span></label>
-        <select class="form-select" id="fascia-oraria-riconsegna" formControlName="oraRiconsegna">
+        <label class="form-label fw-semibold">Orario riconsegna <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="oraRiconsegna">
           <option value="" disabled selected>Seleziona un orario</option>
-          <option *ngFor="let orario of orariDisponibili" [value]="orario">
-            {{ orario }}
-          </option>
+          <option *ngFor="let orario of orariDisponibili" [value]="orario">{{ orario }}</option>
         </select>
       </div>
 
-      <!-- Sezione Biciclette -->
+      <!-- Biciclette (array di righe) -->
       <div class="mb-4">
         <label class="form-label fw-semibold">Biciclette <span class="text-danger">*</span></label>
-        
+
         <div formArrayName="righe">
-          <div *ngFor="let riga of righeArray.controls; let i = index" 
-              [formGroupName]="i"
-              class="row g-2 align-items-center mb-2 p-2 border rounded">
+          <div *ngFor="let riga of righeArray.controls; let i = index"
+               [formGroupName]="i"
+               class="row g-2 align-items-center mb-2 p-2 border rounded">
             <div class="col-md-8">
               <select class="form-select" formControlName="tipoBiciId">
                 <option value="">Seleziona bici</option>
-                <!-- Usa bikesDisponibiliList (array sincrono) -->
                 <option *ngFor="let bike of bikesDisponibiliList" [value]="bike.id">
                   {{ bike.categoria }} - {{ bike.taglia }} (€{{ bike.prezzoMezzaGiornata }})
                 </option>
@@ -68,25 +68,26 @@
             </div>
             <div class="col-md-1">
               <button type="button" class="btn btn-outline-danger btn-sm" (click)="rimuoviRiga(i)"
-                      *ngIf="righeArray.length > 1">
-                Elimina
-              </button>
+                      *ngIf="righeArray.length > 1">Elimina</button>
             </div>
           </div>
         </div>
-        
+
         <button type="button" class="btn btn-outline-secondary btn-sm mt-2" (click)="aggiungiRiga()">
           + Aggiungi altra bici
         </button>
       </div>
 
+      <!-- Accessori globali -->
       <div class="mb-4">
         <label class="form-label fw-semibold">Accessori</label>
         <div class="row">
           <div class="col-md-6" *ngFor="let accessorio of accessori$ | async">
             <div class="form-check border p-3 rounded mb-2">
-              <input class="form-check-input" type="checkbox" [id]="accessorio.id" [value]="accessorio.id"
-                (change)="onAccessorioChange($event, accessorio)">
+              <input class="form-check-input" type="checkbox"
+                     [id]="accessorio.id"
+                     [value]="accessorio.id"
+                     (change)="onAccessorioChange($event, accessorio)">
               <label class="form-check-label w-100" [for]="accessorio.id">
                 <strong>{{ accessorio.nome }}</strong>
                 <span class="badge bg-primary ms-2">€{{ accessorio.prezzo }}</span>
@@ -96,13 +97,17 @@
         </div>
       </div>
 
+      <!-- Copertura globale -->
       <div class="mb-4">
         <label class="form-label fw-semibold">Copertura aggiuntiva (solo una)</label>
         <div class="row">
           <div class="col-md-6" *ngFor="let copertura of coperture$ | async">
             <div class="form-check border p-3 rounded mb-2">
-              <input class="form-check-input" type="radio" name="coperturaUnica" [id]="copertura.id"
-                [value]="copertura.id" (change)="onCoperturaSelezionata(copertura)">
+              <input class="form-check-input" type="radio"
+                     name="coperturaUnica"
+                     [id]="copertura.id"
+                     [value]="copertura.id"
+                     (change)="onCoperturaSelezionata(copertura)">
               <label class="form-check-label w-100" [for]="copertura.id">
                 <strong>{{ copertura.nome }}</strong>
                 <span class="badge bg-primary ms-2">€{{ copertura.prezzo }}</span>
@@ -113,14 +118,17 @@
         </div>
       </div>
 
+      <!-- Totale -->
       <div class="mb-4 text-end">
         <strong class="fs-5">Totale: €{{ prezzoTotale }}</strong>
       </div>
 
+      <!-- Errore -->
       <div *ngIf="formError" class="alert alert-danger">
         <i class="bi bi-exclamation-triangle me-2"></i> {{ formError }}
       </div>
 
+      <!-- Pulsante submit / login -->
       <ng-container *ngIf="user$ | async as user; else noAuth">
         <div class="d-grid">
           <button type="submit" class="btn btn-primary btn-lg" [disabled]="!bookingForm.valid">

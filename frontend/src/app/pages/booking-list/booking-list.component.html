@@ -9,13 +9,21 @@
     <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
   </div>
 
-  <div *ngIf="!loading && prenotazioni.length === 0" class="alert alert-info text-center py-5">
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Caricamento...</span>
+    </div>
+    <p class="mt-2 text-muted">Caricamento prenotazioni in corso...</p>
+  </div>
+
+  <div *ngIf="!loading && prenotazioni.length === 0 && !error" class="alert alert-info text-center py-5">
     <i class="bi bi-emoji-frown fs-1 d-block mb-3"></i>
     <p class="mb-0">Non hai ancora effettuato nessuna prenotazione.</p>
     <button class="btn btn-primary mt-3" routerLink="/booking/form">Prenota ora</button>
   </div>
 
-  <div *ngIf="!loading && prenotazioni.length> 0" class="row g-4">
+  <div *ngIf="!loading && prenotazioni.length > 0" class="row g-4">
     <div class="col-md-6 col-lg-4" *ngFor="let p of prenotazioni">
       <app-card-bike
         [prenotazione]="p"

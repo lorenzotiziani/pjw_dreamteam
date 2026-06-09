@@ -3,12 +3,10 @@ import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { combineLatest, firstValueFrom, map, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { Accessorio } from '../../entities/Accessorio';
-import { TipoBici } from '../../entities/Bike';
 import { Copertura } from '../../entities/Copertura';
 import { StatoPrenotazione } from '../../entities/prenotazione';
 import { AccessorioService } from '../../services/accessorio.service';
 import { AuthService } from '../../services/auth.service';
-import { BikeService } from '../../services/bike.service';
 import { CoperturaService } from '../../services/copertura.service';
 import { PrenotazioneService } from '../../services/prenotazione.service';
 import { PuntoVenditaService } from '../../services/punto-vendita.service';
@@ -21,10 +19,10 @@ import { LogicaService } from '../../services/logica.service';
   styleUrls: ['./booking-form.component.css'],
 })
 export class BookingFormComponent implements OnInit, OnDestroy {
+
   protected fb = inject(FormBuilder);
   protected authSrv = inject(AuthService);
   protected router = inject(Router);
-
   protected puntiVenditaSrv = inject(PuntoVenditaService);
   protected coperturaSrv = inject(CoperturaService);
   protected prenotazioneSrv = inject(PrenotazioneService);
@@ -34,22 +32,21 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   protected destroyed$ = new Subject<void>();
 
   user$ = this.authSrv.currentUser$;
-
-  prezzoTotale = 0;
-  orariDisponibili: string[] = [];
-  coperturaSelezionata: Copertura | null = null;
-  accessoriSelezionati: Accessorio[] = [];
-
   puntoVendita$ = this.puntiVenditaSrv.puntoVendita$;
   accessori$ = this.accessorioSrv.accessorio$;
   coperture$ = this.coperturaSrv.coperture$;
 
+  prezzoTotale = 0;
+  orariDisponibili: string[] = [];
   formError = '';
 
-  // Lista locale delle bici disponibili (per calcolare il totale)
   bikesDisponibiliList: any[] = [];
+  copertureList: any[] = [];
+  accessoriList: any[] = [];
 
-  // Form principale: rimosso tipoBiciId, aggiunto FormArray righe
+  // Accessori selezionati (come array di oggetti, per invio e calcolo)
+  accessoriSelezionati: Accessorio[] = [];
+
   bookingForm = this.fb.group({
     data: ['', Validators.required],
     dataRiconsegna: ['', Validators.required],
@@ -57,15 +54,13 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     ora: ['', Validators.required],
     oraRiconsegna: ['', Validators.required],
     coperturaId: [''],
-    righe: this.fb.array([], [Validators.required, Validators.minLength(1)])  // almeno una riga
+    righe: this.fb.array([], [Validators.required, Validators.minLength(1)])
   });
 
-  // Getter per il FormArray
   get righeArray(): FormArray {
     return this.bookingForm.get('righe') as FormArray;
   }
 
-  // Observable per le bici disponibili nel punto vendita selezionato
   bikesDisponibili$ = combineLatest([
     this.bookingForm.get('puntoVendita')!.valueChanges.pipe(startWith(''))
   ]).pipe(
@@ -74,7 +69,7 @@ export class BookingFormComponent implements OnInit, OnDestroy {
       return this.puntiVenditaSrv.stock(puntoVenditaId).pipe(
         map(stockArray =>
           stockArray
-            .filter(s => s.quantitaTotale > 0)  // solo bici con stock
+            .filter(s => s.quantitaTotale > 0)
             .map(s => ({
               ...s.tipoBici,
               id: String(s.tipoBici.id),
@@ -87,37 +82,49 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
-    this.restoreFormState();
 
-    // Aggiungi una riga vuota se non presente (es. dopo ripristino o all'inizio)
-    if (this.righeArray.length === 0) {
-      this.aggiungiRiga();
-    }
+    this.coperture$.pipe(takeUntil(this.destroyed$)).subscribe(list => this.copertureList = list);
+    this.accessori$.pipe(takeUntil(this.destroyed$)).subscribe(list => this.accessoriList = list);
 
-    // Mantieni aggiornata la lista locale delle bici
     this.bikesDisponibili$
       .pipe(takeUntil(this.destroyed$))
       .subscribe(list => {
         this.bikesDisponibiliList = list;
-        this.calcolaTotale(); // ricalcola il totale ogni volta che cambia la lista
+        this.calcolaTotale();
       });
 
-    // Ascolta i cambiamenti nelle righe per ricalcolare il totale
-    this.righeArray.valueChanges
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(() => this.calcolaTotale());
+    // Ascolto cambi righe (solo tipoBiciId e quantità)
+    this.righeArray.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(() => this.calcolaTotale());
+
+    // Ascolto cambi copertura
+    this.bookingForm.get('coperturaId')!.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(() => this.calcolaTotale());
+
+    // Ascolto cambi date
+    combineLatest([
+      this.bookingForm.get('data')!.valueChanges.pipe(startWith(this.bookingForm.get('data')!.value)),
+      this.bookingForm.get('dataRiconsegna')!.valueChanges.pipe(startWith(this.bookingForm.get('dataRiconsegna')!.value))
+    ]).pipe(takeUntil(this.destroyed$)).subscribe(() => this.calcolaTotale());
+
+    this.restoreFormState();
+    if (this.righeArray.length === 0) {
+      this.aggiungiRiga();
+    }
   }
 
-  // Aggiunge una nuova riga bici
+  ngOnDestroy() {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
+
   aggiungiRiga() {
     const rigaForm = this.fb.group({
       tipoBiciId: ['', Validators.required],
       quantita: [1, [Validators.required, Validators.min(1)]]
     });
     this.righeArray.push(rigaForm);
+    this.calcolaTotale();
   }
 
-  // Rimuove una riga bici
   rimuoviRiga(index: number) {
     if (this.righeArray.length > 1) {
       this.righeArray.removeAt(index);
@@ -125,7 +132,7 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Gestione accessori
+  // Gestione accessori globali
   onAccessorioChange(event: any, accessorio: Accessorio) {
     if (event.target.checked) {
       this.accessoriSelezionati.push(accessorio);
@@ -135,35 +142,37 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     this.calcolaTotale();
   }
 
-  // Gestione copertura
+  // Gestione copertura (radio button)
   onCoperturaSelezionata(copertura: Copertura) {
-    this.coperturaSelezionata = copertura;
     this.bookingForm.patchValue({ coperturaId: copertura.id });
     this.calcolaTotale();
   }
 
-  // Calcolo del totale
   calcolaTotale() {
     let totale = 0;
+    const giorni = this.getGiorniNoleggio();
 
-    // Somma per ogni riga
-    for (const riga of this.righeArray.controls) {
-      const tipoBiciId = riga.get('tipoBiciId')?.value;
-      const quantita = Number(riga.get('quantita')?.value) || 0;
-      if (tipoBiciId && quantita > 0) {
-        const bici = this.bikesDisponibiliList.find(b => b.id == tipoBiciId);
-        if (bici) {
-          totale += Number(bici.prezzoMezzaGiornata) * quantita;
+    if (giorni > 0) {
+      for (const riga of this.righeArray.controls) {
+        const tipoBiciId = riga.get('tipoBiciId')?.value;
+        const quantita = Number(riga.get('quantita')?.value) || 0;
+        if (tipoBiciId && quantita > 0) {
+          const bici = this.bikesDisponibiliList.find(b => b.id == tipoBiciId);
+          if (bici) {
+            totale += Number(bici.prezzoMezzaGiornata) * quantita * giorni;
+          }
         }
       }
     }
 
-    // Copertura
-    if (this.coperturaSelezionata) {
-      totale += Number(this.coperturaSelezionata.prezzo);
+    // Copertura globale
+    const coperturaId = this.bookingForm.get('coperturaId')?.value;
+    if (coperturaId) {
+      const cop = this.copertureList.find(c => c.id == coperturaId);
+      if (cop) totale += Number(cop.prezzo);
     }
 
-    // Accessori
+    // Accessori globali
     for (const acc of this.accessoriSelezionati) {
       totale += Number(acc.prezzo);
     }
@@ -171,9 +180,7 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     this.prezzoTotale = totale;
   }
 
-  // Invio della prenotazione
   async addPrenotazione() {
-    // Validazione lato componente
     if (this.bookingForm.invalid || this.righeArray.length === 0) {
       this.bookingForm.markAllAsTouched();
       return;
@@ -193,14 +200,13 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
     const utenteIdNum = Number(user.id);
     const puntoVenditaIdNum = Number(form.puntoVendita);
-    const coperturaIdNum = this.coperturaSelezionata?.id ? Number(this.coperturaSelezionata.id) : null;
+    const coperturaIdNum = form.coperturaId ? Number(form.coperturaId) : null;
 
     const accessoriPayload = this.accessoriSelezionati.map(acc => ({
       accessorioId: Number(acc.id),
       quantita: 1
     }));
 
-    // Estrai le righe dal form
     const righePayload = this.righeArray.controls.map(riga => ({
       tipoBiciId: Number(riga.get('tipoBiciId')!.value),
       quantita: Number(riga.get('quantita')!.value)
@@ -208,7 +214,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
     const totale = this.prezzoTotale;
 
-    // Chiama il nuovo metodo addMultiRighe (vedi sotto)
     this.prenotazioneSrv.addMultiRighe(
       utenteIdNum,
       dataRitiro,
@@ -228,7 +233,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Salvataggio e ripristino dello stato del form
   private readonly FORM_STORAGE_KEY = 'booking_form_data';
 
   saveFormState() {
@@ -240,11 +244,7 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     if (saved) {
       try {
         const formData = JSON.parse(saved);
-        // Attenzione: il ripristino del FormArray richiede un trattamento speciale
-        // Per semplicità, assumiamo che il form salvato contenga già l'array righe.
-        // Se non è presente, patchiamo solo i campi semplici e aggiungiamo una riga vuota.
         if (formData.righe && Array.isArray(formData.righe)) {
-          // Rimuovi le righe attuali e ricrea quelle salvate
           while (this.righeArray.length) this.righeArray.removeAt(0);
           formData.righe.forEach((riga: any) => {
             this.righeArray.push(this.fb.group({
@@ -262,7 +262,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Navigazione autenticazione
   onLoginClick() {
     this.saveFormState();
     this.router.navigate(['/login'], { queryParams: { requestedUrl: '/booking/form' } });
@@ -273,8 +272,14 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     this.router.navigate(['/register'], { queryParams: { requestedUrl: '/booking/form' } });
   }
 
-  ngOnDestroy() {
-    this.destroyed$.next();
-    this.destroyed$.complete();
+  private getGiorniNoleggio(): number {
+    const dataRitiro = this.bookingForm.get('data')?.value;
+    const dataRiconsegna = this.bookingForm.get('dataRiconsegna')?.value;
+    if (!dataRitiro || !dataRiconsegna) return 0;
+    const inizio = new Date(dataRitiro);
+    const fine = new Date(dataRiconsegna);
+    if (isNaN(inizio.getTime()) || isNaN(fine.getTime()) || fine <= inizio) return 0;
+    const diffTime = fine.getTime() - inizio.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 }
