@@ -99,7 +99,9 @@ async function calcolaRiga(riga: any, mezzeGiornate: number) {
     const accessorio = await AccessoriService.getById(acc.accessorioId);
     if (!accessorio)
       throw new BadRequestError(`Accessorio ${acc.accessorioId} non trovato`);
-    subtotale += Number(accessorio.prezzo) * acc.quantita * mezzeGiornate;
+    // Gli accessori NON dipendono dalla durata: prezzo fisso per quantità
+    // (la riga rappresenta una singola bici, quindi è già "per bici").
+    subtotale += Number(accessorio.prezzo) * acc.quantita;
   }
 
   return {

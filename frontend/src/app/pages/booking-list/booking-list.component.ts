@@ -58,7 +58,8 @@ export class BookingListComponent implements OnInit {
         prenotazioneOriginale.stato,
         updatedData.tipoBiciId,
         updatedData.coperturaId ?? null,
-        updatedData.accessoriPayload
+        updatedData.accessoriPayload,
+        updatedData.numeroBici
       ).subscribe({
         next: () => {
           this.toastSrv.success('Prenotazione aggiornata con successo.');

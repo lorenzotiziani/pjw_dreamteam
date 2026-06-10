@@ -122,14 +122,23 @@ export class PrenotazioneService {
     stato: StatoPrenotazione,
     tipoBiciId: number,
     coperturaId: number | null,
-    accessori: { accessorioId: number; quantita: number }[]
+    accessori: { accessorioId: number; quantita: number }[],
+    numeroBici: number = 1
   ) {
-    const riga: any = {
+    const baseRiga: any = {
       tipoBiciId,
       accessori
     };
     // coperturaId: z.number().optional() — NON inviare null
-    if (coperturaId !== null) riga.coperturaId = coperturaId;
+    if (coperturaId !== null) baseRiga.coperturaId = coperturaId;
+
+    // Espandi in N righe (una per bici), come fa la creazione: il backend
+    // si aspetta una riga per ogni singola bici. Senza questo, l'update
+    // ridurrebbe la prenotazione a 1 sola bici.
+    const righe = Array.from({ length: Math.max(numeroBici, 1) }, () => ({
+      ...baseRiga,
+      accessori: accessori.map(a => ({ ...a }))
+    }));
 
     const body = {
       dataRitiro,
@@ -137,7 +146,7 @@ export class PrenotazioneService {
       oraRitiro,
       dataOraRiconsegna,
       stato,
-      righe: [riga]
+      righe
     };
 
     return this.http.put<Prenotazione>(`/api/prenotazioni/${id}`, body);

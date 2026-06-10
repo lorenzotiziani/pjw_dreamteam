@@ -262,7 +262,9 @@ export class EditBookingComponent implements OnInit, OnDestroy {
       tipoBiciId: Number(form.tipoBiciId),
       coperturaId: form.coperturaId ? Number(form.coperturaId) : null,
       totale: this.getTotale(),
-      accessoriPayload
+      accessoriPayload,
+      // Numero di bici della prenotazione: va re-inviato per non perderle nell'update
+      numeroBici: this.numeroBici
     };
 
     this.modal.close(updated);
