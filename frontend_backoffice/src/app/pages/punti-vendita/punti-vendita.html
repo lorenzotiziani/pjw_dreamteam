@@ -61,7 +61,7 @@
     <form [formGroup]="form">
       <div class="bo-form-group">
         <label class="bo-label" for="pv-nome">Nome sede <span class="text-danger">*</span></label>
-        <input id="pv-nome" class="bo-input" formControlName="nome" placeholder="Es. BikeRent Centro" />
+        <input id="pv-nome" class="bo-input" formControlName="nome" placeholder="Es. DreamRent Centro" />
         <div class="bo-error" *ngIf="form.get('nome')?.invalid && form.get('nome')?.touched">Campo obbligatorio</div>
       </div>
       <div class="bo-form-group">
