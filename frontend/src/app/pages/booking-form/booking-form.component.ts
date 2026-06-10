@@ -156,31 +156,37 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
   calcolaTotale() {
     let totale = 0;
-    const giorni = this.getGiorniNoleggio();
+    const mezzeGiornate = this.getMezzeGiornate();
 
-    if (giorni > 0) {
+    // Numero totale di bici prenotate (somma delle quantità di tutte le righe)
+    const totaleBici = this.righeArray.controls.reduce(
+      (sum, riga) => sum + (Number(riga.get('quantita')?.value) || 0), 0
+    );
+
+    if (mezzeGiornate > 0) {
+      // Costo bici: prezzoMezzaGiornata × quantità × mezzeGiornate
       for (const riga of this.righeArray.controls) {
         const tipoBiciId = riga.get('tipoBiciId')?.value;
         const quantita = Number(riga.get('quantita')?.value) || 0;
         if (tipoBiciId && quantita > 0) {
           const bici = this.bikesDisponibiliList.find(b => b.id == tipoBiciId);
           if (bici) {
-            totale += Number(bici.prezzoMezzaGiornata) * quantita * giorni;
+            totale += Number(bici.prezzoMezzaGiornata) * quantita * mezzeGiornate;
           }
         }
       }
-    }
 
-    // Copertura globale
-    const coperturaId = this.bookingForm.get('coperturaId')?.value;
-    if (coperturaId) {
-      const cop = this.copertureList.find(c => c.id == coperturaId);
-      if (cop) totale += Number(cop.prezzo);
-    }
+      // Copertura: applicata a ogni singola bici (il backend la somma per ogni riga)
+      const coperturaId = this.bookingForm.get('coperturaId')?.value;
+      if (coperturaId && totaleBici > 0) {
+        const cop = this.copertureList.find(c => c.id == coperturaId);
+        if (cop) totale += Number(cop.prezzo) * totaleBici;
+      }
 
-    // Accessori globali
-    for (const acc of this.accessoriSelezionati) {
-      totale += Number(acc.prezzo);
+      // Accessori: costo fisso per bici (non dipende dalla durata)
+      for (const acc of this.accessoriSelezionati) {
+        totale += Number(acc.prezzo) * totaleBici;
+      }
     }
 
     this.prezzoTotale = totale;
@@ -278,14 +284,42 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     this.router.navigate(['/register'], { queryParams: { requestedUrl: '/booking/form' } });
   }
 
-  private getGiorniNoleggio(): number {
-    const dataRitiro = this.bookingForm.get('data')?.value;
+  /**
+   * Calcola le mezze-giornate di noleggio allineandosi alla formula del backend:
+   *   mezzeGiornate = ceil(diffOre / 6)
+   * Usa gli orari effettivi (ora ritiro = START fascia, ora riconsegna = END fascia)
+   * così da dare una stima accurata già nel form.
+   */
+  private getMezzeGiornate(): number {
+    const dataRitiro    = this.bookingForm.get('data')?.value;
     const dataRiconsegna = this.bookingForm.get('dataRiconsegna')?.value;
     if (!dataRitiro || !dataRiconsegna) return 0;
+
+    const oraRitiroFascia     = this.bookingForm.get('ora')?.value;
+    const oraRiconsegnaFascia = this.bookingForm.get('oraRiconsegna')?.value;
+
     const inizio = new Date(dataRitiro);
-    const fine = new Date(dataRiconsegna);
+    const fine   = new Date(dataRiconsegna);
+
+    if (oraRitiroFascia) {
+      // Ora di INIZIO del ritiro (es. "09:00 - 10:00" → 09:00)
+      const { ore, minuti } = this.logicSrv.estraiOreMinuti(
+        this.logicSrv.estraiOraInizioDaFascia(oraRitiroFascia)
+      );
+      inizio.setHours(ore, minuti, 0, 0);
+    }
+
+    if (oraRiconsegnaFascia) {
+      // Ora di FINE della riconsegna (es. "17:00 - 18:00" → 18:00, che il backend salva)
+      const { ore, minuti } = this.logicSrv.estraiOreMinuti(
+        this.logicSrv.estraiOraFineDaFascia(oraRiconsegnaFascia)
+      );
+      fine.setHours(ore, minuti, 0, 0);
+    }
+
     if (isNaN(inizio.getTime()) || isNaN(fine.getTime()) || fine <= inizio) return 0;
-    const diffTime = fine.getTime() - inizio.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    const diffOre = (fine.getTime() - inizio.getTime()) / (1000 * 60 * 60);
+    return Math.ceil(diffOre / 6);
   }
 }
