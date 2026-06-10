@@ -1,0 +1,376 @@
+/* ===================================================
+   DreamRide — Modal Modifica Prenotazione
+   =================================================== */
+
+/* ── Header ─────────────────────────────────────── */
+.eb-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 1.1rem 1.4rem 1rem;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.eb-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eb-header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.eb-header-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  border-radius: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.eb-title {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.eb-subtitle {
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.eb-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  border-radius: 0.4rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-size: 0.85rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.eb-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: white;
+}
+
+/* ── Body ────────────────────────────────────────── */
+.eb-body {
+  background: #f8fafc;
+  padding: 1.2rem 1.4rem;
+  max-height: 62vh;
+  overflow-y: auto;
+}
+
+.eb-body::-webkit-scrollbar { width: 4px; }
+.eb-body::-webkit-scrollbar-track { background: transparent; }
+.eb-body::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+/* ── Loading / Errore ────────────────────────────── */
+.eb-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+  gap: 0.75rem;
+}
+
+.eb-loading-text {
+  color: #6b7280;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.eb-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  border-radius: 0.6rem;
+  padding: 0.8rem 1rem;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ── Sezioni ─────────────────────────────────────── */
+.eb-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.85rem;
+}
+
+.eb-section:last-child { margin-bottom: 0; }
+
+.eb-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #64748b;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Griglia 2 colonne ───────────────────────────── */
+.eb-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+}
+
+/* ── Campi form ──────────────────────────────────── */
+.eb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.eb-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+}
+
+.eb-input {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.85rem;
+  color: #0f172a;
+  background: #f8fafc;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+  font-family: inherit;
+  width: 100%;
+}
+
+.eb-input:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+  background: white;
+}
+
+.eb-input.eb-invalid {
+  border-color: #f87171;
+}
+
+/* ── Copertura (card radio) ──────────────────────── */
+.eb-coperture-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.eb-cop-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  background: #f8fafc;
+  min-width: 90px;
+  flex: 1;
+  user-select: none;
+}
+
+.eb-cop-card:hover {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.eb-cop-card.eb-cop-selected {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.eb-cop-icon {
+  font-size: 1.3rem;
+  color: #9ca3af;
+}
+
+.eb-cop-icon-green { color: #16a34a; }
+.eb-cop-card.eb-cop-selected .eb-cop-icon { color: #16a34a; }
+
+.eb-cop-nome {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+.eb-cop-prezzo {
+  font-size: 0.7rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.eb-cop-card.eb-cop-selected .eb-cop-prezzo { color: #15803d; }
+
+/* ── Accessori (chip checkbox) ───────────────────── */
+.eb-acc-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.eb-acc-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #4b5563;
+  background: #f8fafc;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+}
+
+.eb-acc-chip:hover {
+  border-color: #16a34a;
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.eb-acc-chip.eb-acc-selected {
+  border-color: #16a34a;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.eb-acc-chip i { font-size: 0.85rem; flex-shrink: 0; }
+
+.eb-acc-price {
+  color: #6b7280;
+  font-size: 0.72rem;
+  margin-left: 0.1rem;
+}
+
+.eb-acc-chip.eb-acc-selected .eb-acc-price { color: #15803d; }
+
+/* ── Testo vuoto ─────────────────────────────────── */
+.eb-empty-text {
+  color: #9ca3af;
+  font-size: 0.82rem;
+  padding: 0.25rem 0;
+}
+
+/* ── Footer ──────────────────────────────────────── */
+.eb-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.4rem;
+  border-top: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 0 0 0.5rem 0.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.eb-totale {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.eb-totale-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #9ca3af;
+}
+
+.eb-totale-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #15803d;
+  line-height: 1.1;
+}
+
+.eb-footer-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.eb-btn-cancel {
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+}
+
+.eb-btn-cancel:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.eb-btn-save {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  border: none;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.3rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 3px 10px rgba(22, 163, 74, 0.3);
+  font-family: inherit;
+}
+
+.eb-btn-save:hover {
+  opacity: 0.9;
+  box-shadow: 0 5px 16px rgba(22, 163, 74, 0.4);
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 480px) {
+  .eb-grid-2 { grid-template-columns: 1fr; }
+  .eb-footer { flex-direction: column; align-items: stretch; }
+  .eb-footer-actions { flex-direction: column; }
+  .eb-btn-cancel, .eb-btn-save { justify-content: center; }
+}

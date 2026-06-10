@@ -13,7 +13,8 @@ import { LogicaService } from '../../../services/logica.service';
 @Component({
   selector: 'app-edit-booking',
   standalone: false,
-  templateUrl: './edit-booking.component.html'
+  templateUrl: './edit-booking.component.html',
+  styleUrl: './edit-booking.component.css'
 })
 export class EditBookingComponent implements OnInit, OnDestroy {
   @Input() prenotazioneId!: number;
@@ -131,9 +132,6 @@ export class EditBookingComponent implements OnInit, OnDestroy {
         tipoBiciId: pren.righe?.[0]?.tipoBiciId?.toString() ?? '',
         coperturaId: pren.righe?.[0]?.coperturaId?.toString() ?? ''
       });
-
-      // Forza l'aggiornamento del controllo punto vendita per attivare il filtro bici
-      this.updateForm.get('puntoVenditaId')?.updateValueAndValidity();
 
       const accessoriIds = pren.righe?.[0]?.accessori?.map((a: any) => a.accessorioId) ?? [];
       this.selezionaAccessori(accessoriIds);
