@@ -16,6 +16,15 @@ export class HomeComponent {
   isGraph:boolean = true;
 
   toggleView() { this.isGraph = !this.isGraph; }
+
+  /** Scroll fluido verso una sezione della pagina (senza reload né salto). */
+  scrollTo(sectionId: string, event?: Event) {
+    event?.preventDefault();
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
   // DATI DI TEST
   public barChartType: ChartType = 'bar';
 
