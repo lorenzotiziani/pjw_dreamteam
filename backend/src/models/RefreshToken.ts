@@ -1,5 +1,3 @@
-import sql from 'mssql';
-import { getPool } from '../config/database';
 import { RefreshToken } from '../api/entities/authEntity';
 import {prisma} from '../config/prisma'
 
