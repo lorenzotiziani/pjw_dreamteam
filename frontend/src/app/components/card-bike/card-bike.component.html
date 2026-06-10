@@ -37,40 +37,45 @@
         <span class="dr-date-label"><i class="bi bi-calendar-event me-1"></i>Ritiro</span>
         <span class="dr-date-value">
           {{ prenotazione.dataRitiro | date:'dd MMM yyyy' }}
-          <span class="dr-date-time">{{ prenotazione.oraRitiro | date:'HH:mm' }}</span>
+          <span class="dr-date-time">{{ getRangeOraRitiro(prenotazione.oraRitiro) }}</span>
         </span>
       </div>
       <i class="bi bi-arrow-right dr-dates-arrow"></i>
       <div class="dr-date-block">
         <span class="dr-date-label"><i class="bi bi-calendar-check me-1"></i>Riconsegna</span>
-        <span class="dr-date-value">{{ prenotazione.dataOraRiconsegna | date:'dd MMM yyyy HH:mm' }}</span>
+        <span class="dr-date-value">
+          {{ prenotazione.dataOraRiconsegna | date:'dd MMM yyyy':'UTC' }}
+          <span class="dr-date-time">{{ getRangeOraRiconsegna(prenotazione.dataOraRiconsegna) }}</span>
+        </span>
       </div>
     </div>
 
     <hr class="dr-divider">
 
-    <!-- Biciclette -->
-    <div *ngFor="let riga of prenotazione.righe; let last = last" class="mb-2">
+    <!-- Biciclette raggruppate (N× quando stesso tipo + stessi accessori + stessa copertura) -->
+    <div *ngFor="let gruppo of righeRaggruppate; let last = last" class="mb-2">
       <div class="d-flex align-items-start gap-2">
         <span class="dr-bike-dot"><i class="bi bi-bicycle"></i></span>
         <div class="flex-grow-1 min-w-0">
           <div class="d-flex align-items-center gap-2 flex-wrap">
-            <span class="fw-semibold" style="font-size: 0.88rem">{{ riga.tipoBici?.categoria }}</span>
-            <span class="badge bg-light text-secondary" style="font-size: 0.7rem">{{ riga.tipoBici?.taglia }}</span>
-            <span class="text-muted" style="font-size: 0.78rem">— {{ riga.tipoBici?.prezzoMezzaGiornata | currency }}/½ giornata</span>
+            <!-- Badge quantità, visibile solo se > 1 -->
+            <span *ngIf="gruppo.quantita > 1" class="dr-qty-badge">{{ gruppo.quantita }}×</span>
+            <span class="fw-semibold" style="font-size: 0.88rem">{{ gruppo.tipoBici?.categoria }}</span>
+            <span class="badge bg-light text-secondary" style="font-size: 0.7rem">{{ gruppo.tipoBici?.taglia }}</span>
+            <span class="text-muted" style="font-size: 0.78rem">— {{ gruppo.tipoBici?.prezzoMezzaGiornata | currency }}/½ giornata</span>
           </div>
 
-          <!-- Accessori -->
-          <div *ngIf="riga.accessori?.length" class="mt-1 d-flex flex-wrap gap-1">
-            <span *ngFor="let acc of riga.accessori" class="dr-acc-chip">
+          <!-- Accessori (mostrati una volta sola per il gruppo) -->
+          <div *ngIf="gruppo.accessori?.length" class="mt-1 d-flex flex-wrap gap-1">
+            <span *ngFor="let acc of gruppo.accessori" class="dr-acc-chip">
               {{ acc.accessorio?.nome }}
             </span>
           </div>
 
-          <!-- Copertura -->
-          <div *ngIf="riga.copertura" class="mt-1">
+          <!-- Copertura (mostrata una volta sola per il gruppo) -->
+          <div *ngIf="gruppo.copertura" class="mt-1">
             <span class="dr-copertura-chip">
-              <i class="bi bi-shield-check me-1"></i>{{ riga.copertura.nome }}
+              <i class="bi bi-shield-check me-1"></i>{{ gruppo.copertura.nome }}
             </span>
           </div>
         </div>

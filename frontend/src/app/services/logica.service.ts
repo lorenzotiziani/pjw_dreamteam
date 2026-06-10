@@ -43,9 +43,10 @@ export class LogicaService {
     return `${inizio}:00`;
   }
 
-  // Converte una fascia in un oggetto Date (data base + ora)
+  // Converte una fascia in un oggetto Date (data base + ora di FINE fascia).
+  // Es. "17:00 - 18:00" → Date con ore 18:00, così il backend salva l'ora di fine noleggio.
   fasciaToDate(dataBase: Date, fascia: string): Date {
-    const { ore, minuti } = this.estraiOreMinuti(this.estraiOraInizioDaFascia(fascia));
+    const { ore, minuti } = this.estraiOreMinuti(this.estraiOraFineDaFascia(fascia));
     const result = new Date(dataBase);
     result.setHours(ore, minuti, 0, 0);
     return result;
@@ -63,8 +64,11 @@ export class LogicaService {
   }
 
   formatDateTimeToBackend(datetime: Date): string {
-    // Esempio: "2025-06-10T18:00:00" (senza millisecondi, senza Z)
-    return datetime.toISOString().replace('Z', '').slice(0, 19);
+    // Serializza con ora LOCALE (non UTC) per evitare lo shift di -2h in CEST.
+    // Esempio: local 18:00 CEST → "2025-06-10T18:00:00" (senza Z).
+    const p = (n: number) => n.toString().padStart(2, '0');
+    return `${datetime.getFullYear()}-${p(datetime.getMonth() + 1)}-${p(datetime.getDate())}` +
+           `T${p(datetime.getHours())}:${p(datetime.getMinutes())}:${p(datetime.getSeconds())}`;
   }
 
 
@@ -106,9 +110,13 @@ export class LogicaService {
 
   formatDateTimeToFascia(datetime: string): string {
     if (!datetime) return '';
+    // Il backend salva l'ora di FINE fascia in UTC (es. 18:00 UTC = "17:00 - 18:00").
+    // Usiamo getUTCHours() come ora di fine e calcoliamo l'inizio = fine - 1.
     const date = new Date(datetime);
-    const hour = date.getHours();
-    return `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1).toString().padStart(2, '0')}:00`;
+    const hEnd = date.getUTCHours();
+    const hStart = hEnd - 1;
+    const p = (n: number) => n.toString().padStart(2, '0');
+    return `${p(hStart)}:00 - ${p(hEnd)}:00`;
   }
 
   // Estrae l'orario "HH:MM:SS" da una stringa ISO (es. "1970-01-01T11:00:00.000Z" → "11:00:00")

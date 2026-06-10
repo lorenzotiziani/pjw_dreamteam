@@ -125,6 +125,18 @@
   margin-top: 1px;
 }
 
+/* Badge quantità "N×" per righe raggruppate */
+.dr-qty-badge {
+  background: #1e293b;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 50px;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
 .dr-acc-chip {
   background: #f3f4f6;
   color: #6b7280;

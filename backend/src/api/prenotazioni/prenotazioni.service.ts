@@ -18,6 +18,23 @@ function buildOraRitiro(dataRitiro: Date, oraRitiro: string): Date {
   return date;
 }
 
+/**
+ * Normalizza dataOraRiconsegna in UTC rileggendo le ore LOCALI del server.
+ * z.coerce.date() su server CEST (UTC+2) interpreta "2026-06-30T19:00:00" come
+ * 19:00 locale = 17:00 UTC. Usando getHours() (ore locali = 19) e
+ * setUTCHours(19) si corregge il valore a 19:00 UTC.
+ */
+function normalizzaRiconsegna(data: Date): Date {
+  const result = new Date(data);
+  result.setUTCHours(
+    data.getHours(),
+    data.getMinutes(),
+    data.getSeconds(),
+    0
+  );
+  return result;
+}
+
 function twoDaysFromNow(): Date {
   return new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
 }
@@ -206,9 +223,7 @@ export class PrenotazioniService {
         0,
       );
 
-      //riconsegna in UTC
-      const oraRiconsegna = new Date(body.dataOraRiconsegna);
-      oraRiconsegna.setUTCHours(oraRiconsegna.getUTCHours(), oraRiconsegna.getUTCMinutes(), oraRiconsegna.getUTCSeconds(), 0);
+      const oraRiconsegna = normalizzaRiconsegna(body.dataOraRiconsegna);
 
       // Step 1: crea prenotazione + righe (senza accessori).
       // Un nested create a 3 livelli (prenotazione → righe[] → accessori[]) causa
@@ -267,8 +282,9 @@ export class PrenotazioniService {
     const nuovaOraRitiro = body.oraRitiro
       ? buildOraRitiro(nuovaDataRitiro, body.oraRitiro)
       : prenotazione.oraRitiro;
-    const nuovaDataOraRiconsegna =
-      body.dataOraRiconsegna ?? prenotazione.dataOraRiconsegna;
+    const nuovaDataOraRiconsegna = body.dataOraRiconsegna
+      ? normalizzaRiconsegna(body.dataOraRiconsegna)
+      : prenotazione.dataOraRiconsegna;
     const giorniNoleggio = calcolaMezzeGiornate(
       nuovaOraRitiro,
       nuovaDataOraRiconsegna,
