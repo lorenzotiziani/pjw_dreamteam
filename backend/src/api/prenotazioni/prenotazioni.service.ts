@@ -206,13 +206,17 @@ export class PrenotazioniService {
         0,
       );
 
+      //riconsegna in UTC
+      const oraRiconsegna = new Date(body.dataOraRiconsegna);
+      oraRiconsegna.setUTCHours(oraRiconsegna.getUTCHours(), oraRiconsegna.getUTCMinutes(), oraRiconsegna.getUTCSeconds(), 0);
+
       await tx.prenotazione.create({
         data: {
           utenteId,
           puntoVenditaId: body.puntoVenditaId,
           dataRitiro: body.dataRitiro,
           oraRitiro: dataOraRitiro,
-          dataOraRiconsegna: body.dataOraRiconsegna,
+          dataOraRiconsegna: oraRiconsegna,
           stato: StatoPrenotazione.CONFERMATA,
           totale,
           righe: {
