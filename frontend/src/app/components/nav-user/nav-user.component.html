@@ -1,8 +1,7 @@
 <li class="nav-item" ngbDropdown display="dynamic" placement="bottom-end">
   <a class="dr-user-btn" ngbDropdownToggle>
     <span class="dr-user-avatar"><i class="bi bi-person-fill"></i></span>
-    <span class="dr-user-email">{{ user.email }}</span>
-    <i class="bi bi-chevron-down" style="font-size: 0.65rem; opacity: 0.7;"></i>
+    <span class="dr-user-email">{{ user.cognome }} {{ user.nome }}</span>
   </a>
   <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-1 p-1">
     <div class="px-3 py-2 border-bottom mb-1">
