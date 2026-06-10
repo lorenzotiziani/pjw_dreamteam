@@ -83,7 +83,13 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
 
-    this.coperture$.pipe(takeUntil(this.destroyed$)).subscribe(list => this.copertureList = list);
+    this.coperture$.pipe(takeUntil(this.destroyed$)).subscribe(list => {
+      this.copertureList = list;
+      // Pre-seleziona la prima copertura (Nessuna assicurazione) se non già impostata
+      if (list.length > 0 && !this.bookingForm.get('coperturaId')?.value) {
+        this.bookingForm.patchValue({ coperturaId: list[0].id });
+      }
+    });
     this.accessori$.pipe(takeUntil(this.destroyed$)).subscribe(list => this.accessoriList = list);
 
     this.bikesDisponibili$

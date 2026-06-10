@@ -144,6 +144,7 @@
                            name="coperturaUnica"
                            [id]="'cop-' + copertura.id"
                            [value]="copertura.id"
+                           [checked]="bookingForm.get('coperturaId')?.value == copertura.id"
                            (change)="onCoperturaSelezionata(copertura)">
                     <div class="dr-option-body flex-column align-items-start gap-1">
                       <div class="d-flex w-100 justify-content-between align-items-center">
