@@ -74,7 +74,8 @@ export class BookingListComponent implements OnInit {
     this.error = null;
     this.prenotazioniSrv.mie().subscribe({
       next: (data) => {
-        this.prenotazioni = data;
+        // Mostra solo le prenotazioni CONFERMATE
+        this.prenotazioni = data.filter(p => p.stato === 'CONFERMATA');
         this.loading = false;
       },
       error: (err) => {
@@ -90,14 +91,17 @@ export class BookingListComponent implements OnInit {
     if (!conferma) return;
 
     this.cancellingId = id;
-    this.prenotazioniSrv.delete(Number(id)).subscribe({
+    // Chiama PATCH /api/prenotazioni/:id/stato con { stato: 'CANCELLATA' }
+    // (soft delete: la prenotazione resta nel DB ma non compare più nella lista)
+    this.prenotazioniSrv.cancellaStato(Number(id)).subscribe({
       next: () => {
+        // Rimuove dalla lista locale (non è più CONFERMATA)
         this.prenotazioni = this.prenotazioni.filter(p => p.id !== id);
         this.cancellingId = null;
       },
       error: (err) => {
         console.error('Errore cancellazione', err);
-        alert('Errore durante la cancellazione.');
+        alert(err.error?.message || 'Errore durante la cancellazione.');
         this.cancellingId = null;
       }
     });

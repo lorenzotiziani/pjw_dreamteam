@@ -101,7 +101,12 @@ export class PrenotazioneService {
       .pipe(map(response => response.data));
   }
 
-  // ── Cancella prenotazione ──────────────────────────────────────────────────
+  // ── Cancella prenotazione (soft delete: imposta stato CANCELLATA) ──────────
+  cancellaStato(id: number) {
+    return this.http.patch(`/api/prenotazioni/${id}/stato`, { stato: 'CANCELLATA' });
+  }
+
+  // ── Elimina prenotazione (hard delete, non usato dal frontend utente) ──────
   delete(id: number) {
     return this.http.delete<Prenotazione>(`/api/prenotazioni/${id}`);
   }
