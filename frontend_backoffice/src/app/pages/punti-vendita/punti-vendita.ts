@@ -2,7 +2,9 @@ import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core
 import { FormBuilder, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { PuntiVenditaService } from '../../services/punti-vendita.service';
+import { AuthService } from '../../services/auth.service';
 import { TipiBiciService } from '../../services/tipi-bici.service';
 import { ToastService } from '../../services/toast.service';
 import { ConfirmModalService } from '../../services/confirm-modal.service';
@@ -22,6 +24,10 @@ export class PuntiVenditaComponent implements OnInit {
   private confirmSrv = inject(ConfirmModalService);
   private modalSrv = inject(NgbModal);
   private fb = inject(FormBuilder);
+  private authSrv = inject(AuthService);
+
+  /** Solo l'ADMIN può creare/modificare/eliminare/disattivare le sedi. */
+  isAdmin$ = this.authSrv.currentUser$.pipe(map(u => u?.ruolo === 'ADMIN'));
 
   @ViewChild('formModal') formModal!: TemplateRef<any>;
   @ViewChild('stockModal') stockModal!: TemplateRef<any>;

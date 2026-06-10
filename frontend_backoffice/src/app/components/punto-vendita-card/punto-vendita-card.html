@@ -7,13 +7,13 @@
       </span>
     </div>
     <div class="pv-card-actions">
-      <button class="btn-icon btn-edit" title="Modifica" (click)="edit.emit(puntoVendita)">
+      <button *ngIf="isAdmin" class="btn-icon btn-edit" title="Modifica" (click)="edit.emit(puntoVendita)">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
         </svg>
       </button>
-      <button class="btn-icon" [class.btn-warning]="puntoVendita.attivo" [class.btn-success]="!puntoVendita.attivo"
+      <button *ngIf="isAdmin" class="btn-icon" [class.btn-warning]="puntoVendita.attivo" [class.btn-success]="!puntoVendita.attivo"
         [title]="puntoVendita.attivo ? 'Disattiva' : 'Attiva'" (click)="toggleAttivo.emit(puntoVendita)">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="1" y="5" width="22" height="14" rx="7" ry="7"/>
@@ -28,7 +28,7 @@
           <rect x="14" y="14" width="7" height="7" rx="1.5"/>
         </svg>
       </button>
-      <button class="btn-icon btn-danger" title="Elimina" (click)="delete.emit(puntoVendita.id)">
+      <button *ngIf="isAdmin" class="btn-icon btn-danger" title="Elimina" (click)="delete.emit(puntoVendita.id)">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
           <path d="M9 6V4h6v2"/>

@@ -10,6 +10,8 @@ import { PuntoVendita } from '../../entities/punto-vendita.entity';
 })
 export class PuntoVenditaCardComponent {
   @Input() puntoVendita!: PuntoVendita;
+  /** Solo l'ADMIN vede i pulsanti di modifica/disattivazione/eliminazione. */
+  @Input() isAdmin = false;
   @Output() edit = new EventEmitter<PuntoVendita>();
   @Output() delete = new EventEmitter<number>();
   @Output() toggleAttivo = new EventEmitter<PuntoVendita>();

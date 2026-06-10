@@ -137,11 +137,15 @@
                   🔒
                 </span>
 
-                <!-- Elimina (DELETE, regola 2 giorni o già cancellata) -->
-                <button class="btn-icon btn-icon-danger" title="Elimina definitivamente"
-                  [attr.aria-label]="'Elimina prenotazione #' + p.id"
-                  *ngIf="canDelete(p)" [disabled]="actionLoading"
-                  (click)="onDelete(p)">
+                <!-- Cestino contestuale:
+                     CONFERMATA/IN_ATTESA → annulla (→ CANCELLATA, libera le bici)
+                     CANCELLATA           → eliminazione definitiva
+                     altri stati          → nessun cestino -->
+                <button class="btn-icon btn-icon-danger"
+                  [title]="trashAction(p) === 'cancel' ? 'Annulla prenotazione' : 'Elimina definitivamente'"
+                  [attr.aria-label]="(trashAction(p) === 'cancel' ? 'Annulla prenotazione #' : 'Elimina prenotazione #') + p.id"
+                  *ngIf="trashAction(p)" [disabled]="actionLoading"
+                  (click)="onTrash(p)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/>
                   </svg>

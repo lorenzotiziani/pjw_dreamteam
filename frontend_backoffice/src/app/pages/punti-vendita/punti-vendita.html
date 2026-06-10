@@ -13,7 +13,7 @@
         <p class="bo-page-subtitle">Gestione delle sedi di noleggio</p>
       </div>
     </div>
-    <button class="btn btn-primary" (click)="openCreate()">+ Nuovo punto vendita</button>
+    <button *ngIf="isAdmin$ | async" class="btn btn-primary" (click)="openCreate()">+ Nuovo punto vendita</button>
   </div>
 
   <!-- Loading -->
@@ -27,7 +27,7 @@
     <div *ngIf="puntiVendita.length === 0" class="bo-empty">
       <div class="bo-empty-icon">🏪</div>
       <div class="bo-empty-text">Nessun punto vendita configurato</div>
-      <button class="btn btn-primary mt-2" (click)="openCreate()">Crea il primo</button>
+      <button *ngIf="isAdmin$ | async" class="btn btn-primary mt-2" (click)="openCreate()">Crea il primo</button>
     </div>
 
     <!-- Griglia card centrata, stile "tabella senza bordi" -->
@@ -36,6 +36,7 @@
         <div class="col-12 col-md-6" *ngFor="let pv of puntiVendita">
           <app-punto-vendita-card
             [puntoVendita]="pv"
+            [isAdmin]="(isAdmin$ | async) ?? false"
             (edit)="openEdit($event)"
             (delete)="onDelete($event)"
             (toggleAttivo)="onToggleAttivo($event)"

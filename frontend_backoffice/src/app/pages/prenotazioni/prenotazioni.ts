@@ -240,6 +240,44 @@ export class PrenotazioniComponent implements OnInit {
     });
   }
 
+  // ── Cestino: azione contestuale in base allo stato ──────────────────────
+  /**
+   * Decide cosa fa l'icona del cestino a seconda dello stato:
+   *  - CONFERMATA / IN_ATTESA → 'cancel'  (passa a CANCELLATA → libera le bici)
+   *  - CANCELLATA             → 'delete'  (eliminazione definitiva)
+   *  - RITIRATA/RESTITUITA/DANNO/RITARDO → null (nessun cestino)
+   */
+  trashAction(p: Prenotazione): 'cancel' | 'delete' | null {
+    if (p.stato === 'CONFERMATA' || p.stato === 'IN_ATTESA') return 'cancel';
+    if (p.stato === 'CANCELLATA') return 'delete';
+    return null;
+  }
+
+  onTrash(p: Prenotazione) {
+    const action = this.trashAction(p);
+    if (action === 'cancel') this.onCancella(p);
+    else if (action === 'delete') this.onDelete(p);
+  }
+
+  /** CONFERMATA → CANCELLATA: aggiornamento di stato (le bici tornano disponibili). */
+  onCancella(p: Prenotazione) {
+    const info = `#${p.id} — ${p.utente?.cognome ?? ''} ${p.utente?.nome ?? ''}`.trim();
+    this.confirmSrv.confirm({
+      title: 'Annulla prenotazione',
+      message: `Annullare la prenotazione ${info}?`,
+      detail: 'La prenotazione passerà a "Cancellata" e le bici torneranno disponibili.',
+      confirmLabel: 'Annulla prenotazione',
+      type: 'warning'
+    }).then(ok => {
+      if (!ok) return;
+      this.actionLoading = true;
+      this.prenotazioniSrv.aggiornaStato(p.id, 'CANCELLATA').subscribe({
+        next: () => { this.loadPrenotazioni(); this.actionLoading = false; },
+        error: (e) => { this.toastSrv.error(this.parseError(e, 'aggiornamento stato')); this.actionLoading = false; }
+      });
+    });
+  }
+
   // ── Elimina ────────────────────────────────────────────────────────────
   onDelete(p: Prenotazione) {
     if (!this.canDelete(p)) {
