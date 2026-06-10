@@ -210,7 +210,12 @@ export class PrenotazioniService {
       const oraRiconsegna = new Date(body.dataOraRiconsegna);
       oraRiconsegna.setUTCHours(oraRiconsegna.getUTCHours(), oraRiconsegna.getUTCMinutes(), oraRiconsegna.getUTCSeconds(), 0);
 
-      await tx.prenotazione.create({
+      // Step 1: crea prenotazione + righe (senza accessori).
+      // Un nested create a 3 livelli (prenotazione → righe[] → accessori[]) causa
+      // una violazione FK su righe_accessorio.rigaPrenotazioneId quando le righe
+      // sono più di una, perché Prisma assegna gli ID alle righe in batch e non
+      // riesce a collegare correttamente gli accessori a ciascuna riga.
+      const prenotazioneCreata = await tx.prenotazione.create({
         data: {
           utenteId,
           puntoVenditaId: body.puntoVenditaId,
@@ -220,10 +225,30 @@ export class PrenotazioniService {
           stato: StatoPrenotazione.CONFERMATA,
           totale,
           righe: {
-            create: righeCalcolate,
+            create: righeCalcolate.map(r => ({
+              tipoBiciId: r.tipoBiciId,
+              coperturaId: r.coperturaId,
+              subtotale: r.subtotale,
+            })),
           },
         },
+        include: { righe: { orderBy: { id: "asc" } } },
       });
+
+      // Step 2: ora che ogni riga ha il suo ID reale, creiamo gli accessori
+      // uno step separato per ogni riga.
+      for (let i = 0; i < righeCalcolate.length; i++) {
+        const accCreate = righeCalcolate[i].accessori.create;
+        if (accCreate.length > 0) {
+          await tx.rigaAccessorio.createMany({
+            data: accCreate.map((acc: any) => ({
+              rigaPrenotazioneId: prenotazioneCreata.righe[i].id,
+              accessorioId: acc.accessorioId,
+              quantita: acc.quantita,
+            })),
+          });
+        }
+      }
     });
   }
 
@@ -273,7 +298,8 @@ export class PrenotazioniService {
           where: { prenotazioneId: params.id },
         });
 
-        await tx.prenotazione.update({
+        // Step 1: aggiorna prenotazione + crea righe senza accessori
+        const prenotazioneAggiornata = await tx.prenotazione.update({
           where: { id: params.id },
           data: {
             totale,
@@ -281,9 +307,30 @@ export class PrenotazioniService {
             oraRitiro: nuovaOraRitiro,
             dataOraRiconsegna: nuovaDataOraRiconsegna,
             puntoVenditaId: nuovoPuntoVenditaId,
-            righe: { create: righeCalcolate },
+            righe: {
+              create: righeCalcolate.map(r => ({
+                tipoBiciId: r.tipoBiciId,
+                coperturaId: r.coperturaId,
+                subtotale: r.subtotale,
+              })),
+            },
           },
+          include: { righe: { orderBy: { id: "asc" } } },
         });
+
+        // Step 2: crea gli accessori usando gli ID reali delle righe appena create
+        for (let i = 0; i < righeCalcolate.length; i++) {
+          const accCreate = righeCalcolate[i].accessori.create;
+          if (accCreate.length > 0) {
+            await tx.rigaAccessorio.createMany({
+              data: accCreate.map((acc: any) => ({
+                rigaPrenotazioneId: prenotazioneAggiornata.righe[i].id,
+                accessorioId: acc.accessorioId,
+                quantita: acc.quantita,
+              })),
+            });
+          }
+        }
       } else {
         for (const riga of prenotazione.righe) {
           await prenotaBici(tx, nuovoPuntoVenditaId, riga.tipoBiciId);

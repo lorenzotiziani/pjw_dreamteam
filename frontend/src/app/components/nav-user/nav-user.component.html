@@ -1,8 +1,17 @@
 <li class="nav-item" ngbDropdown display="dynamic" placement="bottom-end">
-  <a class="nav-link" ngbDropdownToggle>
-    {{user.email}}
+  <a class="dr-user-btn" ngbDropdownToggle>
+    <span class="dr-user-avatar"><i class="bi bi-person-fill"></i></span>
+    <span class="dr-user-email">{{ user.email }}</span>
+    <i class="bi bi-chevron-down" style="font-size: 0.65rem; opacity: 0.7;"></i>
   </a>
-  <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
-    <button ngbDropdownItem (click)="onLogoutClick()">Logout</button>
+  <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-1 p-1">
+    <div class="px-3 py-2 border-bottom mb-1">
+      <div style="font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Account</div>
+      <div style="font-size: 0.85rem; font-weight: 600; color: #1e293b; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ user.email }}</div>
+    </div>
+    <button ngbDropdownItem class="rounded-2 d-flex align-items-center gap-2" (click)="onLogoutClick()">
+      <i class="bi bi-box-arrow-right text-danger"></i>
+      <span>Esci</span>
+    </button>
   </div>
 </li>

@@ -1,0 +1,156 @@
+/* ===================================================
+   DreamRide — Booking Form
+   =================================================== */
+
+.dr-booking-page {
+  background: var(--dr-bg, #f9fafb);
+  min-height: calc(100vh - 70px);
+}
+
+/* Page icon */
+.dr-page-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #16a34a, #4ade80);
+  color: white;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ===== Form cards ===== */
+.dr-form-card {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.055);
+  border: 1px solid #efefef;
+}
+
+.dr-form-card-header {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0.85rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.dr-form-card-header i {
+  color: #16a34a;
+}
+
+.dr-form-card-body {
+  padding: 1.25rem;
+}
+
+/* Optional badge */
+.dr-optional-badge {
+  background: #f3f4f6;
+  color: #9ca3af;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 0.1rem 0.5rem;
+  border-radius: 50px;
+  margin-left: 0.5rem;
+}
+
+/* ===== Bike row ===== */
+.dr-bike-row {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}
+
+/* ===== Option cards (checkbox/radio) ===== */
+.dr-option-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: white;
+  margin: 0;
+}
+
+.dr-option-card:hover {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.dr-option-card:has(.dr-option-check:checked) {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.dr-option-check {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: #16a34a;
+  width: 16px;
+  height: 16px;
+}
+
+.dr-option-body {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.dr-option-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #374151;
+}
+
+.dr-option-price {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #16a34a;
+  white-space: nowrap;
+}
+
+.dr-option-desc {
+  font-size: 0.78rem;
+  color: #6b7280;
+  line-height: 1.5;
+  width: 100%;
+}
+
+/* ===== Summary box ===== */
+.dr-summary-box {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 2px solid #86efac;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.dr-summary-total {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #15803d;
+  letter-spacing: -1px;
+}
+
+/* ===== Auth prompt ===== */
+.dr-auth-prompt {
+  background: #f8fafc;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 1rem;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}

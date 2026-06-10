@@ -1,0 +1,264 @@
+/* ===================================================
+   DreamRide — Home Page Styles
+   =================================================== */
+
+/* ---------- HERO ---------- */
+.dr-hero {
+  height: 92vh;
+  min-height: 560px;
+  background-image: url('https://images.mtb-news.de/Psn8zzbKkfZf7XGeX7DSyi-NpaA=/1500x800/https%3A%2F%2Fwww.mtb-news.de%2Fnews%2Fwp-content%2Fuploads%2F2020%2F05%2FWBD_Teaser_Square_Social.jpg');
+  background-size: cover;
+  background-position: center 40%;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.dr-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(10, 20, 35, 0.88) 0%,
+    rgba(10, 20, 35, 0.55) 60%,
+    rgba(10, 20, 35, 0.2) 100%
+  );
+  display: flex;
+  align-items: center;
+}
+
+.dr-hero-content {
+  max-width: 620px;
+  color: white;
+  padding: 2rem 0;
+  animation: fadeUp 0.8s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dr-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(74, 222, 128, 0.2);
+  border: 1px solid rgba(74, 222, 128, 0.45);
+  color: #4ade80;
+  padding: 0.3rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 1.25rem;
+}
+
+.dr-hero-title {
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+  margin-bottom: 1.1rem;
+}
+
+.dr-hero-sub {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.75;
+  max-width: 500px;
+  margin-bottom: 0;
+}
+
+.dr-hero-user-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  margin-top: 1.2rem;
+}
+
+/* ---------- STATS STRIP ---------- */
+.dr-stats-strip {
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+  padding: 1.25rem 0;
+  color: white;
+}
+
+.dr-stat-item {
+  padding: 0.85rem 1rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+}
+.dr-stat-item:last-child { border-right: none; }
+
+.dr-stat-number {
+  font-size: 1.9rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.dr-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.82;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-top: 0.15rem;
+}
+
+/* ---------- BIKE CARDS ---------- */
+.dr-bike-card {
+  border-radius: 1rem;
+  overflow: hidden;
+  background: white;
+  box-shadow: var(--dr-shadow, 0 4px 20px rgba(0,0,0,0.07));
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  height: 100%;
+}
+
+.dr-bike-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.13);
+}
+
+.dr-bike-img {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.dr-bike-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: 50px;
+  letter-spacing: 0.3px;
+}
+
+.dr-bike-body {
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.dr-bike-desc {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+  line-height: 1.55;
+}
+
+.dr-bike-tag {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+}
+
+.dr-bike-sizes {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+}
+
+/* ---------- HOW IT WORKS ---------- */
+.dr-how-section {
+  background: #f0fdf4;
+}
+
+.dr-step-num {
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: #bbf7d0;
+  line-height: 1;
+  margin-bottom: -0.6rem;
+}
+
+.dr-step-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  margin: 0 auto;
+  box-shadow: 0 6px 22px rgba(22, 163, 74, 0.32);
+}
+
+/* ---------- FEATURE CARDS ---------- */
+.dr-feature-card {
+  padding: 2rem 1.75rem;
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.055);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  height: 100%;
+  border: 1px solid #f0f0f0;
+}
+
+.dr-feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+}
+
+.dr-feature-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* ---------- CTA SECTION ---------- */
+.dr-cta-section {
+  background: linear-gradient(135deg, #0f172a 0%, #1a3a28 100%);
+  padding: 5.5rem 0;
+  color: white;
+}
+
+.dr-cta-icon {
+  font-size: 3.5rem;
+  color: #4ade80;
+  display: block;
+  margin-bottom: 1rem;
+  animation: pulse 2.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.07); }
+}
+
+.dr-cta-title {
+  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.dr-cta-sub {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.7;
+}

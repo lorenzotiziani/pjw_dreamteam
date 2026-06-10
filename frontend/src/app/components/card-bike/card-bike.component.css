@@ -1,0 +1,176 @@
+/* ===================================================
+   DreamRide — Card Prenotazione
+   =================================================== */
+
+.dr-card {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 3px 18px rgba(0, 0, 0, 0.07);
+  border: 1px solid #efefef;
+  transition: box-shadow 0.22s ease, transform 0.22s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dr-card:hover {
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.11);
+  transform: translateY(-3px);
+}
+
+/* ===== Status header ===== */
+.dr-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1rem;
+}
+
+.dr-status-confermata  { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.dr-status-attesa      { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.dr-status-ritirata    { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+.dr-status-restituita  { background: linear-gradient(135deg, #0891b2, #38bdf8); }
+.dr-status-cancellata  { background: linear-gradient(135deg, #dc2626, #f87171); }
+
+.dr-status-pill {
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dr-card-id {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+}
+
+/* ===== Body ===== */
+.dr-card-body {
+  padding: 1rem 1.1rem;
+  flex: 1;
+}
+
+.dr-card-shop {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1e293b;
+  margin-bottom: 0.85rem;
+}
+
+/* Dates */
+.dr-dates-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.dr-date-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.dr-date-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9ca3af;
+}
+
+.dr-date-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.dr-date-time {
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 0.72rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 50px;
+  margin-left: 0.25rem;
+}
+
+.dr-dates-arrow {
+  color: #d1d5db;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.dr-divider {
+  border-color: #f3f4f6;
+  margin: 0.75rem 0;
+}
+
+.dr-bike-dot {
+  width: 28px;
+  height: 28px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.dr-acc-chip {
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.15rem 0.5rem;
+  border-radius: 50px;
+}
+
+.dr-copertura-chip {
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 50px;
+}
+
+.dr-card-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dr-card-totale {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #15803d;
+}
+
+/* ===== Actions ===== */
+.dr-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #f3f4f6;
+  background: #fafafa;
+}
+
+.dr-card-scadenza {
+  padding: 0.6rem 1rem;
+  border-top: 1px solid #f3f4f6;
+  background: #fafafa;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.78rem;
+}

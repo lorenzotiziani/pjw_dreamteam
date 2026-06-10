@@ -1,1 +1,168 @@
-/* You can add global styles to this file, and also import other style files */
+/* ===================================================
+   DreamRide — Global Styles
+   =================================================== */
+
+/* ---------- CSS Variables ---------- */
+:root {
+  --dr-primary:       #16a34a;
+  --dr-primary-dark:  #15803d;
+  --dr-primary-light: #dcfce7;
+  --dr-primary-bg:    #f0fdf4;
+  --dr-accent:        #f97316;
+  --dr-accent-dark:   #ea6c0b;
+  --dr-dark:          #0f172a;
+  --dr-slate:         #1e293b;
+  --dr-text:          #374151;
+  --dr-muted:         #6b7280;
+  --dr-border:        #e5e7eb;
+  --dr-bg:            #f9fafb;
+  --dr-radius:        0.875rem;
+  --dr-shadow:        0 4px 20px rgba(0, 0, 0, 0.07);
+  --dr-shadow-lg:     0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- Reset / Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  color: var(--dr-text);
+  background: var(--dr-bg);
+  min-height: 100vh;
+}
+
+/* ---------- Typography ---------- */
+.dr-section-badge {
+  display: inline-block;
+  background: var(--dr-primary-light);
+  color: var(--dr-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0.3rem 1rem;
+  border-radius: 50px;
+  margin-bottom: 0.75rem;
+}
+
+.dr-section-title {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  color: var(--dr-dark);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+/* ---------- Buttons ---------- */
+.dr-btn-green {
+  background: var(--dr-primary);
+  color: white;
+  border: none;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.dr-btn-green:hover,
+.dr-btn-green:focus {
+  background: var(--dr-primary-dark);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.35);
+}
+.dr-btn-green:active { transform: translateY(0); }
+.dr-btn-green:disabled {
+  background: #86efac;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.dr-btn-accent {
+  background: var(--dr-accent);
+  color: white;
+  border: none;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.dr-btn-accent:hover,
+.dr-btn-accent:focus {
+  background: var(--dr-accent-dark);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(249, 115, 22, 0.35);
+}
+.dr-btn-accent:active { transform: translateY(0); }
+
+/* ---------- Forms ---------- */
+.form-control,
+.form-select {
+  border-radius: 0.5rem;
+  border: 1.5px solid var(--dr-border);
+  padding: 0.6rem 0.875rem;
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #fff;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--dr-primary);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+  outline: none;
+}
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dr-text);
+  margin-bottom: 0.35rem;
+}
+
+/* Input group styling */
+.input-group-text {
+  background: #f8fafc;
+  border: 1.5px solid var(--dr-border);
+  font-size: 0.95rem;
+}
+.input-group .form-control.border-start-0 {
+  border-left: none !important;
+}
+.input-group .input-group-text.border-end-0 {
+  border-right: none !important;
+}
+.input-group:focus-within .input-group-text {
+  border-color: var(--dr-primary);
+}
+.input-group:focus-within .form-control {
+  border-color: var(--dr-primary);
+  box-shadow: none;
+}
+.input-group:focus-within {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+  border-radius: 0.5rem;
+}
+
+/* ---------- Auth pages ---------- */
+.dr-auth-page {
+  min-height: calc(100vh - 70px);
+  background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+  display: flex;
+  align-items: center;
+  padding: 3rem 0;
+}
+
+/* ---------- Footer ---------- */
+.dr-footer {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 2.5rem 0;
+  margin-top: 0;
+}
+
+/* ---------- Scrollbar (Webkit) ---------- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--dr-primary); }

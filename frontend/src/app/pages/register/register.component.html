@@ -1,80 +1,115 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-4 col-md-6 col-sm-12 border rounded p-4">
-      <form [formGroup]="registerForm" (ngSubmit)="register()">
+<div class="dr-auth-page">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
 
-        <!-- email -->
-        <div class="form-outline mb-3">
-          <label for="email" class="form-label">email</label>
-          <input id="email" type="email" class="form-control" formControlName="email" />
-          @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
-            <div class="text-danger">
-              A valid email is required.
+        <!-- Logo / Header -->
+        <div class="text-center mb-4">
+          <div class="dr-auth-logo">
+            <i class="bi bi-bicycle"></i>
+          </div>
+          <h2 class="fw-bold mt-3 mb-1" style="color: var(--dr-dark)">Crea il tuo account</h2>
+          <p class="text-muted small">Unisciti a DreamRide e inizia a pedalare</p>
+        </div>
+
+        <!-- Card -->
+        <div class="card border-0 shadow-lg rounded-4 p-4">
+          <form [formGroup]="registerForm" (ngSubmit)="register()">
+
+            <!-- Nome + Cognome -->
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label for="nome" class="form-label">Nome</label>
+                <input id="nome" type="text" class="form-control" formControlName="nome" placeholder="Mario" />
+                @if (registerForm.get('nome')?.touched && registerForm.get('nome')?.invalid) {
+                  <div class="text-danger small mt-1">
+                    <i class="bi bi-exclamation-circle me-1"></i>Obbligatorio
+                  </div>
+                }
+              </div>
+              <div class="col-6">
+                <label for="cognome" class="form-label">Cognome</label>
+                <input id="cognome" type="text" class="form-control" formControlName="cognome" placeholder="Rossi" />
+                @if (registerForm.get('cognome')?.touched && registerForm.get('cognome')?.invalid) {
+                  <div class="text-danger small mt-1">
+                    <i class="bi bi-exclamation-circle me-1"></i>Obbligatorio
+                  </div>
+                }
+              </div>
             </div>
-          }
-        </div>
 
-        <!-- Password -->
-        <div class="form-outline mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input id="password" type="password" class="form-control" formControlName="password" />
-          @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
-            <div class="text-danger">
-              Password is required.
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <div class="input-group rounded-3 overflow-hidden">
+                <span class="input-group-text border-end-0">
+                  <i class="bi bi-envelope text-muted"></i>
+                </span>
+                <input id="email" type="email" class="form-control border-start-0 ps-1"
+                       formControlName="email" placeholder="la-tua@email.com" />
+              </div>
+              @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
+                <div class="text-danger small mt-1">
+                  <i class="bi bi-exclamation-circle me-1"></i>Inserisci un indirizzo email valido
+                </div>
+              }
             </div>
-          }
-        </div>
 
-        <!-- conferma -->
-        <div class="form-outline mb-3">
-          <label for="confirm" class="form-label">Conferma Password</label>
-          <input id="confirm" type="password" class="form-control" formControlName="confirm" />
-          @if (registerForm.get('confirm')?.touched && registerForm.get('confirm')?.invalid) {
-            <div class="text-danger">
-              Password is required.
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group rounded-3 overflow-hidden">
+                <span class="input-group-text border-end-0">
+                  <i class="bi bi-lock text-muted"></i>
+                </span>
+                <input id="password" type="password" class="form-control border-start-0 ps-1"
+                       formControlName="password" placeholder="••••••••" />
+              </div>
+              @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
+                <div class="text-danger small mt-1">
+                  <i class="bi bi-exclamation-circle me-1"></i>La password è obbligatoria
+                </div>
+              }
             </div>
-          }
-        </div>
 
-        <!-- nome -->
-        <div class="form-outline mb-3">
-          <label for="nome" class="form-label">Nome</label>
-          <input id="nome" type="text" class="form-control" formControlName="nome" />
-          @if (registerForm.get('nome')?.touched && registerForm.get('nome')?.invalid) {
-            <div class="text-danger">
-              Nome è obbligatorio.
+            <!-- Conferma password -->
+            <div class="mb-4">
+              <label for="confirm" class="form-label">Conferma password</label>
+              <div class="input-group rounded-3 overflow-hidden">
+                <span class="input-group-text border-end-0">
+                  <i class="bi bi-lock-fill text-muted"></i>
+                </span>
+                <input id="confirm" type="password" class="form-control border-start-0 ps-1"
+                       formControlName="confirm" placeholder="••••••••" />
+              </div>
+              @if (registerForm.get('confirm')?.touched && registerForm.get('confirm')?.invalid) {
+                <div class="text-danger small mt-1">
+                  <i class="bi bi-exclamation-circle me-1"></i>Conferma la password
+                </div>
+              }
             </div>
-          }
+
+            <!-- Error -->
+            @if (registerError) {
+              <div [innerHTML]="registerError" class="alert alert-danger py-2 px-3 rounded-3 small mb-3"></div>
+            }
+
+            <!-- Submit -->
+            <button type="submit" class="btn dr-btn-green w-100 py-2 fw-semibold" [disabled]="registerForm.invalid">
+              <i class="bi bi-person-plus me-2"></i>Crea account
+            </button>
+
+          </form>
+
+          <hr class="my-3 opacity-25">
+
+          <p class="text-center text-muted small mb-0">
+            Hai già un account?
+            <a routerLink="/login" class="fw-semibold text-decoration-none" style="color: var(--dr-primary)">Accedi</a>
+          </p>
         </div>
 
-        <!-- cognome -->
-        <div class="form-outline mb-3">
-          <label for="cognome" class="form-label">Cognome</label>
-          <input id="cognome" type="text" class="form-control" formControlName="cognome" />
-          @if (registerForm.get('cognome')?.touched && registerForm.get('cognome')?.invalid) {
-            <div class="text-danger">
-              Cognome è obbligatorio.
-            </div>
-          }
-        </div>
-
-        <!-- Error message -->
-        @if (registerError) {
-          <div [innerHTML]="registerError" class="text-danger text-center mb-3"></div>
-        }
-
-        <!-- Submit -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary btn-block w-100" [disabled]="registerForm.invalid">
-            Register
-          </button>
-        </div>
-
-
-        <div class="text-center">
-          <p>Do you want to log in? <a routerLink="/login">Login</a></p>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>
