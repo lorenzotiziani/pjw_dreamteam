@@ -1,154 +1,206 @@
-<div class="card shadow-sm border-0">
-  <div class="card-header bg-white py-3 border-bottom">
-    <h2 class="h4 mb-0 fw-semibold">Noleggio bici</h2>
-  </div>
+<div class="dr-booking-page py-4 py-md-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
 
-  <div class="card-body p-4">
-    <form [formGroup]="bookingForm" (ngSubmit)="addPrenotazione()">
-
-      <!-- Data ritiro -->
-      <div class="mb-4">
-        <label class="form-label fw-semibold">Data ritiro <span class="text-danger">*</span></label>
-        <input type="date" class="form-control" formControlName="data">
-      </div>
-
-      <!-- Punto vendita -->
-      <div class="mb-4">
-        <label class="form-label fw-semibold">Punto vendita <span class="text-danger">*</span></label>
-        <select class="form-select" formControlName="puntoVendita">
-          <option value="" disabled selected>Seleziona un punto vendita</option>
-          <option *ngFor="let p of puntoVendita$ | async" [value]="p.id">
-            {{ p.nome }} - {{ p.citta }}, {{ p.indirizzo }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Orario ritiro -->
-      <div class="mb-4">
-        <label class="form-label fw-semibold">Orario ritiro <span class="text-danger">*</span></label>
-        <select class="form-select" formControlName="ora">
-          <option value="" disabled selected>Seleziona un orario</option>
-          <option *ngFor="let orario of orariDisponibili" [value]="orario">{{ orario }}</option>
-        </select>
-      </div>
-
-      <!-- Data riconsegna -->
-      <div class="mb-4">
-        <label class="form-label fw-semibold">Data riconsegna <span class="text-danger">*</span></label>
-        <input type="date" class="form-control" formControlName="dataRiconsegna">
-      </div>
-
-      <!-- Orario riconsegna -->
-      <div class="mb-4">
-        <label class="form-label fw-semibold">Orario riconsegna <span class="text-danger">*</span></label>
-        <select class="form-select" formControlName="oraRiconsegna">
-          <option value="" disabled selected>Seleziona un orario</option>
-          <option *ngFor="let orario of orariDisponibili" [value]="orario">{{ orario }}</option>
-        </select>
-      </div>
-
-      <!-- Biciclette (array di righe) -->
-      <div class="mb-4">
-        <label class="form-label fw-semibold">Biciclette <span class="text-danger">*</span></label>
-
-        <div formArrayName="righe">
-          <div *ngFor="let riga of righeArray.controls; let i = index"
-               [formGroupName]="i"
-               class="row g-2 align-items-center mb-2 p-2 border rounded">
-            <div class="col-md-8">
-              <select class="form-select" formControlName="tipoBiciId">
-                <option value="">Seleziona bici</option>
-                <option *ngFor="let bike of bikesDisponibiliList" [value]="bike.id">
-                  {{ bike.categoria }} - {{ bike.taglia }} (€{{ bike.prezzoMezzaGiornata }})
-                </option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <input type="number" class="form-control" formControlName="quantita" min="1" placeholder="Qtà">
-            </div>
-            <div class="col-md-1">
-              <button type="button" class="btn btn-outline-danger btn-sm" (click)="rimuoviRiga(i)"
-                      *ngIf="righeArray.length > 1">Elimina</button>
-            </div>
+        <!-- Page header -->
+        <div class="mb-4 pb-2">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="dr-page-icon"><i class="bi bi-calendar2-plus"></i></span>
+            <h2 class="fw-bold mb-0" style="color: var(--dr-dark)">Nuova prenotazione</h2>
           </div>
+          <p class="text-muted small ms-5 ps-1 mb-0">Compila il modulo per prenotare la tua bici DreamRide</p>
         </div>
 
-        <button type="button" class="btn btn-outline-secondary btn-sm mt-2" (click)="aggiungiRiga()">
-          + Aggiungi altra bici
-        </button>
-      </div>
+        <form [formGroup]="bookingForm" (ngSubmit)="addPrenotazione()">
 
-      <!-- Accessori globali -->
-      <div class="mb-4">
-        <label class="form-label fw-semibold">Accessori</label>
-        <div class="row">
-          <div class="col-md-6" *ngFor="let accessorio of accessori$ | async">
-            <div class="form-check border p-3 rounded mb-2">
-              <input class="form-check-input" type="checkbox"
-                     [id]="accessorio.id"
-                     [value]="accessorio.id"
-                     (change)="onAccessorioChange($event, accessorio)">
-              <label class="form-check-label w-100" [for]="accessorio.id">
-                <strong>{{ accessorio.nome }}</strong>
-                <span class="badge bg-primary ms-2">€{{ accessorio.prezzo }}</span>
-              </label>
+          <!-- ===== CARD 1: Date e luogo ===== -->
+          <div class="dr-form-card mb-4">
+            <div class="dr-form-card-header">
+              <i class="bi bi-calendar2-event me-2"></i>
+              <span>Date e punto di ritiro</span>
+            </div>
+            <div class="dr-form-card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Data ritiro <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" formControlName="data">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Orario ritiro <span class="text-danger">*</span></label>
+                  <select class="form-select" formControlName="ora">
+                    <option value="" disabled selected>Seleziona orario</option>
+                    <option *ngFor="let orario of orariDisponibili" [value]="orario">{{ orario }}</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Data riconsegna <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control" formControlName="dataRiconsegna">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Orario riconsegna <span class="text-danger">*</span></label>
+                  <select class="form-select" formControlName="oraRiconsegna">
+                    <option value="" disabled selected>Seleziona orario</option>
+                    <option *ngFor="let orario of orariDisponibili" [value]="orario">{{ orario }}</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Punto vendita <span class="text-danger">*</span></label>
+                  <select class="form-select" formControlName="puntoVendita">
+                    <option value="" disabled selected>Seleziona punto vendita</option>
+                    <option *ngFor="let p of puntoVendita$ | async" [value]="p.id">
+                      <i class="bi bi-shop"></i> {{ p.nome }} — {{ p.citta }}, {{ p.indirizzo }}
+                    </option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Copertura globale -->
-      <div class="mb-4">
-        <label class="form-label fw-semibold">Copertura aggiuntiva (solo una)</label>
-        <div class="row">
-          <div class="col-md-6" *ngFor="let copertura of coperture$ | async">
-            <div class="form-check border p-3 rounded mb-2">
-              <input class="form-check-input" type="radio"
-                     name="coperturaUnica"
-                     [id]="copertura.id"
-                     [value]="copertura.id"
-                     (change)="onCoperturaSelezionata(copertura)">
-              <label class="form-check-label w-100" [for]="copertura.id">
-                <strong>{{ copertura.nome }}</strong>
-                <span class="badge bg-primary ms-2">€{{ copertura.prezzo }}</span>
-                <p class="mb-0 mt-2 text-muted small">{{ copertura.descrizione }}</p>
-              </label>
+          <!-- ===== CARD 2: Biciclette ===== -->
+          <div class="dr-form-card mb-4">
+            <div class="dr-form-card-header">
+              <i class="bi bi-bicycle me-2"></i>
+              <span>Biciclette</span>
+            </div>
+            <div class="dr-form-card-body">
+              <div formArrayName="righe">
+                <div *ngFor="let riga of righeArray.controls; let i = index"
+                     [formGroupName]="i"
+                     class="dr-bike-row mb-3">
+                  <div class="row g-2 align-items-center">
+                    <div class="col">
+                      <select class="form-select" formControlName="tipoBiciId">
+                        <option value="">Seleziona bici</option>
+                        <option *ngFor="let bike of bikesDisponibiliList" [value]="bike.id">
+                          {{ bike.categoria }} — Taglia {{ bike.taglia }} (€{{ bike.prezzoMezzaGiornata }}/mezza giornata)
+                        </option>
+                      </select>
+                    </div>
+                    <div style="width: 96px;">
+                      <input type="number"
+                             class="form-control text-center"
+                             formControlName="quantita"
+                             min="1"
+                             placeholder="Qtà">
+                    </div>
+                    <div class="col-auto" *ngIf="righeArray.length > 1">
+                      <button type="button"
+                              class="btn btn-outline-danger btn-sm rounded-3 px-2"
+                              (click)="rimuoviRiga(i)"
+                              title="Rimuovi">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button type="button"
+                      class="btn btn-outline-success btn-sm rounded-3 mt-1"
+                      (click)="aggiungiRiga()">
+                <i class="bi bi-plus-circle me-1"></i>Aggiungi bici
+              </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Totale -->
-      <div class="mb-4 text-end">
-        <strong class="fs-5">Totale: €{{ prezzoTotale }}</strong>
-      </div>
-
-      <!-- Errore -->
-      <div *ngIf="formError" class="alert alert-danger">
-        <i class="bi bi-exclamation-triangle me-2"></i> {{ formError }}
-      </div>
-
-      <!-- Pulsante submit / login -->
-      <ng-container *ngIf="user$ | async as user; else noAuth">
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary btn-lg" [disabled]="!bookingForm.valid">
-            Conferma prenotazione
-          </button>
-        </div>
-      </ng-container>
-
-      <ng-template #noAuth>
-        <div class="d-flex row justify-content-center text-center p-4 bg-light rounded">
-          <div>
-            <p>Effettua il login prima di confermare la prenotazione</p>
-            <button class="btn btn-link p-0" (click)="onRegisterClick()">Registrati</button>
+          <!-- ===== CARD 3: Accessori ===== -->
+          <div class="dr-form-card mb-4">
+            <div class="dr-form-card-header">
+              <i class="bi bi-bag-check me-2"></i>
+              <span>Accessori opzionali</span>
+            </div>
+            <div class="dr-form-card-body">
+              <div class="row g-2">
+                <div class="col-md-6" *ngFor="let accessorio of accessori$ | async">
+                  <label class="dr-option-card" [for]="'acc-' + accessorio.id">
+                    <input class="dr-option-check"
+                           type="checkbox"
+                           [id]="'acc-' + accessorio.id"
+                           [value]="accessorio.id"
+                           (change)="onAccessorioChange($event, accessorio)">
+                    <div class="dr-option-body">
+                      <span class="dr-option-name">{{ accessorio.nome }}</span>
+                      <span class="dr-option-price">+€{{ accessorio.prezzo }}</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="m-4">
-            <button class="btn btn-primary" (click)="onLoginClick()">Login</button>
-          </div>
-        </div>
-      </ng-template>
 
-    </form>
+          <!-- ===== CARD 4: Copertura assicurativa ===== -->
+          <div class="dr-form-card mb-4">
+            <div class="dr-form-card-header">
+              <i class="bi bi-shield-check me-2"></i>
+              <span>Copertura assicurativa <span class="dr-optional-badge">opzionale</span></span>
+            </div>
+            <div class="dr-form-card-body">
+              <div class="d-flex flex-column gap-2">
+                <div *ngFor="let copertura of coperture$ | async">
+                  <label class="dr-option-card dr-option-radio w-100" [for]="'cop-' + copertura.id">
+                    <input class="dr-option-check"
+                           type="radio"
+                           name="coperturaUnica"
+                           [id]="'cop-' + copertura.id"
+                           [value]="copertura.id"
+                           (change)="onCoperturaSelezionata(copertura)">
+                    <div class="dr-option-body flex-column align-items-start gap-1">
+                      <div class="d-flex w-100 justify-content-between align-items-center">
+                        <span class="dr-option-name">{{ copertura.nome }}</span>
+                        <span class="dr-option-price">+€{{ copertura.prezzo }}</span>
+                      </div>
+                      <p class="dr-option-desc mb-0">{{ copertura.descrizione }}</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== RIEPILOGO TOTALE ===== -->
+          <div class="dr-summary-box mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold" style="color: var(--dr-dark)">Totale stimato</div>
+                <div class="text-muted" style="font-size: 0.78rem">IVA inclusa • pagamento al ritiro</div>
+              </div>
+              <span class="dr-summary-total">€{{ prezzoTotale }}</span>
+            </div>
+          </div>
+
+          <!-- ===== ERRORE ===== -->
+          <div *ngIf="formError" class="alert alert-danger rounded-3 mb-3 small">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ formError }}
+          </div>
+
+          <!-- ===== SUBMIT / AUTH ===== -->
+          <ng-container *ngIf="user$ | async as user; else noAuth">
+            <button type="submit"
+                    class="btn dr-btn-green btn-lg w-100 py-3 fw-semibold"
+                    [disabled]="!bookingForm.valid">
+              <i class="bi bi-check2-circle me-2"></i>Conferma prenotazione
+            </button>
+          </ng-container>
+
+          <ng-template #noAuth>
+            <div class="dr-auth-prompt">
+              <i class="bi bi-person-lock fs-2 text-muted mb-2 d-block"></i>
+              <p class="mb-3 fw-semibold" style="color: var(--dr-dark)">Accedi per completare la prenotazione</p>
+              <p class="text-muted small mb-4">I tuoi dati del modulo verranno salvati</p>
+              <div class="d-flex gap-2 justify-content-center">
+                <button class="btn btn-outline-success px-4" (click)="onLoginClick()">
+                  <i class="bi bi-box-arrow-in-right me-1"></i>Accedi
+                </button>
+                <button class="btn dr-btn-green px-4" (click)="onRegisterClick()">
+                  <i class="bi bi-person-plus me-1"></i>Registrati
+                </button>
+              </div>
+            </div>
+          </ng-template>
+
+        </form>
+      </div>
+    </div>
   </div>
 </div>

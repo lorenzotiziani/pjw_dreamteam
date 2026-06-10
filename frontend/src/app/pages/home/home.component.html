@@ -1,80 +1,225 @@
-<!-- Hero section con sfondo sfumato e allineamento centrale -->
-<div class="bg-gradient-primary py-5 mb-5">
-  <div class="container py-4">
-    <div class="text-center">
+<!-- ===================== HERO ===================== -->
+<section class="dr-hero">
+  <div class="dr-hero-overlay">
+    <div class="container h-100">
+      <div class="dr-hero-content">
+        <span class="dr-hero-badge">
+          <i class="bi bi-bicycle me-1"></i>Noleggio biciclette
+        </span>
+        <h1 class="dr-hero-title">Esplora il territorio<br>su due ruote</h1>
+        <p class="dr-hero-sub">
+          City bike, mountain bike, gravel e road bike per ogni tipo di avventura.
+          Noleggio semplice, esperienze memorabili.
+        </p>
 
-    <div class="bg-light rounded p-5 auto shadow">
-      <i class="fas fa-bicycle fs-1 mb-3 text-warning"></i>
-      <h1 class="display-4 fw-bold">Benvenuto nel noleggio ITS!</h1>
-      <p class="lead mb-2">Scopri la libertà su due ruote a Vicenza</p>
-    </div>  
-      <!-- Messaggio user autenticato -->
-      <ng-container *ngIf="user$ | async as user">
-        <div class="alert alert-light d-inline-flex align-items-center gap-2 shadow-sm m-4" role="alert">
-          <i class="fas fa-user-circle fs-5"></i>
-          <span class="fw-semibold">{{ user.email }}</span>
-        </div>
-      </ng-container>
+        <!-- Messaggio utente loggato -->
+        <ng-container *ngIf="user$ | async as user">
+          <div class="dr-hero-user-badge">
+            <i class="bi bi-person-check me-2"></i>
+            Bentornato, <strong>{{ user.email }}</strong>
+          </div>
+        </ng-container>
 
-      <div class="d-flex justify-content-center gap-3 mt-4">
-        <div class="mt-4">
-          <a routerLink="/booking/form" class="btn btn-warning btn-lg px-4 py-2 fw-bold shadow">
-            <i class="fas fa-calendar-check me-2"></i>Prenota ora
+        <div class="d-flex flex-wrap gap-3 mt-4">
+          <a routerLink="/booking/form" class="btn dr-btn-accent btn-lg px-4 py-2 fw-semibold">
+            <i class="bi bi-calendar2-plus me-2"></i>Prenota ora
+          </a>
+          <a href="#tipologie" class="btn btn-outline-light btn-lg px-4 py-2 fw-semibold">
+            Scopri le bici <i class="bi bi-arrow-down ms-1"></i>
           </a>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Sezione descrittiva sotto l'hero -->
-<div class="container mb-5">
-  <div class="row g-4 text-center">
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <i class="fas fa-bike fs-1 text-primary mb-3"></i>
-          <h5 class="card-title">Bici moderne</h5>
-          <p class="card-text">City bike, mountain bike, elettriche: scegli la tua preferita.</p>
+<!-- ============= STATS STRIP ============= -->
+<section class="dr-stats-strip">
+  <div class="container">
+    <div class="row g-0 text-center">
+      <div class="col-6 col-md-3 dr-stat-item">
+        <div class="dr-stat-number">100+</div>
+        <div class="dr-stat-label">Biciclette</div>
+      </div>
+      <div class="col-6 col-md-3 dr-stat-item">
+        <div class="dr-stat-number">4</div>
+        <div class="dr-stat-label">Tipologie</div>
+      </div>
+      <div class="col-6 col-md-3 dr-stat-item">
+        <div class="dr-stat-number">5+</div>
+        <div class="dr-stat-label">Punti noleggio</div>
+      </div>
+      <div class="col-6 col-md-3 dr-stat-item">
+        <div class="dr-stat-number">9–18</div>
+        <div class="dr-stat-label">Orario servizio</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= TIPOLOGIE DI BICI ============= -->
+<section class="py-5 bg-white" id="tipologie">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="dr-section-badge">La nostra flotta</span>
+      <h2 class="dr-section-title">Trova la bici perfetta per te</h2>
+      <p class="text-muted">Da rilassanti passeggiate in città a sfide off-road impegnative</p>
+    </div>
+
+    <div class="row g-4">
+      <!-- City Bike -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="dr-bike-card">
+          <div class="dr-bike-img" style="background-image: url('https://images.unsplash.com/photo-1571068316344-75bc76f77890?auto=format&fit=crop&w=800&q=80')">
+            <span class="dr-bike-badge">City Bike</span>
+          </div>
+          <div class="dr-bike-body">
+            <p class="dr-bike-desc">Perfetta per esplorare la città con comodità e stile.</p>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="dr-bike-tag"><i class="bi bi-lightning-fill me-1"></i>Muscolare / E-bike</span>
+              <span class="dr-bike-sizes">S–XL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mountain Bike -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="dr-bike-card">
+          <div class="dr-bike-img" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80')">
+            <span class="dr-bike-badge">Mountain Bike</span>
+          </div>
+          <div class="dr-bike-body">
+            <p class="dr-bike-desc">Affronta i sentieri più impervi con sicurezza e controllo.</p>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="dr-bike-tag"><i class="bi bi-lightning-fill me-1"></i>Muscolare / E-bike</span>
+              <span class="dr-bike-sizes">S–XL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gravel -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="dr-bike-card">
+          <div class="dr-bike-img" style="background-image: url('https://images.unsplash.com/photo-1501147830916-ce44a6359892?auto=format&fit=crop&w=800&q=80')">
+            <span class="dr-bike-badge">Gravel</span>
+          </div>
+          <div class="dr-bike-body">
+            <p class="dr-bike-desc">Versatile su asfalto e sterrato, ideale per veri avventurieri.</p>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="dr-bike-tag"><i class="bi bi-lightning-fill me-1"></i>Muscolare / E-bike</span>
+              <span class="dr-bike-sizes">S–XL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Road Bike -->
+      <div class="col-sm-6 col-lg-3">
+        <div class="dr-bike-card">
+          <div class="dr-bike-img" style="background-image: url('https://images.unsplash.com/photo-1534787238916-9ba6764efd4f?auto=format&fit=crop&w=800&q=80')">
+            <span class="dr-bike-badge">Road Bike</span>
+          </div>
+          <div class="dr-bike-body">
+            <p class="dr-bike-desc">Velocità e aerodinamica per coprire lunghe distanze su strada.</p>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="dr-bike-tag"><i class="bi bi-lightning-fill me-1"></i>Muscolare / E-bike</span>
+              <span class="dr-bike-sizes">S–XL</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <i class="fas fa-clock fs-1 text-primary mb-3"></i>
-          <h5 class="card-title">Orari flessibili</h5>
-          <p class="card-text">Ritiro e riconsegna in qualsiasi fascia oraria dalle 9 alle 18.</p>
-        </div>
+
+    <div class="text-center mt-5">
+      <a routerLink="/booking/form" class="btn dr-btn-green btn-lg px-5 py-2">
+        <i class="bi bi-calendar2-plus me-2"></i>Prenota adesso
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============= COME FUNZIONA ============= -->
+<section class="dr-how-section py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="dr-section-badge">Semplice e veloce</span>
+      <h2 class="dr-section-title">Come funziona</h2>
+      <p class="text-muted">Tre semplici passi per iniziare la tua avventura</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4 text-center">
+        <div class="dr-step-num">01</div>
+        <div class="dr-step-icon"><i class="bi bi-calendar2-plus"></i></div>
+        <h5 class="fw-bold mt-3 mb-2">Scegli e prenota</h5>
+        <p class="text-muted small">Seleziona data, punto di ritiro e tipo di bicicletta. Aggiungi accessori e copertura assicurativa in pochi clic.</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="dr-step-num">02</div>
+        <div class="dr-step-icon"><i class="bi bi-shop"></i></div>
+        <h5 class="fw-bold mt-3 mb-2">Ritira in negozio</h5>
+        <p class="text-muted small">Presentati al punto vendita scelto nell'orario concordato. Il pagamento avviene direttamente al momento del ritiro.</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="dr-step-num">03</div>
+        <div class="dr-step-icon"><i class="bi bi-bicycle"></i></div>
+        <h5 class="fw-bold mt-3 mb-2">Pedala e goditi il viaggio</h5>
+        <p class="text-muted small">Esplora liberamente strade e sentieri. Riconsegna la bici entro l'orario concordato e vivi un'esperienza indimenticabile.</p>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <i class="fas fa-shield-alt fs-1 text-primary mb-3"></i>
-          <h5 class="card-title">Coperture assicurative</h5>
-          <p class="card-text">Proteggi il tuo noleggio con le nostre coperture aggiuntive.</p>
+  </div>
+</section>
+
+<!-- ============= PERCHÉ DREAMRIDE ============= -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="dr-section-badge">I nostri vantaggi</span>
+      <h2 class="dr-section-title">Perché scegliere DreamRide</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="dr-feature-card">
+          <div class="dr-feature-icon" style="background: #dcfce7; color: #16a34a;">
+            <i class="bi bi-bicycle"></i>
+          </div>
+          <h5 class="fw-bold mt-4 mb-2">Flotta moderna</h5>
+          <p class="text-muted mb-0 small">City bike, mountain bike, gravel e road bike muscolari ed elettriche, sempre in perfette condizioni di manutenzione.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="dr-feature-card">
+          <div class="dr-feature-icon" style="background: #fff7ed; color: #f97316;">
+            <i class="bi bi-clock-history"></i>
+          </div>
+          <h5 class="fw-bold mt-4 mb-2">Orari flessibili</h5>
+          <p class="text-muted mb-0 small">Ritiro e riconsegna in fasce orarie dalle 9:00 alle 18:00. Possibilità di noleggio per più giorni consecutivi.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="dr-feature-card">
+          <div class="dr-feature-icon" style="background: #eff6ff; color: #3b82f6;">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h5 class="fw-bold mt-4 mb-2">Copertura assicurativa</h5>
+          <p class="text-muted mb-0 small">Varie opzioni di copertura: assicurazione base, servizio emergenza o kasko completo per pedalare in totale tranquillità.</p>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!--
-<h1>BENVENUTO NELLA HOME</h1>
-
-<button class="btn btn-danger mb-4" (click)="logout()">Logout</button>
-
-
-<div *ngIf="isGraph; else tableView">
-    <div style="display: block; max-width: 700px; margin: auto;">
-        <canvas baseChart
-                [data]="barChartData"
-                [options]="barChartOptions"
-                [type]="barChartType">
-        </canvas>
-        <button class="btn btn-primary mt-3" (click)="toggleView()">Show Table</button>
-    </div>
-
-</div>
- -->
+<!-- ============= CTA FINALE ============= -->
+<section class="dr-cta-section">
+  <div class="container text-center">
+    <i class="bi bi-bicycle dr-cta-icon"></i>
+    <h2 class="dr-cta-title">Pronto a pedalare?</h2>
+    <p class="dr-cta-sub">Prenota la tua bici in pochi clic e inizia la tua avventura su due ruote.</p>
+    <a routerLink="/booking/form" class="btn dr-btn-accent btn-lg px-5 py-3 mt-2">
+      <i class="bi bi-calendar2-plus me-2"></i>Prenota ora — è gratuito!
+    </a>
+  </div>
+</section>

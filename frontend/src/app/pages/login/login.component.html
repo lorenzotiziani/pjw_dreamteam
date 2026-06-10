@@ -1,35 +1,72 @@
-<div class="container mt-5">
-  <div class="row">
-    <div class="col col-lg-4"></div>
-    <div class="col col-lg-4 col-md-12 border rounded p-4">
-      <form (ngSubmit)="login()" [formGroup]="loginForm">
-        <!-- Email input -->
-        <div class="form-outline mb-4">
-          <label class="form-label">Email address</label>
-          <input type="email" class="form-control" formControlName="username" />
-        </div>
+<div class="dr-auth-page">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-5 col-lg-4">
 
-        <!-- Password input -->
-        <div class="form-outline mb-4">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-control" formControlName="password" />
-        </div>
-        @if (loginError) {
-          <div class="text-danger">
-            {{ loginError }}
+        <!-- Logo / Header -->
+        <div class="text-center mb-4">
+          <div class="dr-auth-logo">
+            <i class="bi bi-bicycle"></i>
           </div>
-        }
-
-        <!-- Submit button -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
+          <h2 class="fw-bold mt-3 mb-1" style="color: var(--dr-dark)">Bentornato!</h2>
+          <p class="text-muted small">Accedi al tuo account DreamRide</p>
         </div>
 
-        <!-- Register link -->
-        <div class="text-center">
-          <p>Don't have an account? <a routerLink="/register">Register</a></p>
+        <!-- Card -->
+        <div class="card border-0 shadow-lg rounded-4 p-4">
+          <form (ngSubmit)="login()" [formGroup]="loginForm">
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <div class="input-group rounded-3 overflow-hidden">
+                <span class="input-group-text border-end-0">
+                  <i class="bi bi-envelope text-muted"></i>
+                </span>
+                <input type="email"
+                       class="form-control border-start-0 ps-1"
+                       formControlName="username"
+                       placeholder="la-tua@email.com" />
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <div class="input-group rounded-3 overflow-hidden">
+                <span class="input-group-text border-end-0">
+                  <i class="bi bi-lock text-muted"></i>
+                </span>
+                <input type="password"
+                       class="form-control border-start-0 ps-1"
+                       formControlName="password"
+                       placeholder="••••••••" />
+              </div>
+            </div>
+
+            <!-- Error -->
+            @if (loginError) {
+              <div class="alert alert-danger py-2 px-3 rounded-3 small mb-3">
+                <i class="bi bi-exclamation-circle me-1"></i>{{ loginError }}
+              </div>
+            }
+
+            <!-- Submit -->
+            <button type="submit" class="btn dr-btn-green w-100 py-2 mt-1 fw-semibold">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Accedi
+            </button>
+
+          </form>
+
+          <hr class="my-3 opacity-25">
+
+          <p class="text-center text-muted small mb-0">
+            Non hai un account?
+            <a routerLink="/register" class="fw-semibold text-decoration-none" style="color: var(--dr-primary)">Registrati</a>
+          </p>
         </div>
-      </form>
+
+      </div>
     </div>
   </div>
 </div>

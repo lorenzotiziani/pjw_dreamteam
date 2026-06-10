@@ -1,97 +1,107 @@
-<div class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-4 overflow-hidden">
-  
-  <!-- Intestazione -->
-  <div class="card-header p-3 border-0 bg-secondary">
-    <div class="d-flex justify-content-between align-items-center">
-      <span class="badge rounded-pill px-3 py-2">
-        <i class="bi" ></i> {{ prenotazione.stato }}
-      </span>
-      <small class="text-muted">#{{ prenotazione.id }}</small>
-    </div>
+<div class="dr-card">
+
+  <!-- Header con stato colorato -->
+  <div class="dr-card-header"
+       [ngClass]="{
+         'dr-status-confermata':  prenotazione.stato === 'CONFERMATA',
+         'dr-status-attesa':      prenotazione.stato === 'IN_ATTESA',
+         'dr-status-ritirata':    prenotazione.stato === 'RITIRATA',
+         'dr-status-restituita':  prenotazione.stato === 'RESTITUITA',
+         'dr-status-cancellata':  prenotazione.stato === 'CANCELLATA'
+       }">
+    <span class="dr-status-pill">
+      <i class="bi me-1"
+         [ngClass]="{
+           'bi-check-circle-fill': prenotazione.stato === 'CONFERMATA',
+           'bi-hourglass-split':   prenotazione.stato === 'IN_ATTESA',
+           'bi-bicycle':           prenotazione.stato === 'RITIRATA',
+           'bi-arrow-return-left': prenotazione.stato === 'RESTITUITA',
+           'bi-x-circle-fill':     prenotazione.stato === 'CANCELLATA'
+         }"></i>
+      {{ prenotazione.stato | titlecase }}
+    </span>
+    <small class="dr-card-id">#{{ prenotazione.id }}</small>
   </div>
 
-  <div class="card-body p-3">
-    
-    <!-- Punto vendita -->
-    <h5 class="card-title mb-3">
-      <i class="bi bi-shop me-2 text-primary"></i>
-      {{ prenotazione.puntoVendita.nome }}
-    </h5>
+  <!-- Body -->
+  <div class="dr-card-body">
 
-    <!-- Date ritiro e riconsegna -->
-    <div class="mb-3">
-      <div class="d-flex align-items-center mb-2">
-        <i class="bi bi-calendar-event me-2 text-primary" style="width: 1.25rem;"></i>
-        <div>
-          <small class="text-muted d-block">Ritiro</small>
-          <strong>{{ prenotazione.dataRitiro | date:'dd/MM/yyyy' }} · {{ prenotazione.oraRitiro | date:'HH:mm' }}</strong>
-        </div>
+    <!-- Punto vendita -->
+    <h6 class="dr-card-shop">
+      <i class="bi bi-shop me-2 text-success"></i>{{ prenotazione.puntoVendita.nome }}
+    </h6>
+
+    <!-- Date ritiro / riconsegna -->
+    <div class="dr-dates-row mb-3">
+      <div class="dr-date-block">
+        <span class="dr-date-label"><i class="bi bi-calendar-event me-1"></i>Ritiro</span>
+        <span class="dr-date-value">
+          {{ prenotazione.dataRitiro | date:'dd MMM yyyy' }}
+          <span class="dr-date-time">{{ prenotazione.oraRitiro | date:'HH:mm' }}</span>
+        </span>
       </div>
-      <div class="d-flex align-items-center">
-        <i class="bi bi-arrow-return-left me-2 text-success" style="width: 1.25rem;"></i>
-        <div>
-          <small class="text-muted d-block">Riconsegna</small>
-          <strong>{{ prenotazione.dataOraRiconsegna | date:'dd/MM/yyyy HH:mm' }}</strong>
-        </div>
+      <i class="bi bi-arrow-right dr-dates-arrow"></i>
+      <div class="dr-date-block">
+        <span class="dr-date-label"><i class="bi bi-calendar-check me-1"></i>Riconsegna</span>
+        <span class="dr-date-value">{{ prenotazione.dataOraRiconsegna | date:'dd MMM yyyy HH:mm' }}</span>
       </div>
     </div>
 
-    <hr class="my-3">
+    <hr class="dr-divider">
 
-    <!-- Elenco biciclette -->
-    <div *ngFor="let riga of prenotazione.righe; let last = last" class="mb-3">
-      <div class="d-flex align-items-start">
-        <i class="bi bi-bicycle me-2 text-secondary fs-5"></i>
-        <div>
-          <strong>{{ riga.tipoBici?.categoria }}</strong>
-          <span class="text-muted ms-1">- {{ riga.tipoBici?.prezzoMezzaGiornata | currency }}</span>
-          
-          <!-- Accessori della riga -->
-          <ul *ngIf="riga.accessori?.length" class="list-unstyled mt-1 mb-0 small text-muted">
-            <li *ngFor="let acc of riga.accessori">
-              <i class="bi bi-backpack me-1"></i>
-              {{ acc.accessorio?.nome }} ({{ acc.accessorio?.prezzo | currency }})
-            </li>
-          </ul>
+    <!-- Biciclette -->
+    <div *ngFor="let riga of prenotazione.righe; let last = last" class="mb-2">
+      <div class="d-flex align-items-start gap-2">
+        <span class="dr-bike-dot"><i class="bi bi-bicycle"></i></span>
+        <div class="flex-grow-1 min-w-0">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="fw-semibold" style="font-size: 0.88rem">{{ riga.tipoBici?.categoria }}</span>
+            <span class="badge bg-light text-secondary" style="font-size: 0.7rem">{{ riga.tipoBici?.taglia }}</span>
+            <span class="text-muted" style="font-size: 0.78rem">— {{ riga.tipoBici?.prezzoMezzaGiornata | currency }}/½ giornata</span>
+          </div>
 
-          <!-- Copertura della riga -->
-          <div *ngIf="riga.copertura" class="mt-1 small text-muted">
-            <i class="bi bi-shield-check me-1"></i>
-            {{ riga.copertura.nome }} - {{ riga.copertura.prezzo | currency }}
-            <span *ngIf="riga.copertura.descrizione">({{ riga.copertura.descrizione }})</span>
+          <!-- Accessori -->
+          <div *ngIf="riga.accessori?.length" class="mt-1 d-flex flex-wrap gap-1">
+            <span *ngFor="let acc of riga.accessori" class="dr-acc-chip">
+              {{ acc.accessorio?.nome }}
+            </span>
+          </div>
+
+          <!-- Copertura -->
+          <div *ngIf="riga.copertura" class="mt-1">
+            <span class="dr-copertura-chip">
+              <i class="bi bi-shield-check me-1"></i>{{ riga.copertura.nome }}
+            </span>
           </div>
         </div>
       </div>
-      <hr *ngIf="!last" class="my-2">
+      <hr *ngIf="!last" class="dr-divider mt-2">
     </div>
 
-    <!-- Totale -->
-    <div class="row mt-3">
-      <div class="col">
-        <span class="fs-5 fw-bold text-primary">Totale: {{ prenotazione.totale | currency }}</span>
-      </div>
+    <!-- Footer: indirizzo + totale -->
+    <div class="dr-card-footer-row mt-3">
+      <span class="text-muted" style="font-size: 0.78rem">
+        <i class="bi bi-geo-alt me-1"></i>{{ prenotazione.puntoVendita.indirizzo }}, {{ prenotazione.puntoVendita.citta }}
+      </span>
+      <span class="dr-card-totale">{{ prenotazione.totale | currency }}</span>
     </div>
 
-    <!-- Indirizzo punto vendita -->
-    <div class="mt-3 small text-muted">
-      <i class="bi bi-geo-alt me-1"></i> {{ prenotazione.puntoVendita.indirizzo }}, {{ prenotazione.puntoVendita.citta }}
-    </div>
   </div>
 
   <!-- Azioni (modifica/cancella) -->
-  <div class="card-footer bg-transparent border-top-0 p-3 pt-0 d-flex gap-2" *ngIf="showActions && scadenza(prenotazione.dataRitiro)">
-    <button class="btn btn-sm btn-outline-danger flex-fill" (click)="onCancella()">
-      <i class="bi bi-trash3 me-1"></i> Cancella
+  <div class="dr-card-actions" *ngIf="showActions && scadenza(prenotazione.dataRitiro)">
+    <button class="btn btn-sm btn-outline-danger flex-fill rounded-3" (click)="onCancella()">
+      <i class="bi bi-trash3 me-1"></i>Cancella
     </button>
-    <button class="btn btn-sm btn-primary flex-fill" (click)="onModifica()">
-      <i class="bi bi-pencil-square me-1"></i> Modifica
+    <button class="btn btn-sm dr-btn-green flex-fill rounded-3" (click)="onModifica()">
+      <i class="bi bi-pencil-square me-1"></i>Modifica
     </button>
   </div>
 
   <!-- Messaggio scadenza -->
-  <div class="card-footer bg-transparent border rounded p-2 m-3 text-center text-muted" *ngIf="showActions && !scadenza(prenotazione.dataRitiro)">
-    <small>
-      <i class="bi bi-info-circle me-1"></i> Modifica e cancellazione non consentite: mancano meno di 2 giorni al ritiro.
-    </small>
+  <div class="dr-card-scadenza" *ngIf="showActions && !scadenza(prenotazione.dataRitiro)">
+    <i class="bi bi-info-circle me-1"></i>
+    <small>Modifica e cancellazione non disponibili: mancano meno di 2 giorni al ritiro.</small>
   </div>
+
 </div>

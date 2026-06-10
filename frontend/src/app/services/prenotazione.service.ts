@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Prenotazione, StatoPrenotazione } from '../entities/prenotazione';
 import { ApiResponse } from './response';
@@ -10,111 +10,126 @@ import { map } from 'rxjs';
 export class PrenotazioneService {
   protected http = inject(HttpClient);
 
-add(
-  utenteId: number,
-  dataRitiro: Date,            // Date dal componente
-  puntoVenditaId: number,
-  oraRitiro: string,           // "HH:MM:SS"
-  dataOraRiconsegna: Date,     // Date dal componente
-  totale: number,
-  stato: StatoPrenotazione,
-  tipoBiciId: number,
-  coperturaId: number | null,
-  accessori: { accessorioId: number; quantita: number }[]
-) {
-  const dataRitiroStr = dataRitiro.toISOString().split('T')[0];
+  // ── Crea una prenotazione con una singola riga ─────────────────────────────
+  add(
+    utenteId: number,             // mantenuto come parametro ma non inviato (JWT)
+    dataRitiro: Date,
+    puntoVenditaId: number,
+    oraRitiro: string,            // "HH:MM:SS"
+    dataOraRiconsegna: Date,
+    totale: number,               // mantenuto come parametro ma non inviato (backend calcola)
+    stato: StatoPrenotazione,     // mantenuto come parametro ma non inviato (non in create schema)
+    tipoBiciId: number,
+    coperturaId: number | null,
+    accessori: { accessorioId: number; quantita: number }[]
+  ) {
+    const dataRitiroStr = dataRitiro.toISOString().split('T')[0];
+    const dataOraRiconsegnaStr = dataOraRiconsegna.toISOString().replace('Z', '').slice(0, 19);
 
-  const dataOraRiconsegnaStr = dataOraRiconsegna.toISOString().replace('Z', '').slice(0, 19);
+    const riga: any = {
+      tipoBiciId,
+      accessori
+    };
+    // coperturaId: z.number().optional() — NON inviare null, solo se presente
+    if (coperturaId !== null) riga.coperturaId = coperturaId;
 
-  const body = {
-    utenteId,
-    puntoVenditaId,
-    dataRitiro: dataRitiroStr,
-    oraRitiro,
-    dataOraRiconsegna: dataOraRiconsegnaStr,
-    stato,
-    totale,
-    righe: [
-      {
-        tipoBiciId,
-        coperturaId,
-        subtotale: totale,
-        accessori
-      }
-    ]
-  };
+    const body = {
+      puntoVenditaId,
+      dataRitiro: dataRitiroStr,
+      oraRitiro,
+      dataOraRiconsegna: dataOraRiconsegnaStr,
+      righe: [riga]
+    };
 
-  return this.http.post<Prenotazione>('/api/prenotazioni', body);
+    return this.http.post<Prenotazione>('/api/prenotazioni', body);
+  }
+
+  // ── Crea una prenotazione con più righe (una per ogni bici) ─────────────────
+  addMultiRighe(
+    utenteId: number,             // mantenuto come parametro ma non inviato (JWT)
+    dataRitiro: Date,
+    puntoVenditaId: number,
+    oraRitiro: string,
+    dataOraRiconsegna: Date,
+    totale: number,               // mantenuto come parametro ma non inviato (backend calcola)
+    stato: StatoPrenotazione,     // mantenuto come parametro ma non inviato (non in create schema)
+    coperturaId: number | null,
+    accessori: { accessorioId: number; quantita: number }[],
+    righe: { tipoBiciId: number; quantita: number }[]
+  ) {
+    const dataRitiroStr = dataRitiro.toISOString().split('T')[0];
+    const dataOraRiconsegnaStr = dataOraRiconsegna.toISOString().replace('Z', '').slice(0, 19);
+
+    // Ogni riga del form ha una "quantita": espandiamo in N righe individuali
+    // perché il backend si aspetta una riga per ogni singola bici.
+    // coperturaId: non inviare null (z.number().optional() non accetta null)
+    const righeBody = righe.flatMap(r =>
+      Array.from({ length: r.quantita }, () => {
+        const riga: any = {
+          tipoBiciId: r.tipoBiciId,
+          accessori
+        };
+        if (coperturaId !== null) riga.coperturaId = coperturaId;
+        return riga;
+      })
+    );
+
+    const body = {
+      puntoVenditaId,
+      dataRitiro: dataRitiroStr,
+      oraRitiro,
+      dataOraRiconsegna: dataOraRiconsegnaStr,
+      righe: righeBody
+    };
+
+    return this.http.post<Prenotazione>('/api/prenotazioni', body);
+  }
+
+  // ── Le mie prenotazioni ────────────────────────────────────────────────────
+  mie() {
+    return this.http.get<ApiResponse<Prenotazione[]>>('/api/prenotazioni/mie')
+      .pipe(map(response => response.data));
+  }
+
+  // ── Cancella prenotazione ──────────────────────────────────────────────────
+  delete(id: number) {
+    return this.http.delete<Prenotazione>(`/api/prenotazioni/${id}`);
+  }
+
+  // ── Aggiorna prenotazione ──────────────────────────────────────────────────
+  update(
+    id: number,
+    dataRitiro: string,
+    puntoVenditaId: number,
+    oraRitiro: string,
+    dataOraRiconsegna: string,
+    totale: number,               // mantenuto come parametro ma non inviato (backend calcola)
+    stato: StatoPrenotazione,
+    tipoBiciId: number,
+    coperturaId: number | null,
+    accessori: { accessorioId: number; quantita: number }[]
+  ) {
+    const riga: any = {
+      tipoBiciId,
+      accessori
+    };
+    // coperturaId: z.number().optional() — NON inviare null
+    if (coperturaId !== null) riga.coperturaId = coperturaId;
+
+    const body = {
+      dataRitiro,
+      puntoVenditaId,
+      oraRitiro,
+      dataOraRiconsegna,
+      stato,
+      righe: [riga]
+    };
+
+    return this.http.put<Prenotazione>(`/api/prenotazioni/${id}`, body);
+  }
+
+  // ── Recupera prenotazione per ID ───────────────────────────────────────────
+  getById(id: number) {
+    return this.http.get<ApiResponse<Prenotazione>>(`/api/prenotazioni/${id}`);
+  }
 }
-
-addMultiRighe(
-  utenteId: number,
-  dataRitiro: Date,
-  puntoVenditaId: number,
-  oraRitiro: string,
-  dataOraRiconsegna: Date,
-  totale: number,
-  stato: StatoPrenotazione,
-  coperturaId: number | null,
-  accessori: { accessorioId: number; quantita: number }[],
-  righe: { tipoBiciId: number; quantita: number }[]
-) {
-  const dataRitiroStr = dataRitiro.toISOString().split('T')[0];
-  const dataOraRiconsegnaStr = dataOraRiconsegna.toISOString().replace('Z', '').slice(0, 19);
-
-  const body = {
-    utenteId,
-    puntoVenditaId,
-    dataRitiro: dataRitiroStr,
-    oraRitiro,
-    dataOraRiconsegna: dataOraRiconsegnaStr,
-    stato,
-    totale,
-    righe: righe.map(r => ({
-      tipoBiciId: r.tipoBiciId,
-      coperturaId: coperturaId, // stessa copertura per tutte le righe
-      subtotale: 0, // il subtotale sarà calcolato dal backend o puoi calcolarlo qui per ogni riga
-      accessori: accessori // stesso set di accessori per tutte le righe (oppure no, dipende dal backend)
-    }))
-  };
-
-  return this.http.post<Prenotazione>('/api/prenotazioni', body);
-}
-mie(){
-  return this.http.get<ApiResponse<Prenotazione[]>>('/api/prenotazioni/mie')
-  .pipe(map(response => response.data));
-}
-
-delete(id: number){
-  return this.http.delete<Prenotazione>(`/api/prenotazioni/${id}`);
-}
-
-update(id: number, dataRitiro: string, puntoVenditaId: number, oraRitiro: string,
-       dataOraRiconsegna: string, totale: number, stato: StatoPrenotazione,
-       tipoBiciId: number, coperturaId: number | null,
-       accessori: { accessorioId: number; quantita: number }[]) {
-  const body = {
-    dataRitiro,
-    puntoVenditaId,
-    oraRitiro,
-    dataOraRiconsegna,
-    totale,
-    stato,
-    righe: [
-      {
-        tipoBiciId,
-        coperturaId: coperturaId ?? null,
-        subtotale: totale,
-        accessori
-      }
-    ]
-  };
-  return this.http.put<Prenotazione>(`/api/prenotazioni/${id}`, body);
-}
-
-getById(id: number){
-  return this.http.get<ApiResponse<Prenotazione>>(`/api/prenotazioni/${id}`);
-}
-
-}
-
