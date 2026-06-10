@@ -7,9 +7,8 @@ export const logoutInterceptor: HttpInterceptorFn = (req, next) => {
   const authSrv = inject(AuthService);
   const http = inject(HttpClient);
 
-  // Entra in gioco sulla risposta delle API
-  const excludedRequests = ['/api/login', '/api/refresh'];
-  if (excludedRequests.includes(req.url)) {
+  // Non gestire il 401 sulle chiamate di login/refresh stesse (altrimenti loop infinito)
+  if (req.url.includes('/api/auth/login') || req.url.includes('/api/auth/refresh')) {
     return next(req);
   }
 

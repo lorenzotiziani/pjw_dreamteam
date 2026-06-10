@@ -17,10 +17,14 @@ export class JwtService {
 
   getPayload<T>() {
     const authTokens = this.getToken();
-    if (!authTokens) {
+    if (!authTokens || !this.isJwt(authTokens.token)) {
       return null;
     }
-    return jwtDecode<T>(authTokens.token);
+    try {
+      return jwtDecode<T>(authTokens.token);
+    } catch {
+      return null;
+    }
   }
 
   areTokensValid() {
@@ -28,8 +32,21 @@ export class JwtService {
     if (!authTokens) {
       return false;
     }
-    const decoded = jwtDecode(authTokens.refreshToken);
-    return !decoded.exp || decoded.exp * 1000 > Date.now();
+    // Verifica la validità del REFRESH token (l'access può essere scaduto e verrà refreshato)
+    if (!this.isJwt(authTokens.refreshToken)) {
+      return false;
+    }
+    try {
+      const decoded = jwtDecode(authTokens.refreshToken);
+      return !decoded.exp || decoded.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  }
+
+  /** Verifica che la stringa abbia il formato di un JWT (header.payload.signature). */
+  private isJwt(token: string): boolean {
+    return !!token && token.split('.').length === 3;
   }
 
   getToken(): {token: string, refreshToken: string} | null {
