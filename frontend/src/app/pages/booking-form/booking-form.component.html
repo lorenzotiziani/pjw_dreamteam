@@ -171,11 +171,6 @@
             </div>
           </div>
 
-          <!-- ===== ERRORE ===== -->
-          <div *ngIf="formError" class="alert alert-danger rounded-3 mb-3 small">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ formError }}
-          </div>
-
           <!-- ===== SUBMIT / AUTH ===== -->
           <ng-container *ngIf="user$ | async as user; else noAuth">
             <button type="submit"

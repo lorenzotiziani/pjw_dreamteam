@@ -22,6 +22,8 @@ import { CardBikeComponent } from './components/card-bike/card-bike.component';
 import { NavUserComponent } from './components/nav-user/nav-user.component';
 import { BookingListComponent } from './pages/booking-list/booking-list.component';
 import { EditBookingComponent } from './components/modals/edit-booking/edit-booking.component';
+import { ToastComponent } from './components/toast/toast.component';
+import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,8 @@ import { EditBookingComponent } from './components/modals/edit-booking/edit-book
     NavUserComponent,
     BookingListComponent,
     EditBookingComponent,
-    
+    ToastComponent,
+    ConfirmModalComponent,
   ],
   imports: [
     BrowserModule,

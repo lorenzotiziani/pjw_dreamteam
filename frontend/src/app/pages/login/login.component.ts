@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute,Router } from '@angular/router';
 import { map, Subject, takeUntil } from 'rxjs';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,7 @@ import { map, Subject, takeUntil } from 'rxjs';
 })
 export class LoginComponent {
   protected activatedRoute = inject(ActivatedRoute);
+  protected toastSrv = inject(ToastService);
   protected destroyed$ = new Subject<void>();
   loginForm: FormGroup;
   loginError: string = '';
@@ -47,6 +49,9 @@ export class LoginComponent {
 
   login() {
     if (this.loginForm.invalid) {
+      // Mostra gli errori di validazione inline sotto i campi (nessun toast,
+      // nessuna chiamata: gli errori del form si gestiscono qui).
+      this.loginForm.markAllAsTouched();
       return;
     }
 
@@ -54,10 +59,12 @@ export class LoginComponent {
 
     this.loginService.login(username, password).subscribe({
       next: () => {
+        this.toastSrv.success('Accesso effettuato. Bentornato!');
         this.router.navigate([this.requestedUrl ? this.requestedUrl : '/']);
       },
       error: (err: Error) => {
-        this.loginError = err.message;
+        // Errore del backend (es. credenziali errate) → solo toast
+        this.toastSrv.error(err.message || 'Credenziali errate.');
       }
     });
   }

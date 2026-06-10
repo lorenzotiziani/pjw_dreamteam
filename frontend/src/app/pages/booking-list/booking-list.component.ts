@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditBookingComponent } from '../../components/modals/edit-booking/edit-booking.component';
 import { LogicaService } from '../../services/logica.service';
+import { ToastService } from '../../services/toast.service';
+import { ConfirmModalService } from '../../services/confirm-modal.service';
 
 @Component({
   selector: 'app-booking-list',
@@ -19,6 +21,8 @@ export class BookingListComponent implements OnInit {
   protected router = inject(Router);
   protected modalService = inject(NgbModal);
   protected logicSrv = inject(LogicaService);
+  protected toastSrv = inject(ToastService);
+  protected confirmSrv = inject(ConfirmModalService);
 
   prenotazioni: Prenotazione[] = [];
   loading = false;
@@ -40,7 +44,7 @@ export class BookingListComponent implements OnInit {
     modalRef.result.then((updatedData: any) => {
       const prenotazioneOriginale = this.prenotazioni.find(p => p.id === id);
       if (!prenotazioneOriginale) {
-        alert('Prenotazione non trovata nella lista.');
+        this.toastSrv.error('Prenotazione non trovata nella lista.');
         return;
       }
 
@@ -56,10 +60,13 @@ export class BookingListComponent implements OnInit {
         updatedData.coperturaId ?? null,
         updatedData.accessoriPayload
       ).subscribe({
-        next: () => this.caricaPrenotazioni(),
+        next: () => {
+          this.toastSrv.success('Prenotazione aggiornata con successo.');
+          this.caricaPrenotazioni();
+        },
         error: (err) => {
           console.error('Errore aggiornamento', err);
-          alert('Errore durante il salvataggio delle modifiche.');
+          this.toastSrv.error(err.error?.message || 'Errore durante il salvataggio delle modifiche.');
         }
       });
     }).catch(() => {
@@ -86,8 +93,15 @@ export class BookingListComponent implements OnInit {
     });
   }
 
-  cancellaPrenotazione(id: string) {
-    const conferma = confirm('Sei sicuro di voler cancellare questa prenotazione?');
+  async cancellaPrenotazione(id: string) {
+    const conferma = await this.confirmSrv.confirm({
+      title: 'Cancella prenotazione',
+      message: 'Sei sicuro di voler cancellare questa prenotazione?',
+      detail: 'L\'operazione non può essere annullata.',
+      confirmLabel: 'Sì, cancella',
+      cancelLabel: 'Annulla',
+      type: 'danger'
+    });
     if (!conferma) return;
 
     this.cancellingId = id;
@@ -98,10 +112,11 @@ export class BookingListComponent implements OnInit {
         // Rimuove dalla lista locale (non è più CONFERMATA)
         this.prenotazioni = this.prenotazioni.filter(p => p.id !== id);
         this.cancellingId = null;
+        this.toastSrv.success('Prenotazione cancellata.');
       },
       error: (err) => {
         console.error('Errore cancellazione', err);
-        alert(err.error?.message || 'Errore durante la cancellazione.');
+        this.toastSrv.error(err.error?.message || 'Errore durante la cancellazione.');
         this.cancellingId = null;
       }
     });

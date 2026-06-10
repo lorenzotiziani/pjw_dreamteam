@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
 	selector: 'app-register',
@@ -12,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class RegisterComponent implements OnInit {
 
 	protected activatedRoute = inject(ActivatedRoute);
+	protected toastSrv = inject(ToastService);
 
 	registerForm: FormGroup;
 	registerError: string = '';
@@ -44,8 +46,10 @@ export class RegisterComponent implements OnInit {
 			next: (res: any) => {
 				if (!res.success) {
 					this.registerError = res.error || 'Errore sconosciuto';
+					this.toastSrv.error(this.registerError);
 					return;
 				}
+				this.toastSrv.success('Registrazione completata! Controlla la tua email per attivare l\'account.');
 				// Dopo la registrazione serve verifica email + login:
 				// mandiamo al login mantenendo la destinazione (così si torna al form).
 				this.router.navigate(['/login'], {
@@ -53,16 +57,9 @@ export class RegisterComponent implements OnInit {
 				});
 			},
 			error: (err: any) => {
-
-				if (Array.isArray(err)) {
-					// Errori di validazione dal backend
-					this.registerError = err.map(e => e.message).join('<br>');
-				} else if (typeof err === 'string') {
-					// Errore semplice
-					this.registerError = err;
-				} else {
-					this.registerError = 'Errore di connessione';
-				}
+				// Il service restituisce già un Error con messaggio pulito
+				this.registerError = err?.message || 'Errore durante la registrazione';
+				this.toastSrv.error(this.registerError);
 			}
 
 		});

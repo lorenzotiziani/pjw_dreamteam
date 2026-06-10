@@ -1,0 +1,23 @@
+<div class="cm-wrap">
+
+  <!-- Icona -->
+  <div class="cm-icon" [ngClass]="'cm-icon--' + type">
+    <i class="bi" [ngClass]="icon"></i>
+  </div>
+
+  <!-- Testo -->
+  <h5 class="cm-title">{{ title }}</h5>
+  <p class="cm-message">{{ message }}</p>
+  <p class="cm-detail" *ngIf="detail">{{ detail }}</p>
+
+  <!-- Azioni -->
+  <div class="cm-actions">
+    <button type="button" class="cm-btn cm-btn--cancel" (click)="activeModal.dismiss()">
+      {{ cancelLabel }}
+    </button>
+    <button type="button" class="cm-btn" [ngClass]="'cm-btn--' + type" (click)="activeModal.close(true)">
+      {{ confirmLabel }}
+    </button>
+  </div>
+
+</div>

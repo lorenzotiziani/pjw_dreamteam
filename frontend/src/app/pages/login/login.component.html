@@ -28,6 +28,11 @@
                        formControlName="username"
                        placeholder="la-tua@email.com" />
               </div>
+              @if (loginForm.get('username')?.touched && loginForm.get('username')?.invalid) {
+                <div class="text-danger small mt-1">
+                  <i class="bi bi-exclamation-circle me-1"></i>Inserisci un indirizzo email valido
+                </div>
+              }
             </div>
 
             <!-- Password -->
@@ -42,17 +47,15 @@
                        formControlName="password"
                        placeholder="••••••••" />
               </div>
+              @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+                <div class="text-danger small mt-1">
+                  <i class="bi bi-exclamation-circle me-1"></i>La password è obbligatoria
+                </div>
+              }
             </div>
 
-            <!-- Error -->
-            @if (loginError) {
-              <div class="alert alert-danger py-2 px-3 rounded-3 small mb-3">
-                <i class="bi bi-exclamation-circle me-1"></i>{{ loginError }}
-              </div>
-            }
-
             <!-- Submit -->
-            <button type="submit" class="btn dr-btn-green w-100 py-2 mt-1 fw-semibold">
+            <button type="submit" class="btn dr-btn-green w-100 py-2 mt-1 fw-semibold" [disabled]="loginForm.invalid">
               <i class="bi bi-box-arrow-in-right me-2"></i>Accedi
             </button>
 

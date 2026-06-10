@@ -89,11 +89,6 @@
               }
             </div>
 
-            <!-- Error -->
-            @if (registerError) {
-              <div [innerHTML]="registerError" class="alert alert-danger py-2 px-3 rounded-3 small mb-3"></div>
-            }
-
             <!-- Submit -->
             <button type="submit" class="btn dr-btn-green w-100 py-2 fw-semibold" [disabled]="registerForm.invalid">
               <i class="bi bi-person-plus me-2"></i>Crea account

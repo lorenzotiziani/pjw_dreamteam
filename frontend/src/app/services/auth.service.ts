@@ -91,12 +91,62 @@ export class AuthService {
         // Salva il profilo completo in cache: al refresh la navbar mostra subito nome/cognome
         tap(res => this.saveUserToCache(res.data.user)),
         tap(res => this._currentUser$.next(res.data.user)),
-        map(res => res.data.user)
+        map(res => res.data.user),
+        catchError(err => {
+          // Il backend manda il messaggio in err.error.message.
+          // Manteniamo i casi specifici (es. "Email non verificata"),
+          // mentre il generico diventa "Credenziali errate".
+          const backendMsg = err?.error?.message as string | undefined;
+          const msg = backendMsg && backendMsg !== 'Credenziali non valide'
+            ? backendMsg
+            : 'Credenziali errate';
+          return throwError(() => new Error(msg));
+        })
       );
   }
 
   register(email: string, password: string, confirm: string, nome: string, cognome: string){
-    return this.http.post<any>('/api/auth/register', { email, password, confirm, nome, cognome});
+    return this.http.post<any>('/api/auth/register', { email, password, confirm, nome, cognome})
+      .pipe(
+        catchError(err => {
+          // Due forme di errore dal backend:
+          //  - validazione Zod: { error: 'Validation failed', details: [{ field, message }] }
+          //  - BadRequestError:  { success: false, error, message }  (es. "Email già registrata")
+          const body = err?.error;
+          let parts: { field?: string; message: string }[] = [];
+          if (Array.isArray(body?.details) && body.details.length) {
+            parts = body.details.map((d: any) => ({ field: d.field, message: d.message }));
+          } else if (body?.message) {
+            parts = [{ message: body.message }];
+          } else {
+            return throwError(() => new Error('Errore durante la registrazione'));
+          }
+
+          // Rende generici i messaggi: tutto ciò che è legato a email/password
+          // viene ricondotto a un unico messaggio per campo.
+          const messages = parts.map(p => this.genericFieldError(p.field, p.message));
+          const unique = Array.from(new Set(messages));
+          return throwError(() => new Error(unique.join(' • ')));
+        })
+      );
+  }
+
+  /**
+   * Riconduce un errore di campo a un messaggio generico:
+   *  - qualsiasi errore su email    → "Email non valida"
+   *  - qualsiasi errore su password → "Password non valida"
+   * Per gli altri campi mantiene il messaggio originale.
+   */
+  private genericFieldError(field: string | undefined, message: string): string {
+    const f = (field ?? '').toLowerCase();
+    const m = (message ?? '').toLowerCase();
+    if (f.includes('email') || m.includes('email') || m.includes('mail')) {
+      return 'Email non valida';
+    }
+    if (f.includes('password') || f.includes('confirm') || m.includes('password')) {
+      return 'Password non valida';
+    }
+    return message;
   }
 
   refresh() {

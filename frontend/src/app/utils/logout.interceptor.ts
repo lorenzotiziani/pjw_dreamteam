@@ -1,11 +1,13 @@
 import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
+import { ToastService } from '../services/toast.service';
 import { catchError, switchMap, throwError } from 'rxjs';
 
 export const logoutInterceptor: HttpInterceptorFn = (req, next) => {
   const authSrv = inject(AuthService);
   const http = inject(HttpClient);
+  const toastSrv = inject(ToastService);
 
   // Non gestire il 401 sulle chiamate di login/refresh stesse (altrimenti loop infinito)
   if (req.url.includes('/api/auth/login') || req.url.includes('/api/auth/refresh')) {
@@ -20,6 +22,7 @@ export const logoutInterceptor: HttpInterceptorFn = (req, next) => {
         .pipe(
           catchError(_ => {
             authSrv.logout();
+            toastSrv.warn('Sessione scaduta. Effettua di nuovo l\'accesso.');
             return throwError(() => response)
           }),
           switchMap(_ => {

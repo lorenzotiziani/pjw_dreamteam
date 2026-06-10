@@ -11,6 +11,7 @@ import { CoperturaService } from '../../services/copertura.service';
 import { PrenotazioneService } from '../../services/prenotazione.service';
 import { PuntoVenditaService } from '../../services/punto-vendita.service';
 import { LogicaService } from '../../services/logica.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-booking-form',
@@ -28,6 +29,7 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   protected prenotazioneSrv = inject(PrenotazioneService);
   protected accessorioSrv = inject(AccessorioService);
   protected logicSrv = inject(LogicaService);
+  protected toastSrv = inject(ToastService);
 
   protected destroyed$ = new Subject<void>();
 
@@ -268,11 +270,25 @@ export class BookingFormComponent implements OnInit, OnDestroy {
       next: () => {
         // Prenotazione completata: ripuliamo lo stato salvato del form
         sessionStorage.removeItem(this.FORM_STORAGE_KEY);
+        this.toastSrv.success('Prenotazione confermata con successo!');
         this.router.navigate(['/booking/list']);
       },
       error: (err) => {
-        this.formError = err.error?.message || 'Errore sconosciuto durante la prenotazione.';
+        const raw = err.error?.message || 'Errore sconosciuto durante la prenotazione.';
+        this.formError = this.humanizeError(raw);
+        this.toastSrv.error(this.formError);
       }
+    });
+  }
+
+  /**
+   * Rende leggibili i messaggi di errore del backend che usano l'id della bici.
+   * Es: "Bici 1 non disponibile..." → "CITY_BIKE (taglia M) non disponibile..."
+   */
+  private humanizeError(msg: string): string {
+    return msg.replace(/Bici\s+(\d+)/g, (match, id) => {
+      const bici = this.bikesDisponibiliList.find(b => String(b.id) === String(id));
+      return bici ? `${bici.categoria} (taglia ${bici.taglia})` : match;
     });
   }
 

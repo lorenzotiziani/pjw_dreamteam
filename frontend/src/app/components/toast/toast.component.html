@@ -1,0 +1,18 @@
+<div class="dr-toast-container">
+  <div
+    *ngFor="let t of toasts$ | async"
+    class="dr-toast"
+    [class.dr-toast--error]="t.type === 'error'"
+    [class.dr-toast--success]="t.type === 'success'"
+    [class.dr-toast--warn]="t.type === 'warn'"
+    [class.dr-toast--info]="t.type === 'info'">
+
+    <i class="bi dr-toast-icon" [ngClass]="iconFor(t.type)"></i>
+
+    <span class="dr-toast-msg">{{ t.message }}</span>
+
+    <button class="dr-toast-close" (click)="remove(t.id)" aria-label="Chiudi">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+</div>
