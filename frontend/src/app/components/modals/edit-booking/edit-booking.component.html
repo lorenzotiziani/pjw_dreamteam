@@ -91,13 +91,6 @@
       </div>
       <div class="eb-coperture-grid">
 
-        <label class="eb-cop-card" [class.eb-cop-selected]="!updateForm.get('coperturaId')?.value">
-          <input type="radio" formControlName="coperturaId" value="" class="visually-hidden">
-          <i class="bi bi-shield-slash eb-cop-icon"></i>
-          <span class="eb-cop-nome">Nessuna</span>
-          <span class="eb-cop-prezzo">€0,00</span>
-        </label>
-
         <label *ngFor="let cop of coperture$ | async"
                class="eb-cop-card"
                [class.eb-cop-selected]="updateForm.get('coperturaId')?.value == cop.id">

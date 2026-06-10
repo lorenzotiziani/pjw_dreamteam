@@ -44,6 +44,10 @@ export class EditBookingComponent implements OnInit, OnDestroy {
   bikesDisponibiliList: any[] = [];
   copertureList: any[] = [];
 
+  // Numero di bici della prenotazione (= numero di righe).
+  // In modifica non è editabile, ma serve a moltiplicare totale/copertura/accessori.
+  numeroBici = 1;
+
   updateForm = this.fb.group({
     dataRitiro: ['', Validators.required],
     dataRiconsegna: ['', Validators.required],
@@ -116,6 +120,9 @@ export class EditBookingComponent implements OnInit, OnDestroy {
       const dataRitiro = pren.dataRitiro?.split('T')[0] ?? '';
       const dataRiconsegna = pren.dataOraRiconsegna?.split('T')[0] ?? '';
 
+      // Numero di bici = numero di righe della prenotazione (1 riga per bici).
+      this.numeroBici = pren.righe?.length || 1;
+
       // Estrazione corretta dell'ora di ritiro dal formato ISO
       const oraTime = this.logicSrv.extractTimeFromISO(pren.oraRitiro);
       const oraRitiroFascia = this.logicSrv.formatOraInFasciaFromTime(oraTime);
@@ -165,33 +172,61 @@ export class EditBookingComponent implements OnInit, OnDestroy {
     }, 50);
   }
 
+  /**
+   * Mezze giornate = ceil(diffOre / 6), identico al backend.
+   * Usa ora di INIZIO ritiro e ora di FINE riconsegna (fascia selezionata).
+   */
+  private getMezzeGiornate(): number {
+    const dataRitiro      = this.updateForm.get('dataRitiro')?.value;
+    const dataRiconsegna  = this.updateForm.get('dataRiconsegna')?.value;
+    if (!dataRitiro || !dataRiconsegna) return 0;
+
+    const oraRitiroFascia     = this.updateForm.get('oraRitiro')?.value;
+    const oraRiconsegnaFascia = this.updateForm.get('oraRiconsegna')?.value;
+
+    const inizio = new Date(dataRitiro);
+    const fine   = new Date(dataRiconsegna);
+
+    if (oraRitiroFascia) {
+      const { ore, minuti } = this.logicSrv.estraiOreMinuti(
+        this.logicSrv.estraiOraInizioDaFascia(oraRitiroFascia)
+      );
+      inizio.setHours(ore, minuti, 0, 0);
+    }
+
+    if (oraRiconsegnaFascia) {
+      const { ore, minuti } = this.logicSrv.estraiOreMinuti(
+        this.logicSrv.estraiOraFineDaFascia(oraRiconsegnaFascia)
+      );
+      fine.setHours(ore, minuti, 0, 0);
+    }
+
+    if (isNaN(inizio.getTime()) || isNaN(fine.getTime()) || fine <= inizio) return 0;
+    return Math.ceil((fine.getTime() - inizio.getTime()) / (1000 * 60 * 60 * 6));
+  }
+
   getTotale(): number {
     const form = this.updateForm.value;
-    const tipoBiciId = form.tipoBiciId;
-    const coperturaId = form.coperturaId;
-
+    const mezzeGiornate = this.getMezzeGiornate();
+    const nBici = Math.max(this.numeroBici, 1);
     let totale = 0;
 
-    // Prezzo bici
-    if (tipoBiciId && this.bikesDisponibiliList.length) {
-      const bici = this.bikesDisponibiliList.find(b => b.id == tipoBiciId);
-      if (bici) {
-        totale += Number(bici.prezzoMezzaGiornata);
-      }
+    // Bici: prezzoMezzaGiornata × mezzeGiornate × numeroBici
+    if (form.tipoBiciId && this.bikesDisponibiliList.length) {
+      const bici = this.bikesDisponibiliList.find(b => b.id == form.tipoBiciId);
+      if (bici) totale += Number(bici.prezzoMezzaGiornata) * Math.max(mezzeGiornate, 1) * nBici;
     }
 
-    // Prezzo copertura
-    if (coperturaId && this.copertureList.length) {
-      const cop = this.copertureList.find(c => c.id == coperturaId);
-      if (cop) {
-        totale += Number(cop.prezzo);
-      }
+    // Copertura: costo fisso × numeroBici (non dipende dalla durata)
+    if (form.coperturaId && this.copertureList.length) {
+      const cop = this.copertureList.find(c => c.id == form.coperturaId);
+      if (cop) totale += Number(cop.prezzo) * nBici;
     }
 
-    // Prezzi accessori
+    // Accessori: costo fisso × numeroBici (non dipende dalla durata)
     this.accessoriArray.controls.forEach((ctrl, idx) => {
       if (ctrl.value && this.listaAccessori[idx]) {
-        totale += Number(this.listaAccessori[idx].prezzo);
+        totale += Number(this.listaAccessori[idx].prezzo) * nBici;
       }
     });
 

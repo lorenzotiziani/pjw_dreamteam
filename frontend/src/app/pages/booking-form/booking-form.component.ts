@@ -36,7 +36,6 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   accessori$ = this.accessorioSrv.accessorio$;
   coperture$ = this.coperturaSrv.coperture$;
 
-  prezzoTotale = 0;
   orariDisponibili: string[] = [];
   formError = '';
 
@@ -154,43 +153,51 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     this.calcolaTotale();
   }
 
-  calcolaTotale() {
-    let totale = 0;
+  /**
+   * Totale stimato — getter computato.
+   * Angular lo rivaluta ad ogni ciclo di change detection:
+   * nessun problema di timing/subscription, sempre aggiornato.
+   */
+  get prezzoTotale(): number {
     const mezzeGiornate = this.getMezzeGiornate();
 
-    // Numero totale di bici prenotate (somma delle quantità di tutte le righe)
-    const totaleBici = this.righeArray.controls.reduce(
-      (sum, riga) => sum + (Number(riga.get('quantita')?.value) || 0), 0
+    type RigaVal = { tipoBiciId: string; quantita: number };
+    const righeValide = (this.righeArray.value as RigaVal[])
+      .filter(r => r.tipoBiciId);
+
+    const totaleBici = righeValide.reduce(
+      (sum, r) => sum + (Number(r.quantita) || 0), 0
     );
 
+    let totale = 0;
+
+    // Bici: prezzoMezzaGiornata × quantità × mezzeGiornate
     if (mezzeGiornate > 0) {
-      // Costo bici: prezzoMezzaGiornata × quantità × mezzeGiornate
-      for (const riga of this.righeArray.controls) {
-        const tipoBiciId = riga.get('tipoBiciId')?.value;
-        const quantita = Number(riga.get('quantita')?.value) || 0;
-        if (tipoBiciId && quantita > 0) {
-          const bici = this.bikesDisponibiliList.find(b => b.id == tipoBiciId);
-          if (bici) {
-            totale += Number(bici.prezzoMezzaGiornata) * quantita * mezzeGiornate;
-          }
+      for (const r of righeValide) {
+        const bici = this.bikesDisponibiliList.find(b => b.id == r.tipoBiciId);
+        if (bici) {
+          totale += Number(bici.prezzoMezzaGiornata) * (Number(r.quantita) || 0) * mezzeGiornate;
         }
-      }
-
-      // Copertura: applicata a ogni singola bici (il backend la somma per ogni riga)
-      const coperturaId = this.bookingForm.get('coperturaId')?.value;
-      if (coperturaId && totaleBici > 0) {
-        const cop = this.copertureList.find(c => c.id == coperturaId);
-        if (cop) totale += Number(cop.prezzo) * totaleBici;
-      }
-
-      // Accessori: costo fisso per bici (non dipende dalla durata)
-      for (const acc of this.accessoriSelezionati) {
-        totale += Number(acc.prezzo) * totaleBici;
       }
     }
 
-    this.prezzoTotale = totale;
+    // Copertura: costo fisso × totaleBici (non dipende dalla durata)
+    const coperturaId = this.bookingForm.get('coperturaId')?.value;
+    if (coperturaId && totaleBici > 0) {
+      const cop = this.copertureList.find(c => c.id == coperturaId);
+      if (cop) totale += Number(cop.prezzo) * totaleBici;
+    }
+
+    // Accessori: costo fisso × totaleBici (non dipende dalla durata)
+    for (const acc of this.accessoriSelezionati) {
+      totale += Number(acc.prezzo) * totaleBici;
+    }
+
+    return totale;
   }
+
+  /** Mantenuto per retrocompatibilità con i call-site — il getter sopra è la sorgente di verità. */
+  calcolaTotale() { /* intentionally empty */ }
 
   async addPrenotazione() {
     if (this.bookingForm.invalid || this.righeArray.length === 0) {
