@@ -86,20 +86,39 @@ export class PuntiVenditaService {
     try {
       const existing = await prisma.stockBici.findUnique({ where: { id: stockId } });
       if (!existing) throw new NotFoundError('Stock non trovato');
-
+  
       const nuovaTotale       = data.quantitaTotale       ?? existing.quantitaTotale;
       const nuovaManutenzione = data.quantitaManutenzione ?? existing.quantitaManutenzione;
-
-      const nuovaAttuale = nuovaTotale - nuovaManutenzione;
-
+  
       if (nuovaManutenzione > nuovaTotale)
         throw new BadRequestError('Le bici in manutenzione non possono superare la quantità totale');
+  
+        const biciRitirate = await prisma.rigaPrenotazione.count({
+          where: {
+            tipoBiciId: existing.tipoBiciId,
+            prenotazione: {
+              puntoVenditaId: existing.puntoVenditaId,
+              stato: 'RITIRATA',
+              dataRitiro: {
+                lte: new Date(),
+              },
+              dataOraRiconsegna: {
+                gte: new Date(),
+              },
+            },
+          },
+        });
       
-      data = { ...data, quantitaAttuale: nuovaAttuale}
-      
+      const nuovaAttuale = nuovaTotale - nuovaManutenzione - biciRitirate;
+  
+      if (nuovaAttuale < 0)
+        throw new BadRequestError(
+          `Impossibile aggiornare lo stock: ${biciRitirate} bici sono attualmente ritirate`
+        );
+  
       return await prisma.stockBici.update({
         where: { id: stockId },
-        data,
+        data: { ...data, quantitaAttuale: nuovaAttuale },
         include: { tipoBici: true },
       });
     } catch (e) {

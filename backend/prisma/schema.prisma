@@ -210,3 +210,36 @@ model LogPrenotazione {
 
   @@map("log_operazioni")
 }
+
+model ViewStatistiche {
+  idUtente             Int               @map("id_utente")
+  nominativo           String?
+  email                String?
+  idPrenotazione       Int               @map("id_prenotazione")
+  stato                StatoPrenotazione?
+  totale               Decimal?          @db.Decimal(10, 2)
+  ritiro               String?
+  puntoVendita         String?           @map("punto_vendita")
+  indirizzo            String?
+  citta                String?
+  attivo               Boolean?
+  subtotale            Decimal?          @db.Decimal(8, 2)
+  categoria            CategoriaBici?
+  taglia               Taglia?
+  motorizzazione       Tipo?
+  prezzoMezzaGiornata  Decimal?          @db.Decimal(8, 2)
+  quantitaTotale       Int?
+  quantitaAttuale      Int?
+  quantitaManutenzione Int?
+  accessorio           String?
+  quantitaAccessorio   Int?              @map("quantitaaccessorio")
+  coperturaAssicurativa String?          @map("copertura_assicurativa")
+  descrizione          String?
+  prezzo               Decimal?          @db.Decimal(6, 2)
+  tipo                 StatoPrenotazione?
+  note                 String?
+  eseguitaIl           DateTime?
+
+  @@unique([idUtente, idPrenotazione])
+  @@map("viewstatistiche")
+}
