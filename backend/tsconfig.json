@@ -12,7 +12,6 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "types": ["node"]
   },
   "include": ["src/**/*", "prisma.config.ts", "prisma/**/*"],
   "exclude": ["node_modules", "dist"]
