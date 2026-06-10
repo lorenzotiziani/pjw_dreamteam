@@ -46,6 +46,9 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   // Accessori selezionati (come array di oggetti, per invio e calcolo)
   accessoriSelezionati: Accessorio[] = [];
 
+  // Id accessori in attesa di essere riapplicati dopo il ripristino dal sessionStorage
+  private pendingAccessoriIds: string[] = [];
+
   bookingForm = this.fb.group({
     data: ['', Validators.required],
     dataRiconsegna: ['', Validators.required],
@@ -89,7 +92,11 @@ export class BookingFormComponent implements OnInit, OnDestroy {
         this.bookingForm.patchValue({ coperturaId: list[0].id });
       }
     });
-    this.accessori$.pipe(takeUntil(this.destroyed$)).subscribe(list => this.accessoriList = list);
+    this.accessori$.pipe(takeUntil(this.destroyed$)).subscribe(list => {
+      this.accessoriList = list;
+      // Riapplica gli accessori ripristinati dal sessionStorage una volta che la lista è disponibile
+      this.applyPendingAccessori();
+    });
 
     this.bikesDisponibili$
       .pipe(takeUntil(this.destroyed$))
@@ -145,6 +152,19 @@ export class BookingFormComponent implements OnInit, OnDestroy {
       this.accessoriSelezionati = this.accessoriSelezionati.filter(a => a.id !== accessorio.id);
     }
     this.calcolaTotale();
+  }
+
+  /** True se l'accessorio è tra quelli selezionati (per il binding [checked] dei checkbox). */
+  isAccessorioSelezionato(id: any): boolean {
+    return this.accessoriSelezionati.some(a => String(a.id) === String(id));
+  }
+
+  /** Riapplica gli accessori salvati (per id) dopo che la lista accessori è caricata. */
+  private applyPendingAccessori() {
+    if (!this.pendingAccessoriIds.length || !this.accessoriList.length) return;
+    this.accessoriSelezionati = this.accessoriList.filter(a =>
+      this.pendingAccessoriIds.includes(String(a.id))
+    );
   }
 
   // Gestione copertura (radio button)
@@ -245,7 +265,11 @@ export class BookingFormComponent implements OnInit, OnDestroy {
       accessoriPayload,
       righePayload
     ).subscribe({
-      next: () => this.router.navigate(['/booking/list']),
+      next: () => {
+        // Prenotazione completata: ripuliamo lo stato salvato del form
+        sessionStorage.removeItem(this.FORM_STORAGE_KEY);
+        this.router.navigate(['/booking/list']);
+      },
       error: (err) => {
         this.formError = err.error?.message || 'Errore sconosciuto durante la prenotazione.';
       }
@@ -255,29 +279,44 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   private readonly FORM_STORAGE_KEY = 'booking_form_data';
 
   saveFormState() {
-    sessionStorage.setItem(this.FORM_STORAGE_KEY, JSON.stringify(this.bookingForm.value));
+    const state = {
+      ...this.bookingForm.value,
+      // Gli accessori non sono nel form: li salviamo a parte come lista di id
+      accessoriIds: this.accessoriSelezionati.map(a => String(a.id))
+    };
+    sessionStorage.setItem(this.FORM_STORAGE_KEY, JSON.stringify(state));
   }
 
   restoreFormState() {
     const saved = sessionStorage.getItem(this.FORM_STORAGE_KEY);
-    if (saved) {
-      try {
-        const formData = JSON.parse(saved);
-        if (formData.righe && Array.isArray(formData.righe)) {
-          while (this.righeArray.length) this.righeArray.removeAt(0);
-          formData.righe.forEach((riga: any) => {
-            this.righeArray.push(this.fb.group({
-              tipoBiciId: [riga.tipoBiciId || '', Validators.required],
-              quantita: [riga.quantita || 1, [Validators.required, Validators.min(1)]]
-            }));
-          });
-          delete formData.righe;
-        }
-        this.bookingForm.patchValue(formData);
-        sessionStorage.removeItem(this.FORM_STORAGE_KEY);
-      } catch (e) {
-        console.error('Errore nel ripristino del form', e);
+    if (!saved) return;
+    try {
+      const formData = JSON.parse(saved);
+
+      // Accessori: memorizziamo gli id e li riapplichiamo quando la lista è pronta
+      this.pendingAccessoriIds = Array.isArray(formData.accessoriIds)
+        ? formData.accessoriIds.map((id: any) => String(id))
+        : [];
+      delete formData.accessoriIds;
+      this.applyPendingAccessori();
+
+      // Righe (FormArray): ricostruite manualmente
+      if (formData.righe && Array.isArray(formData.righe)) {
+        while (this.righeArray.length) this.righeArray.removeAt(0);
+        formData.righe.forEach((riga: any) => {
+          this.righeArray.push(this.fb.group({
+            tipoBiciId: [riga.tipoBiciId || '', Validators.required],
+            quantita: [riga.quantita || 1, [Validators.required, Validators.min(1)]]
+          }));
+        });
+        delete formData.righe;
       }
+
+      this.bookingForm.patchValue(formData);
+      // NB: non rimuoviamo qui il sessionStorage. Lo stato sopravvive al percorso
+      // login/register/verifica-email finché la prenotazione non va a buon fine.
+    } catch (e) {
+      console.error('Errore nel ripristino del form', e);
     }
   }
 

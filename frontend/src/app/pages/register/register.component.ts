@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -9,10 +9,13 @@ import { AuthService } from '../../services/auth.service';
 	templateUrl: './register.component.html',
 	styleUrl: './register.component.css'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
+
+	protected activatedRoute = inject(ActivatedRoute);
 
 	registerForm: FormGroup;
 	registerError: string = '';
+	requestedUrl: string | null = null;
 
 	constructor(
 		private fb: FormBuilder,
@@ -29,6 +32,11 @@ export class RegisterComponent {
 
 	}
 
+	ngOnInit() {
+		// Conserva l'eventuale destinazione richiesta (es. /booking/form) per dopo il login
+		this.requestedUrl = this.activatedRoute.snapshot.queryParams['requestedUrl'] ?? null;
+	}
+
 	register() {
 		if (this.registerForm.invalid) return;
 		const {email, password, confirm, nome, cognome} = this.registerForm.value
@@ -38,7 +46,11 @@ export class RegisterComponent {
 					this.registerError = res.error || 'Errore sconosciuto';
 					return;
 				}
-				this.router.navigate(['/']);
+				// Dopo la registrazione serve verifica email + login:
+				// mandiamo al login mantenendo la destinazione (così si torna al form).
+				this.router.navigate(['/login'], {
+					queryParams: this.requestedUrl ? { requestedUrl: this.requestedUrl } : {}
+				});
 			},
 			error: (err: any) => {
 

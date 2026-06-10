@@ -105,7 +105,9 @@
 
           <p class="text-center text-muted small mb-0">
             Hai già un account?
-            <a routerLink="/login" class="fw-semibold text-decoration-none" style="color: var(--dr-primary)">Accedi</a>
+            <a routerLink="/login"
+               [queryParams]="requestedUrl ? { requestedUrl: requestedUrl } : {}"
+               class="fw-semibold text-decoration-none" style="color: var(--dr-primary)">Accedi</a>
           </p>
         </div>
 

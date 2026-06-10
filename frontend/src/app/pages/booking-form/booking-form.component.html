@@ -118,6 +118,7 @@
                            type="checkbox"
                            [id]="'acc-' + accessorio.id"
                            [value]="accessorio.id"
+                           [checked]="isAccessorioSelezionato(accessorio.id)"
                            (change)="onAccessorioChange($event, accessorio)">
                     <div class="dr-option-body">
                       <span class="dr-option-name">{{ accessorio.nome }}</span>
