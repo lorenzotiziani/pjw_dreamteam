@@ -47,7 +47,7 @@ type CachedUser = Pick<User, 'id' | 'nome' | 'cognome' | 'email' | 'ruolo'>;
     providedIn: 'root'
 })
 export class AuthService {
-    private readonly API_URL = 'http://localhost:3000/api';
+    private readonly API_URL = 'https://pjw-dreamteam-1.onrender.com/api';
     private readonly USER_CACHE_KEY = 'currentUserCache';
 
     protected http = inject(HttpClient);

@@ -57,7 +57,7 @@ export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) 
                     console.log('🔄 Access token scaduto/invalido, tentativo refresh...');
 
                     return http.post<{ success: boolean; data: { accessToken: string; refreshToken: string } }>(
-                        'http://localhost:3000/api/auth/refresh',
+                        'https://pjw-dreamteam-1.onrender.com/api/auth/refresh',
                         { refreshToken }
                     ).pipe(
                         switchMap((response) => {
