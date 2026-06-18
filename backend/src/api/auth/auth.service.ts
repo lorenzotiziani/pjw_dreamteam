@@ -42,11 +42,11 @@ export class AuthService {
     const verifyLink = `${process.env.FRONTEND_URL}/verify-email?token=${emailToken}`;
 
     await transporter.sendMail({
-      from: '<no-reply@pjw-dreamteam.it>',
+      from: `"no-reply@pjw-dreamteam.it" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Verifica la tua email",
       html: `
-        <h2>Benvenuto ${user.nome}</h2>
+        <h2>Benvenuto ${user.nome}</h2> 
         <p>Per attivare il tuo account clicca qui:</p>
         <a href="${verifyLink}">Verifica email</a>
         <p>Il link scade tra 24 ore.</p>

@@ -39,6 +39,10 @@ export class TipiBiciController {
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
       const data: CreateTipoBiciDTO = req.body;
+
+      const existing = await TipiBiciService.find(data);
+      if (existing) throw new Error('Tipo bici già esistente');
+
       const tipoBici = await TipiBiciService.create(data);
       res.status(201).json({
         success: true, data: tipoBici

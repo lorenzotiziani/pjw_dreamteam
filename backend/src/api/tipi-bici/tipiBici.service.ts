@@ -16,6 +16,16 @@ export class TipiBiciService {
     });
   }
 
+  static async find(data: CreateTipoBiciDTO) {
+    return prisma.tipoBici.findFirst({
+      where: {
+        categoria: data.categoria,
+        motorizzazione: data.motorizzazione ?? 'NORMALE',
+        taglia: data.taglia,
+      },
+    });
+  }
+
   static async create(data: CreateTipoBiciDTO) {
     return prisma.tipoBici.create({
       data: {
