@@ -27,6 +27,22 @@ export class CardBikeComponent {
   onCancella() { this.cancella.emit(this.prenotazione.id); }
   onModifica()  { this.modifica.emit(this.prenotazione.id); }
 
+  /** Nome categoria leggibile: CITY_BIKE → "City Bike". */
+  formatCategoria(categoria: string): string {
+    const map: Record<string, string> = {
+      CITY_BIKE: 'City Bike',
+      MOUNTAIN_BIKE: 'Mountain Bike',
+      GRAVEL: 'Gravel',
+      ROAD_BIKE: 'Road Bike'
+    };
+    return map[categoria] ?? categoria;
+  }
+
+  /** Motorizzazione leggibile: ELETTRICA → "Elettrica", NORMALE → "Muscolare". */
+  formatMotorizzazione(motorizzazione: string): string {
+    return motorizzazione === 'ELETTRICA' ? 'Elettrica' : 'Muscolare';
+  }
+
   /**
    * Raggruppa le righe con stessa bici + stessa copertura + stessi accessori.
    * Poiché quando si prenotano N bici dello stesso tipo vengono assegnati

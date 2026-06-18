@@ -10,7 +10,8 @@ export enum StatoPrenotazione {
   RITIRATA = 'RITIRATA',
   RESTITUITA = 'RESTITUITA',
   CANCELLATA = 'CANCELLATA',
-  DANNO = 'DANNO'
+  DANNO = 'DANNO',
+  RITARDO = 'RITARDO'
 }
 
 export type RigaPrenotazione = {

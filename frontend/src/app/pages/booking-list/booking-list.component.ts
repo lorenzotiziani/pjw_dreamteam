@@ -41,6 +41,7 @@ export class BookingListComponent implements OnInit {
     { label: 'Restituita', value: StatoPrenotazione.RESTITUITA },
     { label: 'Cancellata', value: StatoPrenotazione.CANCELLATA },
     { label: 'Danno',      value: StatoPrenotazione.DANNO },
+    { label: 'Ritardo',    value: StatoPrenotazione.RITARDO },
   ];
 
   ngOnInit(): void {

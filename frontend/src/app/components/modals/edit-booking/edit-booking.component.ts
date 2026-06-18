@@ -35,6 +35,7 @@ export class EditBookingComponent implements OnInit, OnDestroy {
 
   orariDisponibili: string[] = [];
   orariRiconsegna: string[] = []; // Ora popolato con tutti gli orari
+  minDate: string = new Date().toISOString().split('T')[0];
 
   puntiVendita$ = this.puntiVenditaSrv.puntoVendita$;
   coperture$ = this.coperturaSrv.coperture$;
@@ -91,6 +92,15 @@ export class EditBookingComponent implements OnInit, OnDestroy {
     this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
     this.orariRiconsegna = [...this.orariDisponibili]; // Mostra tutte le ore, nessun filtro
 
+    // Stessa logica del form di prenotazione: se la data è oggi, escludi le fasce
+    // già passate (e azzera la selezione se non è più valida).
+    this.updateForm.get('dataRitiro')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => this.aggiornaOrariDisponibili(data ?? ''));
+    this.updateForm.get('dataRiconsegna')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => this.aggiornaOrariRiconsegna(data ?? ''));
+
     // Sottoscrizioni per tenere aggiornate le liste locali
     this.bikesDisponibili$
       .pipe(takeUntil(this.destroy$))
@@ -107,6 +117,24 @@ export class EditBookingComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /** Rigenera le fasce di ritiro in base alla data (oggi → esclude le ore passate). */
+  private aggiornaOrariDisponibili(selectedDate: string) {
+    this.orariDisponibili = this.logicSrv.generaOrariDisponibili(9, 18, selectedDate);
+    const oraAttuale = this.updateForm.get('oraRitiro')?.value;
+    if (oraAttuale && !this.orariDisponibili.includes(oraAttuale)) {
+      this.updateForm.patchValue({ oraRitiro: '' });
+    }
+  }
+
+  /** Rigenera le fasce di riconsegna in base alla data (oggi → esclude le ore passate). */
+  private aggiornaOrariRiconsegna(selectedDate: string) {
+    this.orariRiconsegna = this.logicSrv.generaOrariDisponibili(9, 18, selectedDate);
+    const oraAttuale = this.updateForm.get('oraRiconsegna')?.value;
+    if (oraAttuale && !this.orariRiconsegna.includes(oraAttuale)) {
+      this.updateForm.patchValue({ oraRiconsegna: '' });
+    }
   }
 
   async caricaPrenotazione() {

@@ -48,6 +48,7 @@
             <i class="bi bi-calendar-event me-1 text-success"></i>Data ritiro
           </label>
           <input type="date" class="eb-input" formControlName="dataRitiro"
+                 [min]="minDate"
                  [class.eb-invalid]="updateForm.get('dataRitiro')?.invalid && updateForm.get('dataRitiro')?.touched">
         </div>
 
@@ -67,6 +68,7 @@
             <i class="bi bi-calendar-check me-1 text-success"></i>Data riconsegna
           </label>
           <input type="date" class="eb-input" formControlName="dataRiconsegna"
+                 [min]="updateForm.get('dataRitiro')?.value || minDate"
                  [class.eb-invalid]="updateForm.get('dataRiconsegna')?.invalid && updateForm.get('dataRiconsegna')?.touched">
         </div>
 

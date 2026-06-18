@@ -8,7 +8,8 @@
          'dr-status-ritirata':    prenotazione.stato === 'RITIRATA',
          'dr-status-restituita':  prenotazione.stato === 'RESTITUITA',
          'dr-status-cancellata':  prenotazione.stato === 'CANCELLATA',
-         'dr-status-danno':       prenotazione.stato === 'DANNO'
+         'dr-status-danno':       prenotazione.stato === 'DANNO',
+         'dr-status-ritardo':     prenotazione.stato === 'RITARDO'
        }">
     <span class="dr-status-pill">
       <i class="bi me-1"
@@ -18,7 +19,8 @@
            'bi-bicycle':           prenotazione.stato === 'RITIRATA',
            'bi-arrow-return-left': prenotazione.stato === 'RESTITUITA',
            'bi-x-circle-fill':     prenotazione.stato === 'CANCELLATA',
-           'bi-exclamation-triangle-fill': prenotazione.stato === 'DANNO'
+           'bi-exclamation-triangle-fill': prenotazione.stato === 'DANNO',
+           'bi-clock-history':     prenotazione.stato === 'RITARDO'
          }"></i>
       {{ prenotazione.stato | titlecase }}
     </span>
@@ -62,8 +64,13 @@
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <!-- Badge quantità, visibile solo se > 1 -->
             <span *ngIf="gruppo.quantita > 1" class="dr-qty-badge">{{ gruppo.quantita }}×</span>
-            <span class="fw-semibold" style="font-size: 0.88rem">{{ gruppo.tipoBici!.categoria }}</span>
+            <span class="fw-semibold" style="font-size: 0.88rem">{{ formatCategoria(gruppo.tipoBici!.categoria) }}</span>
             <span class="badge bg-light text-secondary" style="font-size: 0.7rem">{{ gruppo.tipoBici!.taglia }}</span>
+            <span class="dr-moto-badge"
+                  [class.dr-moto-elettrica]="gruppo.tipoBici!.motorizzazione === 'ELETTRICA'">
+              <i class="bi me-1"
+                 [ngClass]="gruppo.tipoBici!.motorizzazione === 'ELETTRICA' ? 'bi-lightning-charge-fill' : 'bi-bicycle'"></i>{{ formatMotorizzazione(gruppo.tipoBici!.motorizzazione) }}
+            </span>
             <span class="text-muted" style="font-size: 0.78rem">— {{ gruppo.tipoBici!.prezzoMezzaGiornata | currency }}/½ giornata</span>
           </div>
 

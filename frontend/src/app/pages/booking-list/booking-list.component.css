@@ -113,3 +113,4 @@
 .dr-filtro-chip.dr-filtro-restituita.active { background: linear-gradient(135deg, #0891b2, #38bdf8); }
 .dr-filtro-chip.dr-filtro-cancellata.active { background: linear-gradient(135deg, #6b7280, #9ca3af); }
 .dr-filtro-chip.dr-filtro-danno.active      { background: linear-gradient(135deg, #dc2626, #f87171); }
+.dr-filtro-chip.dr-filtro-ritardo.active    { background: linear-gradient(135deg, #ea580c, #fb923c); }
