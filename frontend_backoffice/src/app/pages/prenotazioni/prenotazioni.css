@@ -63,3 +63,9 @@
 .riga-bici { flex: 1; font-size: .88rem; }
 .riga-price { font-weight: 700; color: var(--primary-dark); font-size: .9rem; }
 .riga-acc { font-size: .78rem; color: var(--text-muted); }
+
+.nota-detail { padding: .55rem 0; border-bottom: 1px solid var(--border-subtle); }
+.nota-detail:last-child { border-bottom: none; }
+.nota-detail .stato-badge { margin-right: .5rem; }
+.nota-data { font-size: .78rem; }
+.nota-testo { margin-top: .35rem; font-size: .88rem; color: var(--text); white-space: pre-wrap; }
