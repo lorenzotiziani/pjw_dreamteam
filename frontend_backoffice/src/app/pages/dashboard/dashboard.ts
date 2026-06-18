@@ -60,9 +60,12 @@ export class DashboardComponent implements OnInit {
 
   get totalePrenotazioni(): number { return this.prenotazioni.length; }
 
+  // Stati che generano ricavo effettivo (coerente con la pagina Statistiche)
+  private static readonly RICAVI_STATI: StatoPrenotazione[] = ['RITIRATA', 'RESTITUITA', 'DANNO', 'RITARDO'];
+
   get ricaviTotali(): string {
     const tot = this.prenotazioni
-      .filter(p => p.stato === 'RITIRATA' || p.stato === 'RESTITUITA')
+      .filter(p => DashboardComponent.RICAVI_STATI.includes(p.stato))
       .reduce((s, p) => s + Number(p.totale), 0);
     return tot.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
