@@ -31,7 +31,8 @@
 .dr-status-attesa      { background: linear-gradient(135deg, #d97706, #f59e0b); }
 .dr-status-ritirata    { background: linear-gradient(135deg, #2563eb, #60a5fa); }
 .dr-status-restituita  { background: linear-gradient(135deg, #0891b2, #38bdf8); }
-.dr-status-cancellata  { background: linear-gradient(135deg, #dc2626, #f87171); }
+.dr-status-cancellata  { background: linear-gradient(135deg, #6b7280, #9ca3af); }
+.dr-status-danno       { background: linear-gradient(135deg, #dc2626, #f87171); }
 
 .dr-status-pill {
   color: white;

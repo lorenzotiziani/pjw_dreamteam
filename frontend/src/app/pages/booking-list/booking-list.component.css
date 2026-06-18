@@ -53,3 +53,63 @@
   justify-content: center;
   font-size: 2.2rem;
 }
+
+/* ---------- Filtri per stato ---------- */
+.dr-filtri {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dr-filtro-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1.5px solid var(--dr-border, #e5e7eb);
+  background: #fff;
+  color: var(--dr-text, #374151);
+  border-radius: 50px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dr-filtro-chip:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+/* Pallino contatore */
+.dr-filtro-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.4rem;
+  background: #f1f5f9;
+  color: var(--dr-muted, #6b7280);
+  border-radius: 50px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+/* Chip attivo: colore per stato */
+.dr-filtro-chip.active {
+  color: #fff;
+  border-color: transparent;
+}
+.dr-filtro-chip.active .dr-filtro-count {
+  background: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.dr-filtro-chip.dr-filtro-tutte.active      { background: linear-gradient(135deg, #475569, #64748b); }
+.dr-filtro-chip.dr-filtro-confermata.active { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.dr-filtro-chip.dr-filtro-in_attesa.active  { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.dr-filtro-chip.dr-filtro-ritirata.active   { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+.dr-filtro-chip.dr-filtro-restituita.active { background: linear-gradient(135deg, #0891b2, #38bdf8); }
+.dr-filtro-chip.dr-filtro-cancellata.active { background: linear-gradient(135deg, #6b7280, #9ca3af); }
+.dr-filtro-chip.dr-filtro-danno.active      { background: linear-gradient(135deg, #dc2626, #f87171); }

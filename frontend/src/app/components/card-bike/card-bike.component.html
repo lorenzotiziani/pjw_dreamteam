@@ -7,7 +7,8 @@
          'dr-status-attesa':      prenotazione.stato === 'IN_ATTESA',
          'dr-status-ritirata':    prenotazione.stato === 'RITIRATA',
          'dr-status-restituita':  prenotazione.stato === 'RESTITUITA',
-         'dr-status-cancellata':  prenotazione.stato === 'CANCELLATA'
+         'dr-status-cancellata':  prenotazione.stato === 'CANCELLATA',
+         'dr-status-danno':       prenotazione.stato === 'DANNO'
        }">
     <span class="dr-status-pill">
       <i class="bi me-1"
@@ -16,7 +17,8 @@
            'bi-hourglass-split':   prenotazione.stato === 'IN_ATTESA',
            'bi-bicycle':           prenotazione.stato === 'RITIRATA',
            'bi-arrow-return-left': prenotazione.stato === 'RESTITUITA',
-           'bi-x-circle-fill':     prenotazione.stato === 'CANCELLATA'
+           'bi-x-circle-fill':     prenotazione.stato === 'CANCELLATA',
+           'bi-exclamation-triangle-fill': prenotazione.stato === 'DANNO'
          }"></i>
       {{ prenotazione.stato | titlecase }}
     </span>

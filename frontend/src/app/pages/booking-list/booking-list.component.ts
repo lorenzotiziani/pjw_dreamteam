@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { PrenotazioneService } from '../../services/prenotazione.service';
-import { Prenotazione } from '../../entities/prenotazione';
+import { Prenotazione, StatoPrenotazione } from '../../entities/prenotazione';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -27,10 +27,40 @@ export class BookingListComponent implements OnInit {
   prenotazioni: Prenotazione[] = [];
   loading = false;
   error: string | null = null;
-  cancellingId: string | null = null;  
+  cancellingId: string | null = null;
+
+  // Filtro per stato attivo ('TUTTE' = nessun filtro)
+  statoFiltro: StatoPrenotazione | 'TUTTE' = 'TUTTE';
+
+  // Filtri mostrati in alto (ordine = ciclo di vita della prenotazione)
+  readonly filtri: { label: string; value: StatoPrenotazione | 'TUTTE' }[] = [
+    { label: 'Tutte',      value: 'TUTTE' },
+    { label: 'Confermata', value: StatoPrenotazione.CONFERMATA },
+    { label: 'In attesa',  value: StatoPrenotazione.IN_ATTESA },
+    { label: 'Ritirata',   value: StatoPrenotazione.RITIRATA },
+    { label: 'Restituita', value: StatoPrenotazione.RESTITUITA },
+    { label: 'Cancellata', value: StatoPrenotazione.CANCELLATA },
+    { label: 'Danno',      value: StatoPrenotazione.DANNO },
+  ];
 
   ngOnInit(): void {
     this.caricaPrenotazioni();
+  }
+
+  /** Prenotazioni mostrate in base al filtro stato selezionato. */
+  get prenotazioniFiltrate(): Prenotazione[] {
+    if (this.statoFiltro === 'TUTTE') return this.prenotazioni;
+    return this.prenotazioni.filter(p => p.stato === this.statoFiltro);
+  }
+
+  /** Numero di prenotazioni per uno stato (per il badge accanto al filtro). */
+  contaPerStato(value: StatoPrenotazione | 'TUTTE'): number {
+    if (value === 'TUTTE') return this.prenotazioni.length;
+    return this.prenotazioni.filter(p => p.stato === value).length;
+  }
+
+  setFiltro(value: StatoPrenotazione | 'TUTTE'): void {
+    this.statoFiltro = value;
   }
 
   openModal(id: string) {
@@ -82,8 +112,9 @@ export class BookingListComponent implements OnInit {
     this.error = null;
     this.prenotazioniSrv.mie().subscribe({
       next: (data) => {
-        // Mostra solo le prenotazioni CONFERMATE
-        this.prenotazioni = data.filter(p => p.stato === 'CONFERMATA');
+        // Mostra tutte le prenotazioni: lo stato effettivo è visibile sulla card
+        // e filtrabile dai pulsanti in alto.
+        this.prenotazioni = data;
         this.loading = false;
       },
       error: (err) => {
@@ -110,10 +141,10 @@ export class BookingListComponent implements OnInit {
     // (soft delete: la prenotazione resta nel DB ma non compare più nella lista)
     this.prenotazioniSrv.cancellaStato(Number(id)).subscribe({
       next: () => {
-        // Rimuove dalla lista locale (non è più CONFERMATA)
-        this.prenotazioni = this.prenotazioni.filter(p => p.id !== id);
+        // Ricarica: la prenotazione resta in lista ma ora con stato CANCELLATA
         this.cancellingId = null;
         this.toastSrv.success('Prenotazione cancellata.');
+        this.caricaPrenotazioni();
       },
       error: (err) => {
         console.error('Errore cancellazione', err);

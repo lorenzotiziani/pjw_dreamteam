@@ -38,11 +38,35 @@
       </a>
     </div>
 
+    <!-- Filtri per stato -->
+    <div *ngIf="!loading && prenotazioni.length > 0" class="dr-filtri mb-4">
+      <button *ngFor="let f of filtri"
+              type="button"
+              class="dr-filtro-chip"
+              [class.active]="statoFiltro === f.value"
+              [ngClass]="'dr-filtro-' + f.value.toLowerCase()"
+              (click)="setFiltro(f.value)">
+        {{ f.label }}
+        <span class="dr-filtro-count">{{ contaPerStato(f.value) }}</span>
+      </button>
+    </div>
+
     <!-- Lista prenotazioni -->
     <div *ngIf="!loading && prenotazioni.length > 0" class="row g-4">
-      <div class="col-md-6 col-lg-4" *ngFor="let p of prenotazioni">
+
+      <!-- Nessun risultato per il filtro selezionato -->
+      <div *ngIf="prenotazioniFiltrate.length === 0" class="col-12">
+        <div class="dr-empty-state">
+          <div class="dr-empty-icon"><i class="bi bi-funnel"></i></div>
+          <h5 class="fw-bold mt-3 mb-1">Nessuna prenotazione con questo stato</h5>
+          <p class="text-muted small mb-0">Prova a selezionare un altro filtro.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4" *ngFor="let p of prenotazioniFiltrate">
         <app-card-bike
           [prenotazione]="p"
+          [showActions]="p.stato === 'CONFERMATA'"
           (cancella)="cancellaPrenotazione($event)"
           (modifica)="openModal($event)">
         </app-card-bike>
