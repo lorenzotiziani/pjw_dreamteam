@@ -208,11 +208,15 @@
             class="text-muted small">Dettaglio non disponibile</div>
           <div *ngFor="let r of selectedPrenotazione.righe" class="riga-detail">
             <div class="riga-bici">
-              <span class="fw-600">{{ r.tipoBici?.categoria }} {{ r.tipoBici?.motorizzazione === 'ELETTRICA' ? '⚡' : '' }} – {{ r.tipoBici?.taglia }}</span>
-              <span class="text-muted ms-2">{{ r.copertura ? '+ ' + r.copertura.nome : '' }}</span>
-            </div>
-            <div class="riga-acc" *ngIf="r.accessori && r.accessori.length > 0">
-              Accessori: {{ r.accessori.length }}
+              <div>
+                <span class="fw-600">{{ r.tipoBici?.categoria }} {{ r.tipoBici?.motorizzazione === 'ELETTRICA' ? '⚡' : '' }} – {{ r.tipoBici?.taglia }}</span>
+                <span class="text-muted ms-2">{{ r.copertura ? '+ ' + r.copertura.nome : '' }}</span>
+              </div>
+              <ul class="riga-acc-list" *ngIf="r.accessori && r.accessori.length > 0">
+                <li *ngFor="let a of r.accessori">
+                  {{ a.accessorio?.nome ?? 'Accessorio' }}<span *ngIf="a.quantita > 1"> × {{ a.quantita }}</span>
+                </li>
+              </ul>
             </div>
             <div class="riga-price">€ {{ (+r.subtotale).toFixed(2) }}</div>
           </div>
