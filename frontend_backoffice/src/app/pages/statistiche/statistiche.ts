@@ -81,7 +81,7 @@ export class StatisticheComponent implements OnInit {
 
     this.computeKpi(delAnno);
     this.computeChart(delAnno);
-    this.computeStatoBreakdown();     // sempre storico completo
+    this.computeStatoBreakdown(delAnno);
     this.computeBiciBreakdown(delAnno);
     this.computePvBreakdown(delAnno);
   }
@@ -110,10 +110,10 @@ export class StatisticheComponent implements OnInit {
     }));
   }
 
-  private computeStatoBreakdown(): void {
-    const totale = this.tutte.length || 1;
+  private computeStatoBreakdown(delAnno: Prenotazione[]): void {
+    const totale = delAnno.length || 1;
     this.statoBreakdown = STATI_CONFIG.map(({ stato, label, colore }) => {
-      const count = this.tutte.filter(p => p.stato === stato).length;
+      const count = delAnno.filter(p => p.stato === stato).length;
       return { stato, label, colore, count, percent: Math.round((count / totale) * 100) };
     });
   }

@@ -7,6 +7,13 @@ export type RigaAccessorio = {
   accessorio?: { id: number; nome: string; prezzo: number };
 };
 
+export type LogOperazione = {
+  id: number;
+  tipo: StatoPrenotazione;
+  eseguitaIl?: string;
+  note?: string;
+};
+
 export type RigaPrenotazione = {
   id: number;
   prenotazioneId: number;
@@ -31,4 +38,5 @@ export type Prenotazione = {
   utente?: { id: number; nome: string; cognome: string; email: string };
   puntoVendita?: { id: number; nome: string; citta: string; indirizzo: string };
   righe?: RigaPrenotazione[];
+  operazioni?: LogOperazione[];
 };

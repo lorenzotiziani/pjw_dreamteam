@@ -197,7 +197,7 @@
           </div>
           <div class="detail-row">
             <span class="dl">Riconsegna</span>
-            <span class="dv">{{ dataOraFmt(selectedPrenotazione.dataOraRiconsegna) }}</span>
+            <span class="dv">{{ dataFmt(selectedPrenotazione.dataOraRiconsegna) }} ore {{ oraFmt(selectedPrenotazione.dataOraRiconsegna) }}</span>
           </div>
         </div>
       </div>
@@ -208,13 +208,29 @@
             class="text-muted small">Dettaglio non disponibile</div>
           <div *ngFor="let r of selectedPrenotazione.righe" class="riga-detail">
             <div class="riga-bici">
-              <span class="fw-600">{{ r.tipoBici?.categoria }} {{ r.tipoBici?.motorizzazione === 'ELETTRICA' ? '⚡' : '' }} – {{ r.tipoBici?.taglia }}</span>
-              <span class="text-muted ms-2">{{ r.copertura ? '+ ' + r.copertura.nome : '' }}</span>
-            </div>
-            <div class="riga-acc" *ngIf="r.accessori && r.accessori.length > 0">
-              Accessori: {{ r.accessori.length }}
+              <div>
+                <span class="fw-600">{{ r.tipoBici?.categoria }} {{ r.tipoBici?.motorizzazione === 'ELETTRICA' ? '⚡' : '' }} – {{ r.tipoBici?.taglia }}</span>
+                <span class="text-muted ms-2">{{ r.copertura ? '+ ' + r.copertura.nome : '' }}</span>
+              </div>
+              <ul class="riga-acc-list" *ngIf="r.accessori && r.accessori.length > 0">
+                <li *ngFor="let a of r.accessori">
+                  {{ a.accessorio?.nome ?? 'Accessorio' }}<span *ngIf="a.quantita > 1"> × {{ a.quantita }}</span>
+                </li>
+              </ul>
             </div>
             <div class="riga-price">€ {{ (+r.subtotale).toFixed(2) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Note (visibili solo se presenti, es. registrate alla restituzione) -->
+      <div class="col-12" *ngIf="noteOperazioni.length > 0">
+        <div class="detail-section">
+          <div class="detail-section-title">Note</div>
+          <div *ngFor="let op of noteOperazioni" class="nota-detail">
+            <span class="stato-badge" [ngClass]="statoBadgeClass(op.tipo)">{{ statoLabel(op.tipo) }}</span>
+            <span class="nota-data text-muted" *ngIf="op.eseguitaIl">{{ dataOraFmt(op.eseguitaIl) }}</span>
+            <div class="nota-testo">{{ op.note }}</div>
           </div>
         </div>
       </div>

@@ -58,8 +58,16 @@
 .dl { min-width: 80px; color: var(--text-muted); font-weight: 500; }
 .dv { color: var(--text); font-weight: 600; }
 
-.riga-detail { display: flex; align-items: center; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid var(--border-subtle); }
+.riga-detail { display: flex; align-items: flex-start; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid var(--border-subtle); }
 .riga-detail:last-child { border-bottom: none; }
 .riga-bici { flex: 1; font-size: .88rem; }
 .riga-price { font-weight: 700; color: var(--primary-dark); font-size: .9rem; }
-.riga-acc { font-size: .78rem; color: var(--text-muted); }
+.riga-acc-list { list-style: none; margin: .35rem 0 0; padding: 0; }
+.riga-acc-list li { font-size: .78rem; color: var(--text-muted); padding-left: .85rem; position: relative; }
+.riga-acc-list li::before { content: '•'; position: absolute; left: 0; color: var(--text-muted); }
+
+.nota-detail { padding: .55rem 0; border-bottom: 1px solid var(--border-subtle); }
+.nota-detail:last-child { border-bottom: none; }
+.nota-detail .stato-badge { margin-right: .5rem; }
+.nota-data { font-size: .78rem; }
+.nota-testo { margin-top: .35rem; font-size: .88rem; color: var(--text); white-space: pre-wrap; }

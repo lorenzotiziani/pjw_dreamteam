@@ -5,7 +5,7 @@ import { PrenotazioniService } from '../../services/prenotazioni.service';
 import { PuntiVenditaService } from '../../services/punti-vendita.service';
 import { ToastService } from '../../services/toast.service';
 import { ConfirmModalService } from '../../services/confirm-modal.service';
-import { Prenotazione, StatoPrenotazione } from '../../entities/prenotazione.entity';
+import { LogOperazione, Prenotazione, StatoPrenotazione } from '../../entities/prenotazione.entity';
 import { PuntoVendita } from '../../entities/punto-vendita.entity';
 
 @Component({
@@ -114,9 +114,16 @@ export class PrenotazioniComponent implements OnInit {
     return (new Date(p.dataRitiro).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
   }
 
+  /**
+   * Stati "chiusi": la prenotazione è di fatto conclusa.
+   * DANNO e RITARDO equivalgono a RESTITUITA (riconsegna avvenuta, ma con un esito
+   * diverso): non sono più modificabili, esattamente come una restituzione regolare.
+   */
+  private readonly statiChiusi: StatoPrenotazione[] = ['RITIRATA', 'RESTITUITA', 'CANCELLATA', 'DANNO', 'RITARDO'];
+
   /** Modifica date consentita: stato attivo + ritiro > 2 giorni */
   canModify(p: Prenotazione): boolean {
-    if (p.stato === 'RITIRATA' || p.stato === 'RESTITUITA' || p.stato === 'CANCELLATA') return false;
+    if (this.statiChiusi.includes(p.stato)) return false;
     return this.giorniAlRitiro(p) > 2;
   }
 
@@ -136,7 +143,7 @@ export class PrenotazioniComponent implements OnInit {
 
   /** Mostra il lucchetto nella riga quando l'azione è bloccata dal periodo di 2 giorni */
   isBlocked(p: Prenotazione): boolean {
-    if (p.stato === 'RITIRATA' || p.stato === 'RESTITUITA' || p.stato === 'CANCELLATA') return false;
+    if (this.statiChiusi.includes(p.stato)) return false;
     return this.giorniAlRitiro(p) <= 2;
   }
 
@@ -144,6 +151,23 @@ export class PrenotazioniComponent implements OnInit {
   openDetail(p: Prenotazione) {
     this.selectedPrenotazione = p;
     this.modalSrv.open(this.detailModal, { size: 'lg', centered: true });
+    // La lista (getAll) non include le operazioni: ricarico il dettaglio
+    // per recuperare le eventuali note registrate alla restituzione.
+    this.prenotazioniSrv.getById(p.id).subscribe({
+      next: full => {
+        if (this.selectedPrenotazione?.id === full.id) {
+          this.selectedPrenotazione = { ...this.selectedPrenotazione, operazioni: full.operazioni };
+        }
+      },
+      error: () => { /* le note sono facoltative: in caso di errore il dettaglio resta visibile */ }
+    });
+  }
+
+  /** Operazioni con una nota valorizzata, dalla più recente. */
+  get noteOperazioni(): LogOperazione[] {
+    return (this.selectedPrenotazione?.operazioni ?? [])
+      .filter(o => o.note && o.note.trim())
+      .sort((a, b) => new Date(b.eseguitaIl ?? 0).getTime() - new Date(a.eseguitaIl ?? 0).getTime());
   }
 
   // ── Modifica ───────────────────────────────────────────────────────────
