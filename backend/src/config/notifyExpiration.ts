@@ -25,7 +25,7 @@ cron.schedule('0 0 8 * * *', async () => {
     await mailjet.post('send', { version: 'v3.1' }).request({
       Messages: [
         {
-          From: { Email: 'no-reply@pjw-dreamteam.it', Name: 'PJW DreamTeam' },
+          From: { Email: 'lorenzo.tiziani97@gmail.com', Name: 'PJW DreamTeam' },
           To: [{ Email: p.utente.email, Name: p.utente.nome }],
           Subject: 'Promemoria ritiro bici',
           HTMLPart: `
