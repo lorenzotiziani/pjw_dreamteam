@@ -40,6 +40,7 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
   orariDisponibili: string[] = [];
   formError = '';
+  minDate: string = new Date().toISOString().split('T')[0];
 
   bikesDisponibiliList: any[] = [];
   copertureList: any[] = [];
@@ -86,6 +87,10 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
+
+    this.bookingForm.get('data')!.valueChanges
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(data => this.aggiornaOrariDisponibili(data ?? ''));
 
     this.coperture$.pipe(takeUntil(this.destroyed$)).subscribe(list => {
       this.copertureList = list;
@@ -333,6 +338,14 @@ export class BookingFormComponent implements OnInit, OnDestroy {
       // login/register/verifica-email finché la prenotazione non va a buon fine.
     } catch (e) {
       console.error('Errore nel ripristino del form', e);
+    }
+  }
+
+  private aggiornaOrariDisponibili(selectedDate: string) {
+    this.orariDisponibili = this.logicSrv.generaOrariDisponibili(9, 18, selectedDate);
+    const oraAttuale = this.bookingForm.get('ora')?.value;
+    if (oraAttuale && !this.orariDisponibili.includes(oraAttuale)) {
+      this.bookingForm.patchValue({ ora: '' });
     }
   }
 

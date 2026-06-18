@@ -3,9 +3,21 @@ import { Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class LogicaService {
 
-  generaOrariDisponibili(startHour: number = 9, endHour: number = 18): string[] {
+  generaOrariDisponibili(startHour: number = 9, endHour: number = 18, selectedDate?: string): string[] {
+    let effectiveStart = startHour;
+    if (selectedDate) {
+      const now = new Date();
+      const sel = new Date(selectedDate);
+      const isToday =
+        sel.getFullYear() === now.getFullYear() &&
+        sel.getMonth()    === now.getMonth()    &&
+        sel.getDate()     === now.getDate();
+      if (isToday) {
+        effectiveStart = Math.max(startHour, now.getHours() + 1);
+      }
+    }
     const orari: string[] = [];
-    for (let ora = startHour; ora < endHour; ora++) {
+    for (let ora = effectiveStart; ora < endHour; ora++) {
       orari.push(`${ora.toString().padStart(2, '0')}:00 - ${(ora + 1).toString().padStart(2, '0')}:00`);
     }
     return orari;

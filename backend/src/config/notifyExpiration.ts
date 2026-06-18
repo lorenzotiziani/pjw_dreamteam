@@ -4,7 +4,7 @@ import { mailjet } from './mailSender';
 import { startOfDay, endOfDay, addDays } from 'date-fns';
 
 cron.schedule('0 0 8 * * *', async () => {
-  console.log('📬 Avvio promemoria prenotazioni...');
+  console.log('promemoria prenotazioni');
 
   const tomorrowStart = startOfDay(addDays(new Date(), 1));
   const tomorrowEnd = endOfDay(addDays(new Date(), 1));
@@ -37,5 +37,5 @@ cron.schedule('0 0 8 * * *', async () => {
     });
   }
 
-  console.log(`📨 Inviati ${prenotazioni.length} promemoria`);
+  console.log(`Inviati ${prenotazioni.length} promemoria`);
 });
