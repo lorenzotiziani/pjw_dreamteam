@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import { prisma } from '../config/prisma';
-import { transporter } from './mailSender';
+import { mailjet } from './mailSender';
 import { startOfDay, endOfDay, addDays } from 'date-fns';
 
 cron.schedule('0 0 8 * * *', async () => {
@@ -22,13 +22,18 @@ cron.schedule('0 0 8 * * *', async () => {
   });
 
   for (const p of prenotazioni) {
-    await transporter.sendMail({
-      to: p.utente.email,
-      subject: 'Promemoria ritiro bici',
-      html: `
-        <h3>Ciao ${p.utente.nome}</h3>
-        <p>Ti ricordiamo che domani hai un ritiro prenotato.</p>
-      `,
+    await mailjet.post('send', { version: 'v3.1' }).request({
+      Messages: [
+        {
+          From: { Email: 'no-reply@pjw-dreamteam.it', Name: 'PJW DreamTeam' },
+          To: [{ Email: p.utente.email, Name: p.utente.nome }],
+          Subject: 'Promemoria ritiro bici',
+          HTMLPart: `
+            <h3>Ciao ${p.utente.nome}</h3>
+            <p>Ti ricordiamo che domani hai un ritiro prenotato.</p>
+          `,
+        },
+      ],
     });
   }
 

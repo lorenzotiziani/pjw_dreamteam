@@ -8,7 +8,7 @@ import { jwtConfig } from "../../config/jwt";
 import { BadRequestError, UnauthorizedError } from "../../errors";
 import { AuthResponse, JwtPayload } from "../entities/authEntity";
 import { User } from "../entities/userEntity";
-import { transporter } from "../../config/mailSender";
+import { mailjet } from "../../config/mailSender";
 import { Ruolo } from "@prisma/client";
 
 export class AuthService {
@@ -41,16 +41,16 @@ export class AuthService {
 
     const verifyLink = `${process.env.FRONTEND_URL}/verify-email?token=${emailToken}`;
 
-    await transporter.sendMail({
-      from: `"no-reply@pjw-dreamteam.it" <${process.env.EMAIL_USER}>`,
-      to: user.email,
-      subject: "Verifica la tua email",
-      html: `
-        <h2>Benvenuto ${user.nome}</h2> 
-        <p>Per attivare il tuo account clicca qui:</p>
-        <a href="${verifyLink}">Verifica email</a>
-        <p>Il link scade tra 24 ore.</p>
-      `,
+    await mailjet.post('send', { version: 'v3.1' }).request({
+      Messages: [
+        {
+          From: { Email: 'no-reply@pjw-dreamteam.it', Name: 'PJW DreamTeam' },
+          To: [{ Email: user.email, Name: user.nome }],
+          Subject: 'Verifica la tua email',
+          TextPart: `Benvenuto ${user.nome}, per attivare il tuo account clicca qui: ${verifyLink}`,
+          HTMLPart: `<h2>Benvenuto ${user.nome}</h2><p>Per attivare il tuo account clicca qui:</p><a href="${verifyLink}">Verifica email</a><p>Il link scade tra 24 ore.</p>`,
+        },
+      ],
     });
 
     const {
