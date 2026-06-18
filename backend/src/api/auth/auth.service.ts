@@ -44,7 +44,7 @@ export class AuthService {
     await mailjet.post('send', { version: 'v3.1' }).request({
       Messages: [
         {
-          From: { Email: 'no-reply@pjw-dreamteam.it', Name: 'PJW DreamTeam' },
+          From: { Email: 'lorenzo.tiziani97@gmail.com', Name: 'PJW DreamTeam' },
           To: [{ Email: user.email, Name: user.nome }],
           Subject: 'Verifica la tua email',
           TextPart: `Benvenuto ${user.nome}, per attivare il tuo account clicca qui: ${verifyLink}`,
