@@ -73,7 +73,7 @@
                       <select class="form-select" formControlName="tipoBiciId">
                         <option value="">Seleziona bici</option>
                         <option *ngFor="let bike of bikesDisponibiliList" [value]="bike.id">
-                          {{ bike.categoria }} — Taglia {{ bike.taglia }} (€{{ bike.prezzoMezzaGiornata }}/mezza giornata)
+                          {{ formatCategoria(bike.categoria) }} · {{ formatMotorizzazione(bike.motorizzazione) }} — Taglia {{ bike.taglia }} · €{{ bike.prezzoMezzaGiornata | number:'1.2-2' }}/mezza giornata
                         </option>
                       </select>
                     </div>

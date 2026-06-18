@@ -292,6 +292,22 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Nome categoria leggibile: CITY_BIKE → "City Bike". */
+  formatCategoria(categoria: string): string {
+    const map: Record<string, string> = {
+      CITY_BIKE: 'City Bike',
+      MOUNTAIN_BIKE: 'Mountain Bike',
+      GRAVEL: 'Gravel',
+      ROAD_BIKE: 'Road Bike'
+    };
+    return map[categoria] ?? categoria;
+  }
+
+  /** Motorizzazione leggibile: ELETTRICA → "Elettrica", NORMALE → "Muscolare". */
+  formatMotorizzazione(motorizzazione: string): string {
+    return motorizzazione === 'ELETTRICA' ? 'Elettrica' : 'Muscolare';
+  }
+
   private readonly FORM_STORAGE_KEY = 'booking_form_data';
 
   saveFormState() {
