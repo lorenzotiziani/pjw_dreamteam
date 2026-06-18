@@ -201,8 +201,20 @@ export class PuntiVenditaComponent implements OnInit {
     this.stockForm.reset({ tipoBiciId: null, quantitaTotale: 1, quantitaManutenzione: 0 });
   }
 
+  /**
+   * Eliminazione stock consentita solo se tutte le bici sono "presenti"
+   * (disponibili o in manutenzione): nessuna deve essere a noleggio.
+   */
+  canDeleteStock(s: StockBici): boolean {
+    return s.quantitaAttuale + s.quantitaManutenzione >= s.quantitaTotale;
+  }
+
   onDeleteStock(s: StockBici) {
     if (!this.selectedPv) return;
+    if (!this.canDeleteStock(s)) {
+      this.toastSrv.warn('Impossibile eliminare: alcune bici sono ancora a noleggio. Tutte devono essere disponibili o in manutenzione.');
+      return;
+    }
     this.confirmSrv.confirm({
       title: 'Elimina stock',
       message: `Sei sicuro di voler eliminare lo stock per "${this.tipoBiciLabel(s.tipoBiciId)}"?`,
