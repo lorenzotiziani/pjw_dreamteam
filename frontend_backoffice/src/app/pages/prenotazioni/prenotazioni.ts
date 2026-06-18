@@ -89,9 +89,11 @@ export class PrenotazioniComponent implements OnInit {
   get prenotazioniFiltrate(): Prenotazione[] {
     return this.prenotazioni.filter(p => {
       const testo = this.filtroTesto.toLowerCase();
+      const nomeCompleto = `${p.utente?.nome ?? ''} ${p.utente?.cognome ?? ''}`.toLowerCase();
+      const nomeInverso  = `${p.utente?.cognome ?? ''} ${p.utente?.nome ?? ''}`.toLowerCase();
       const matchTesto = !testo
-        || (p.utente?.nome ?? '').toLowerCase().includes(testo)
-        || (p.utente?.cognome ?? '').toLowerCase().includes(testo)
+        || nomeCompleto.includes(testo)
+        || nomeInverso.includes(testo)
         || (p.utente?.email ?? '').toLowerCase().includes(testo)
         || String(p.id).includes(testo);
       const matchStato = !this.filtroStato || p.stato === this.filtroStato;
