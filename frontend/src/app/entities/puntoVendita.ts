@@ -17,6 +17,7 @@ export type Stock = {
   puntoVenditaId: number;
   tipoBiciId: number;
   quantitaTotale: number;
+  quantitaAttuale: number;
   quantitaManutenzione: number;
   tipoBici: {
     id: number;

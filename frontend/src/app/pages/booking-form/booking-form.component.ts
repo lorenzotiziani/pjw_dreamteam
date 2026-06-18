@@ -39,6 +39,7 @@ export class BookingFormComponent implements OnInit, OnDestroy {
   coperture$ = this.coperturaSrv.coperture$;
 
   orariDisponibili: string[] = [];
+  orariRiconsegna: string[] = [];
   formError = '';
   minDate: string = new Date().toISOString().split('T')[0];
 
@@ -74,7 +75,9 @@ export class BookingFormComponent implements OnInit, OnDestroy {
       return this.puntiVenditaSrv.stock(puntoVenditaId).pipe(
         map(stockArray =>
           stockArray
-            .filter(s => s.quantitaTotale > 0)
+            // Solo le bici realmente disponibili: quantitaAttuale tiene già conto
+            // di manutenzione e prenotazioni in corso (il backend la decrementa).
+            .filter(s => s.quantitaAttuale > 0)
             .map(s => ({
               ...s.tipoBici,
               id: String(s.tipoBici.id),
@@ -87,10 +90,18 @@ export class BookingFormComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.orariDisponibili = this.logicSrv.generaOrariDisponibili();
+    this.orariRiconsegna = this.logicSrv.generaOrariDisponibili();
 
+    // Le fasce di ritiro dipendono dalla data di ritiro,
+    // quelle di riconsegna dalla data di riconsegna: il troncamento delle ore
+    // passate scatta solo se quella specifica data è oggi.
     this.bookingForm.get('data')!.valueChanges
       .pipe(takeUntil(this.destroyed$))
       .subscribe(data => this.aggiornaOrariDisponibili(data ?? ''));
+
+    this.bookingForm.get('dataRiconsegna')!.valueChanges
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(data => this.aggiornaOrariRiconsegna(data ?? ''));
 
     this.coperture$.pipe(takeUntil(this.destroyed$)).subscribe(list => {
       this.copertureList = list;
@@ -362,6 +373,14 @@ export class BookingFormComponent implements OnInit, OnDestroy {
     const oraAttuale = this.bookingForm.get('ora')?.value;
     if (oraAttuale && !this.orariDisponibili.includes(oraAttuale)) {
       this.bookingForm.patchValue({ ora: '' });
+    }
+  }
+
+  private aggiornaOrariRiconsegna(selectedDate: string) {
+    this.orariRiconsegna = this.logicSrv.generaOrariDisponibili(9, 18, selectedDate);
+    const oraAttuale = this.bookingForm.get('oraRiconsegna')?.value;
+    if (oraAttuale && !this.orariRiconsegna.includes(oraAttuale)) {
+      this.bookingForm.patchValue({ oraRiconsegna: '' });
     }
   }
 
