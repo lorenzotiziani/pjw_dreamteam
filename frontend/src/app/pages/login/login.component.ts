@@ -17,6 +17,7 @@ export class LoginComponent {
   protected destroyed$ = new Subject<void>();
   loginForm: FormGroup;
   loginError: string = '';
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -48,7 +49,7 @@ export class LoginComponent {
   }
 
   login() {
-    if (this.loginForm.invalid) {
+    if (this.loginForm.invalid || this.loading) {
       // Mostra gli errori di validazione inline sotto i campi (nessun toast,
       // nessuna chiamata: gli errori del form si gestiscono qui).
       this.loginForm.markAllAsTouched();
@@ -57,12 +58,15 @@ export class LoginComponent {
 
     const { username, password } = this.loginForm.value;
 
+    this.loading = true;
     this.loginService.login(username, password).subscribe({
       next: () => {
+        this.loading = false;
         this.toastSrv.success('Accesso effettuato. Bentornato!');
         this.router.navigate([this.requestedUrl ? this.requestedUrl : '/']);
       },
       error: (err: Error) => {
+        this.loading = false;
         // Errore del backend (es. credenziali errate) → solo toast
         this.toastSrv.error(err.message || 'Credenziali errate.');
       }

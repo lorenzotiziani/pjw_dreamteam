@@ -18,6 +18,7 @@ export class RegisterComponent implements OnInit {
 	registerForm: FormGroup;
 	registerError: string = '';
 	requestedUrl: string | null = null;
+	loading = false;
 
 	constructor(
 		private fb: FormBuilder,
@@ -40,10 +41,12 @@ export class RegisterComponent implements OnInit {
 	}
 
 	register() {
-		if (this.registerForm.invalid) return;
+		if (this.registerForm.invalid || this.loading) return;
 		const {email, password, confirm, nome, cognome} = this.registerForm.value
+		this.loading = true;
 		this.registerService.register(email, password, confirm, nome, cognome).subscribe({
 			next: (res: any) => {
+				this.loading = false;
 				if (!res.success) {
 					this.registerError = res.error || 'Errore sconosciuto';
 					this.toastSrv.error(this.registerError);
@@ -57,6 +60,7 @@ export class RegisterComponent implements OnInit {
 				});
 			},
 			error: (err: any) => {
+				this.loading = false;
 				// Il service restituisce già un Error con messaggio pulito
 				this.registerError = err?.message || 'Errore durante la registrazione';
 				this.toastSrv.error(this.registerError);

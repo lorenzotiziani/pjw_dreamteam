@@ -90,8 +90,12 @@
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="btn dr-btn-green w-100 py-2 fw-semibold" [disabled]="registerForm.invalid">
-              <i class="bi bi-person-plus me-2"></i>Crea account
+            <button type="submit" class="btn dr-btn-green w-100 py-2 fw-semibold" [disabled]="registerForm.invalid || loading">
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creazione account…
+              } @else {
+                <i class="bi bi-person-plus me-2"></i>Crea account
+              }
             </button>
 
           </form>

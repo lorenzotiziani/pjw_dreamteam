@@ -55,8 +55,12 @@
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="btn dr-btn-green w-100 py-2 mt-1 fw-semibold" [disabled]="loginForm.invalid">
-              <i class="bi bi-box-arrow-in-right me-2"></i>Accedi
+            <button type="submit" class="btn dr-btn-green w-100 py-2 mt-1 fw-semibold" [disabled]="loginForm.invalid || loading">
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Accesso in corso…
+              } @else {
+                <i class="bi bi-box-arrow-in-right me-2"></i>Accedi
+              }
             </button>
 
           </form>
