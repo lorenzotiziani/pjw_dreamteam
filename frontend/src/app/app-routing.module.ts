@@ -8,6 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BookingFormComponent } from './pages/booking-form/booking-form.component';
 import { BookingListComponent } from './pages/booking-list/booking-list.component';
 import { authGuard } from './utils/auth.guard';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
   {
     path: 'register',
     component:RegisterComponent,
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmailComponent,
   },
   {
     path:'homepage',

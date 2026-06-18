@@ -24,6 +24,7 @@ import { BookingListComponent } from './pages/booking-list/booking-list.componen
 import { EditBookingComponent } from './components/modals/edit-booking/edit-booking.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal.component';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { ConfirmModalComponent } from './components/confirm-modal/confirm-modal.
     EditBookingComponent,
     ToastComponent,
     ConfirmModalComponent,
+    VerifyEmailComponent,
   ],
   imports: [
     BrowserModule,

@@ -187,6 +187,24 @@ export class AuthService {
       );
   }
 
+  /**
+   * Verifica l'email tramite il token ricevuto via email.
+   * Chiama l'endpoint pubblico del backend (GET /api/auth/verify-email?token=...)
+   * e normalizza il messaggio di errore restituito dal server.
+   */
+  verifyEmail(token: string) {
+    return this.http.get<{ success: boolean; message: string }>(
+      '/api/auth/verify-email',
+      { params: { token } }
+    ).pipe(
+      catchError(err => {
+        const msg = (err?.error?.message as string | undefined)
+          ?? 'Impossibile verificare l\'email. Il link potrebbe essere scaduto o non valido.';
+        return throwError(() => new Error(msg));
+      })
+    );
+  }
+
   logout() {
     this.jwtSrv.removeToken();
     this.clearUserCache();
