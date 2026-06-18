@@ -5,11 +5,15 @@ import {
   PrenotazioneByFiltersDTO,
 } from "./prenotazioni.dto";
 import { prisma } from "../../config/prisma";
-import { startOfDay, addDays } from "date-fns";
+import { startOfDay, addDays, format } from "date-fns";
+import { it } from "date-fns/locale";
 import { TipiBiciService } from "../tipi-bici/tipiBici.service";
 import { CopertureService } from "../coperture/coperture.service";
 import { AccessoriService } from "../accessori/accessori.service";
-import { BadRequestError } from "../../errors";
+import { BadRequestError, NotFoundError } from "../../errors";
+import { mailjet } from "../../config/mailSender";
+import { UserService } from "../user/user.service";
+
 
 function buildOraRitiro(dataRitiro: Date, oraRitiro: string): Date {
   const [hours, minutes, seconds] = oraRitiro.split(":").map(Number);
@@ -117,6 +121,130 @@ async function calcolaRiga(riga: any, mezzeGiornate: number) {
   };
 }
 
+const categoriaLabel: Record<string, string> = {
+  CITY_BIKE: 'City Bike',
+  MOUNTAIN_BIKE: 'Mountain Bike',
+  GRAVEL: 'Gravel',
+  ROAD_BIKE: 'Road Bike',
+};
+
+function buildConfirmationEmail(user: any, p: any): string {
+  const righeHtml = p.righe.map((riga: any) => {
+    const motLabel = riga.tipoBici.motorizzazione === 'ELETTRICA' ? ' (Elettrica)' : '';
+    const biciLabel = `${categoriaLabel[riga.tipoBici.categoria] ?? riga.tipoBici.categoria}${motLabel} — Taglia ${riga.tipoBici.taglia}`;
+    const copertura = riga.copertura
+      ? `<br><span style="font-size:13px;color:#666;">Assicurazione: ${riga.copertura.nome}</span>`
+      : '';
+    const accessori = riga.accessori.length > 0
+      ? `<br><span style="font-size:13px;color:#666;">Accessori: ${riga.accessori.map((a: any) => `${a.accessorio.nome} ×${a.quantita}`).join(', ')}</span>`
+      : '';
+    return `
+      <tr>
+        <td style="padding:12px 16px;border-bottom:1px solid #eee;">${biciLabel}${copertura}${accessori}</td>
+        <td style="padding:12px 16px;border-bottom:1px solid #eee;text-align:right;white-space:nowrap;font-weight:600;">€${Number(riga.subtotale).toFixed(2)}</td>
+      </tr>`;
+  }).join('');
+
+  const dataRitiro = format(new Date(p.dataRitiro), 'dd/MM/yyyy', { locale: it });
+  const oraRitiro = format(new Date(p.oraRitiro), 'HH:mm', { locale: it });
+  const dataRiconsegna = format(new Date(p.dataOraRiconsegna), 'dd/MM/yyyy', { locale: it });
+  const oraRiconsegna = format(new Date(p.dataOraRiconsegna), 'HH:mm', { locale: it });
+
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,sans-serif;color:#333;">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 0;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+      <tr>
+        <td style="background:#1a1a2e;padding:28px 40px;text-align:center;">
+          <p style="margin:0;font-size:26px;font-weight:bold;color:#fff;letter-spacing:1px;">PJW DreamTeam</p>
+          <p style="margin:6px 0 0;color:#8892b0;font-size:13px;">Noleggio Bici</p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:36px 40px;">
+          <h2 style="margin:0 0 6px;font-size:22px;">Prenotazione confermata!</h2>
+          <p style="margin:0 0 24px;color:#666;">Ciao <strong>${user.nome}</strong>, la tua prenotazione è stata confermata con successo.</p>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+            <tr>
+              <td style="background:#eef1ff;border-left:4px solid #4361ee;padding:14px 18px;border-radius:4px;">
+                <span style="font-size:12px;color:#666;text-transform:uppercase;letter-spacing:0.5px;">Numero prenotazione</span><br>
+                <strong style="font-size:20px;color:#4361ee;">#${p.id}</strong>
+              </td>
+            </tr>
+          </table>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eee;border-radius:8px;margin-bottom:24px;">
+            <tr>
+              <td style="padding:16px;border-bottom:1px solid #eee;width:50%;vertical-align:top;">
+                <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Ritiro</div>
+                <div style="font-weight:bold;font-size:15px;">${dataRitiro}</div>
+                <div style="color:#555;">alle ${oraRitiro}</div>
+              </td>
+              <td style="padding:16px;border-bottom:1px solid #eee;vertical-align:top;">
+                <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Riconsegna</div>
+                <div style="font-weight:bold;font-size:15px;">${dataRiconsegna}</div>
+                <div style="color:#555;">alle ${oraRiconsegna}</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding:16px;">
+                <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Punto di ritiro</div>
+                <div style="font-weight:bold;font-size:15px;">${p.puntoVendita.nome}</div>
+                <div style="color:#555;">${p.puntoVendita.indirizzo}, ${p.puntoVendita.citta}</div>
+              </td>
+            </tr>
+          </table>
+
+          <p style="margin:0 0 10px;font-size:12px;color:#999;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Dettaglio noleggio</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eee;border-radius:8px;margin-bottom:20px;">
+            <thead>
+              <tr style="background:#f9f9f9;">
+                <th style="padding:10px 16px;text-align:left;font-size:12px;color:#888;font-weight:600;">Bici</th>
+                <th style="padding:10px 16px;text-align:right;font-size:12px;color:#888;font-weight:600;">Subtotale</th>
+              </tr>
+            </thead>
+            <tbody>${righeHtml}</tbody>
+          </table>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+            <tr>
+              <td style="background:#1a1a2e;padding:16px 20px;border-radius:8px;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="color:#a0aec0;font-size:14px;">Totale da pagare</td>
+                    <td style="text-align:right;color:#fff;font-size:22px;font-weight:bold;">€${Number(p.totale).toFixed(2)}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <p style="margin:0;color:#999;font-size:13px;line-height:1.7;">
+            Presentati al punto di ritiro con un documento d'identità valido.<br>
+            Per qualsiasi informazione rispondi a questa email.
+          </p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background:#f9f9f9;padding:18px 40px;text-align:center;border-top:1px solid #eee;">
+          <p style="margin:0;font-size:12px;color:#bbb;">© ${new Date().getFullYear()} PJW DreamTeam · Noleggio Bici</p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+}
+
 export class PrenotazioniService {
   static async getAll(filters: PrenotazioneByFiltersDTO) {
     const where: any = {};
@@ -211,6 +339,8 @@ export class PrenotazioniService {
     const dataOraRitiro = buildOraRitiro(body.dataRitiro, body.oraRitiro);
     const giorniNoleggio = calcolaMezzeGiornate(dataOraRitiro, body.dataOraRiconsegna);
 
+    let newPrenotazioneId = 0;
+
     await prisma.$transaction(async (tx) => {
       for (const riga of body.righe) {
         await prenotaBici(tx, body.puntoVenditaId, riga.tipoBiciId);
@@ -252,6 +382,8 @@ export class PrenotazioniService {
         include: { righe: { orderBy: { id: "asc" } } },
       });
 
+      newPrenotazioneId = prenotazioneCreata.id;
+
       // Step 2: ora che ogni riga ha il suo ID reale, creiamo gli accessori
       // uno step separato per ogni riga.
       for (let i = 0; i < righeCalcolate.length; i++) {
@@ -266,6 +398,27 @@ export class PrenotazioniService {
           });
         }
       }
+    });
+
+    const [user, prenotazione] = await Promise.all([
+      UserService.getUserById(utenteId),
+      PrenotazioniService.getById(newPrenotazioneId),
+    ]);
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    await mailjet.post('send', { version: 'v3.1' }).request({
+      Messages: [
+        {
+          From: { Email: 'lorenzo.tiziani97@gmail.com', Name: 'PJW DreamTeam' },
+          To: [{ Email: user.email, Name: user.nome }],
+          Subject: `Prenotazione #${newPrenotazioneId} confermata — PJW DreamTeam`,
+          TextPart: `Ciao ${user.nome}, la tua prenotazione #${newPrenotazioneId} è stata confermata. Totale: €${Number(prenotazione.totale).toFixed(2)}`,
+          HTMLPart: buildConfirmationEmail(user, prenotazione),
+        },
+      ],
     });
   }
 
